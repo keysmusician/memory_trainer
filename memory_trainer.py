@@ -3,7 +3,7 @@ import csv
 import random
 import time
 
-
+# Decide if you want to use the term "item" or "question".
 class RecallTrainer():
 
     def __init__(self, answer_key, shuffle=True):
@@ -27,6 +27,7 @@ class RecallTrainer():
         }
         self.stats = {item: dict(stats) for item in questions} # dict(stats) instantiates a new dict per item so items don't share their stats
         self.__current_item = None
+        self.hints:dict = dict() # Not implemented
 
         # Probability of an unasked question being selected: <- variable description
         # self.P_CHOOSE_UNASKED = .5 # <- variable with a shortened name; Variables should have a full name which collapses to a short version automatically by the IDE
@@ -62,6 +63,20 @@ class RecallTrainer():
             if item in self.focus_questions
         }
 
+    @property
+    def hint(self):
+        """
+        Returns a hint at what the answer is.
+        """
+        hint = self.hints.get(self.current_item)
+        if hint is not None:
+            return hint
+        else:
+            try:
+                return self.answer[0]
+            except IndexError:
+                return ''
+
     def __normalized_inverse_weights(self, weights):
         # Calculate the relative weights of each item
         max_weight = max(weights.values())
@@ -87,43 +102,6 @@ class RecallTrainer():
         weights = [element[1] for element in weights_list]
 
         return items, weights
-
-    def _next_item(self):
-        """
-        Chooses the (hopefully) optimal item for helping you memorize the
-        entire sequence.
-
-        Traits:
-            Idempotent: false
-            Side-effects: self-mutating
-
-        Returns: A prompt item.
-        """
-        focus_is_ready_to_grow = all(
-            stats['streak'] >= 2 for stats in self.focus_stats.values())
-        if focus_is_ready_to_grow and len(self.unasked_questions) > 0:
-            del focus_is_ready_to_grow
-            next_item = self.unasked_questions.pop()
-            self.focus_questions.append(next_item)
-        else:
-        # Draw a new item, and replace the previous item (if there was one):
-            current_item = self.__current_item
-            if current_item is not None:
-                self.focus_questions.remove(current_item)
-
-            items, weights = self.__normalized_inverse_weights(
-                {item: score['weight'] for item, score in
-                self.focus_stats.items()}
-            )
-
-            next_item = random.choices(items, weights)[0]
-            if current_item is not None:
-                self.focus_questions.append(current_item)
-
-        self.__current_item = next_item
-        self.stats[next_item]['count'] += 1
-
-        return next_item
 
     def add_answers(self, key_or_dict, value=None):
         """
@@ -169,9 +147,11 @@ class RecallTrainer():
         """
         print('RecallTrainer.next_item: # unasked questions:', len(self.unasked_questions))
         focus_questions_count = len(self.focus_questions)
+        print('RecallTrainer.next_item: # focus questions:', focus_questions_count)
 
         # Probability of choosing a focus question (at least 50%):
-        P_focus = focus_questions_count / (focus_questions_count + 1)
+        P_focus = focus_questions_count / (focus_questions_count + .5)
+        print('RecallTrainer.next_item: Probability of choosing a focus question:', P_focus)
 
         if random.random() < P_focus or (
             len(self.unasked_questions) == 0 and
@@ -182,6 +162,7 @@ class RecallTrainer():
             self.focus_questions.remove(next_item) # There's probably a more efficient way to do this
 
             self.__return_collection.append(self.__current_item)
+            print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
 
             self.__return_collection = self.focus_questions
         elif len(self.unasked_questions) > 0:
@@ -189,6 +170,7 @@ class RecallTrainer():
 
             if self.__current_item:
                 self.__return_collection.append(self.__current_item)
+                print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
 
             self.__return_collection = self.unasked_questions
         else:
@@ -198,6 +180,8 @@ class RecallTrainer():
             self.comfortable_questions.remove(next_item) # There's probably a more efficient way to do this
             # Return current item to a collection
             self.__return_collection.append(self.__current_item)
+            print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
+
             # Where to return an item to if it's skipped
             self.__return_collection = self.comfortable_questions
 
@@ -253,6 +237,7 @@ class RecallTrainer():
 
         return is_correct
 
+
 # Show me a random item from a list of things I want to memorize.
 # The list of things I want to memorize:
 
@@ -280,37 +265,36 @@ all_items = us_state_capitals
 all_items = {key: us_state_capitals[key] for key in random.sample(list(all_items.keys()), 5)}
 
 # Don't show the same item twice in a row.
-recall_trainer = RecallTrainer(all_items)
+recall_trainer = RecallTrainer({character: '' for character in hiragana})
 
 
 while not recall_trainer.complete:
     print(recall_trainer.current_item)
 # I'll tell you what I think the answer is. <- english explanation
-
-    fail_streak = 0 # <- loop variable
     # Time the response <- block/multiline code summary
     start_time = time.time_ns()
-    while True:
-        user_input = input() # should probably be sanitized <- to-do
 
-        if recall_trainer.check_answer(user_input):
-            print("correct")
-            recall_trainer.register(user_input)
-            break
+    user_input = input() # should probably be sanitized <- to-do
 
-        # implicit else: <- explicit notice/reminder of an implicit detail
-        fail_streak += 1
-# If I'm wrong, tell me to try again.
-        if fail_streak == 1:
-            print('Try again')
-# If I'm wrong a second time, give me a hint.
-        elif fail_streak == 2:
-            print(f"Hint: {recall_trainer.answer[0]}")
-# If I'm wrong a third time, tell me what it is.
-        elif fail_streak >= 3:
-            print(f"Answer:{recall_trainer.answer}")
-            recall_trainer.register(user_input)
-            break
+            # implicit else: <- explicit notice/reminder of an implicit detail
+    if recall_trainer.register(user_input):
+        print("correct")
+    else:
+        fail_streak = 0 # <- loop variable
+        while True:
+            fail_streak += 1
+    # If I'm wrong, tell me to try again.
+            if fail_streak == 1:
+                print('Try again')
+    # If I'm wrong a second time, give me a hint.
+            elif fail_streak == 2:
+                print(f"Hint: {recall_trainer.hint}")
+    # If I'm wrong a third time, tell me what it is.
+            elif fail_streak >= 3:
+                print(f"Answer:{recall_trainer.answer}")
+                break
+            if recall_trainer.check_answer(input()):
+                break
 
     end_time = time.time_ns()
     answer_duration = end_time - start_time
