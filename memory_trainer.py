@@ -1,7 +1,12 @@
-from collections import UserList
-import csv
 import random
 import time
+from quizzes import european_capitals, us_state_capitals, hiragana
+
+DEBUG = False
+
+def debug_print(*args, **kwargs):
+    if DEBUG:
+        return print(*args, **kwargs)
 
 # Decide if you want to use the term "item" or "question".
 class RecallTrainer():
@@ -93,7 +98,7 @@ class RecallTrainer():
             inverse_weights.items()
         }
 
-        print('__normalized_inverse_weights : ', {k: v for k, v in weights.items()}) # <- Debugging line
+        debug_print('__normalized_inverse_weights : ', {k: v for k, v in weights.items()}) # <- Debugging line
 
         weights_list = list(weights.items())
 
@@ -145,13 +150,13 @@ class RecallTrainer():
 
         Returns: A prompt item.
         """
-        print('RecallTrainer.next_item: # unasked questions:', len(self.unasked_questions))
+        debug_print('RecallTrainer.next_item: # unasked questions:', len(self.unasked_questions))
         focus_questions_count = len(self.focus_questions)
-        print('RecallTrainer.next_item: # focus questions:', focus_questions_count)
+        debug_print('RecallTrainer.next_item: # focus questions:', focus_questions_count)
 
         # Probability of choosing a focus question (at least 50%):
         P_focus = focus_questions_count / (focus_questions_count + .5)
-        print('RecallTrainer.next_item: Probability of choosing a focus question:', P_focus)
+        debug_print('RecallTrainer.next_item: Probability of choosing a focus question:', P_focus)
 
         if random.random() < P_focus or (
             len(self.unasked_questions) == 0 and
@@ -162,7 +167,7 @@ class RecallTrainer():
             self.focus_questions.remove(next_item) # There's probably a more efficient way to do this
 
             self.__return_collection.append(self.__current_item)
-            print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
+            debug_print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
 
             self.__return_collection = self.focus_questions
         elif len(self.unasked_questions) > 0:
@@ -170,7 +175,7 @@ class RecallTrainer():
 
             if self.__current_item:
                 self.__return_collection.append(self.__current_item)
-                print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
+                debug_print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
 
             self.__return_collection = self.unasked_questions
         else:
@@ -180,7 +185,7 @@ class RecallTrainer():
             self.comfortable_questions.remove(next_item) # There's probably a more efficient way to do this
             # Return current item to a collection
             self.__return_collection.append(self.__current_item)
-            print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
+            debug_print(f'RecallTrainer.next_item: Returned {self.__current_item} to {self.__return_collection}.')
 
             # Where to return an item to if it's skipped
             self.__return_collection = self.comfortable_questions
@@ -240,32 +245,13 @@ class RecallTrainer():
 
 # Show me a random item from a list of things I want to memorize.
 # The list of things I want to memorize:
+quiz = hiragana
 
-with open('us_state_capitals.csv') as file:
-    reader = csv.reader(file)
-    next(reader)
-    us_state_capitals = {row[0].strip(): row[1].strip() for row in reader}
-
-
-hiragana = [
-    'あ',
-    'い',
-    'う',
-    'え',
-    'お',
-    'か',
-    'き',
-    'く',
-    'け',
-    'こ'
-]
-
-all_items = us_state_capitals
-
-all_items = {key: us_state_capitals[key] for key in random.sample(list(all_items.keys()), 5)}
+# Selects a subset of 5 random questions:
+quiz = {key: quiz[key] for key in random.sample(list(quiz.keys()), 5)}
 
 # Don't show the same item twice in a row.
-recall_trainer = RecallTrainer({character: '' for character in hiragana})
+recall_trainer = RecallTrainer(quiz)
 
 
 while not recall_trainer.complete:
@@ -306,7 +292,7 @@ while not recall_trainer.complete:
         if score['count'] > 0:
             accuracy = score['correct'] / score['count'] \
                 if score['count'] > 0 else 0
-            print('{}: {:3}%: {}'.format(key, float(accuracy) * 100, score))
+            print('{}: {:.1f}%: {}'.format(key, accuracy * 100, score))
 
     recall_trainer.next_item()
 # If I'm right, show me a different item at random.
