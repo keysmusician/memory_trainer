@@ -9,7 +9,7 @@ def debug_print(*args, **kwargs):
         return print(*args, **kwargs)
 
 # Decide if you want to use the term "item" or "question".
-class RecallTrainer():
+class MemoryTrainer():
 
     def __init__(self, answer_key, shuffle=True):
         if not type(answer_key) is dict:
@@ -248,14 +248,14 @@ class RecallTrainer():
 quiz = hiragana
 
 # Selects a subset of 5 random questions:
-quiz = {key: quiz[key] for key in random.sample(list(quiz.keys()), 5)}
+# quiz = {key: quiz[key] for key in random.sample(list(quiz.keys()), 5)}
 
 # Don't show the same item twice in a row.
-recall_trainer = RecallTrainer(quiz)
+memory_trainer = MemoryTrainer(quiz)
 
 
-while not recall_trainer.complete:
-    print(recall_trainer.current_item)
+while not memory_trainer.complete:
+    print(memory_trainer.current_item)
 # I'll tell you what I think the answer is. <- english explanation
     # Time the response <- block/multiline code summary
     start_time = time.time_ns()
@@ -263,7 +263,7 @@ while not recall_trainer.complete:
     user_input = input() # should probably be sanitized <- to-do
 
             # implicit else: <- explicit notice/reminder of an implicit detail
-    if recall_trainer.register(user_input):
+    if memory_trainer.register(user_input):
         print("correct")
     else:
         fail_streak = 0 # <- loop variable
@@ -274,12 +274,12 @@ while not recall_trainer.complete:
                 print('Try again')
     # If I'm wrong a second time, give me a hint.
             elif fail_streak == 2:
-                print(f"Hint: {recall_trainer.hint}")
+                print(f"Hint: {memory_trainer.hint}")
     # If I'm wrong a third time, tell me what it is.
             elif fail_streak >= 3:
-                print(f"Answer:{recall_trainer.answer}")
+                print(f"Answer:{memory_trainer.answer}")
                 break
-            if recall_trainer.check_answer(input()):
+            if memory_trainer.check_answer(input()):
                 break
 
     end_time = time.time_ns()
@@ -288,13 +288,13 @@ while not recall_trainer.complete:
     # print stats
     print('{:.3g}s'.format(answer_duration / 1e9))
 
-    for key, score in sorted(recall_trainer.stats.items(), reverse=True):
+    for key, score in sorted(memory_trainer.stats.items(), reverse=True):
         if score['count'] > 0:
             accuracy = score['correct'] / score['count'] \
                 if score['count'] > 0 else 0
             print('{}: {:.1f}%: {}'.format(key, accuracy * 100, score))
 
-    recall_trainer.next_item()
+    memory_trainer.next_item()
 # If I'm right, show me a different item at random.
 # Remember the ones I get wrong, and choose those more frequently.
 # If I get something right the first time, assume that I don't need to practice it.
