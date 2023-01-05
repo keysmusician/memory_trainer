@@ -177,7 +177,7 @@ function get_user_input() {
 
     const listener = () => {
       submit_button.removeEventListener('click', listener);
-      resolve(user_input.value);
+      resolve(user_input.value.trim());
       user_input.value = '';
     }
     submit_button.addEventListener('click', listener);
