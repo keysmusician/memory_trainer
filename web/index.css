@@ -1,0 +1,22 @@
+html {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    background-color: rgb(115, 114, 134);
+}
+
+h1, h2, input, form, p{
+    text-align: center;
+    display: block;
+    margin: auto;
+}
+
+input {
+    width: 25%;
+}
+
+#memory_trainer {
+    padding: 50px;
+}
+
+#item_display {
+    padding: 60px;
+}
