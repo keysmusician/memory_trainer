@@ -1,4 +1,10 @@
-import { state_capitals } from "./data.js";
+import { music_notation } from "./data.js";
+
+declare global {
+  interface Window {
+      Vex: any;
+  }
+}
 
 
 // Disable form submission
@@ -8,39 +14,51 @@ window.onload = function() {
   }
 }
 
+const question_display_base: HTMLElement =
+  document.getElementById('item_display')!;
+
 /**
  * Shuffles an array in place.
  */
-function shuffleArray(array) {
+function shuffleArray(array: any[]): void {
   for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [array[i], array[j]] = [array[j], array[i]];
   }
 }
 
+type QuestionStats = {
+  count: number,
+  correct: number,
+  streak: number,
+  weight: number,
+}
+
+/**
+ * The main training class. Determines which questions to ask and when by
+ * keeping track of correct and incorrect answer.
+ *
+ * This class doesn't actually know what the questions or answers are, it
+ * works with question *indexes*, so wherever you see "question" used in this
+ * class, think "question index."
+ */
 class Trainer {
 
-  #current_item;
+  #current_question: number;
 
-  #return_collection;
+  #return_collection: number[];
 
+  // The number of times each question needs be correctly answered in a row in
+  // order to complete training
   #winning_streak = 3;
 
   unasked_questions: number[];
 
-  focus_questions: never[];
+  focus_questions: number[];
 
-  comfortable_questions: never[];
+  comfortable_questions: number[];
 
-  stats: Map<
-    number,
-    {
-      count: number,
-      correct: number,
-      streak: number,
-      weight: number,
-    }
-  >;
+  stats: Map<number, QuestionStats>;
 
   constructor(question_count: number) {
     const questions = [...Array(question_count).keys()];
@@ -63,10 +81,10 @@ class Trainer {
     this.stats = new Map(
       questions.map(question => [question, Object.create(stats)]));
 
-    this.#current_item = null;
+    this.#current_question = null;
   };
 
-  get complete() {
+  get is_complete(): boolean {
     for (const item of this.stats.values()) {
       if (item['streak'] < this.#winning_streak) { return false; }
     }
@@ -74,17 +92,18 @@ class Trainer {
     return true;
   }
 
-  get current_item() {
-    if (this.#current_item === null) { this.next_item(); }
-    return this.#current_item
+  get current_question(): number {
+    if (this.#current_question === null) { this.get_next_question(); }
+    return this.#current_question
   }
 
-  get focus_stats() {
-    return new Map(
-      this.focus_questions.map(item => [item, this.stats.get(item)]));
+  get focus_stats(): Map<number, QuestionStats> {
+    return new Map(this.focus_questions.map(
+      question => [question, this.stats.get(question)])
+    );
   }
 
-  next_item() {
+  get_next_question(): number {
     const focus_questions_count = this.focus_questions.length;
 
     // Probability of choosing a focus question (at least 50%):
@@ -93,7 +112,7 @@ class Trainer {
     const random_index = Math.floor(
       Math.random() * this.focus_questions.length);
 
-    let next_item: number;
+    let next_question: number;
 
     if (Math.random() < P_focus || (
         this.unasked_questions.length === 0 &&
@@ -101,40 +120,40 @@ class Trainer {
         )
       ) { // If a focus question is randomly chosen or is the only option
 
-        next_item = this.focus_questions.splice(random_index, 1)[0];
+        next_question = this.focus_questions.splice(random_index, 1)[0];
 
-        this.#return_collection.push(this.#current_item);
+        this.#return_collection.push(this.#current_question);
 
         this.#return_collection = this.focus_questions;
     }
     else if (this.unasked_questions.length > 0) {
-        next_item = this.unasked_questions.pop();
+        next_question = this.unasked_questions.pop();
 
-        if (this.#current_item) {
-          this.#return_collection.push(this.#current_item);
+        if (this.#current_question) {
+          this.#return_collection.push(this.#current_question);
         }
 
         this.#return_collection = this.unasked_questions;
     }
     else {
-        next_item = this.focus_questions.splice(random_index, 1)[0];
+        next_question = this.focus_questions.splice(random_index, 1)[0];
 
         // Return current item to a collection
-        this.#return_collection.push(this.#current_item);
+        this.#return_collection.push(this.#current_question);
 
         // Where to return an item to if it's skipped
         this.#return_collection = this.comfortable_questions;
     }
 
-    this.stats.get(next_item)['count'] += 1;
+    this.stats.get(next_question)['count'] += 1;
 
-    this.#current_item = next_item;
+    this.#current_question = next_question;
 
-    return next_item;
+    return next_question;
   }
 
-  register(is_correct) {
-    const current_item_stats = this.stats.get(this.current_item);
+  register(is_correct: boolean): boolean {
+    const current_item_stats = this.stats.get(this.current_question);
 
     this.#return_collection = this.focus_questions;
 
@@ -158,10 +177,13 @@ class Trainer {
   }
 };
 
+/**
+ * Input interpreter.
+ */
 function get_user_input() {
   return new Promise((resolve) => {
     const submit_button = document.getElementById('submit')!;
-    const user_input: HTMLInputElement = document.getElementById('user_input')!;
+    const user_input = <HTMLInputElement>document.getElementById('user_input')!;
 
     const listener = () => {
       submit_button.removeEventListener('click', listener);
@@ -172,25 +194,38 @@ function get_user_input() {
   });
 }
 
-function display_item(item) {
-  document.getElementById('item_display')!.innerText = item;
-}
 
 /**
- * Class which manages memory training.
+ * Output renderer. Controls how questions are visually presented.
+ */
+class BaseRenderer {
+  rendering_area: HTMLElement;
+
+  constructor(rendering_area: HTMLElement) {
+    this.rendering_area = rendering_area;
+  }
+
+  render(question: any): void {
+    this.rendering_area.innerText =
+      `No renderer implemented for this data: ${question}`
+  }
+};
+
+/**
+ * Class which manages associative memory training.
  *
  * Wrapper around a Trainer.
  */
 class MemoryTrainer {
-  // answer_key: Map;
-
   trainer: Trainer;
 
-  questions: Array<any>;
+  renderer: BaseRenderer;
 
-  answers: Array<any>;
+  questions: any[];
 
-  constructor(answer_key: Map<string, string>) {
+  answers: any[];
+
+  constructor(answer_key: Map<any, any>, renderer: BaseRenderer) {
     const questions = [...answer_key.keys()];
 
     const answers = [...answer_key.values()];
@@ -200,42 +235,52 @@ class MemoryTrainer {
     this.answers = answers;
 
     this.trainer = new Trainer(questions.length);
+
+    this.renderer = renderer;
   }
 
-  get answer() {
-    return this.answers[this.trainer.current_item];
+  get answer(): any {
+    return this.answers[this.trainer.current_question];
   }
 
-  get hint() {
+  get hint(): any {
     return this.answer[0];
   }
 
-  get current_item() {
-    return this.questions[this.trainer.current_item]
+  get question(): any {
+    return this.questions[this.trainer.current_question]
   }
 
-  check_answer(user_answer) {
+  /**
+   * Input evaluator.
+   *
+   * Determines whether an answer was correct or incorrect.
+   *
+   * Note: This could later be extended to give a degree of correctness in the
+   * range 0–1.
+   */
+  evaluate(user_answer: any): boolean {
     const correct_answer = String(
-        this.answers[this.trainer.current_item]
+        this.answers[this.trainer.current_question]
       )
       .toLowerCase();
 
       return String(user_answer).toLowerCase() === correct_answer;
   }
 
-  respond(user_answer) {
-    const is_correct = this.check_answer(user_answer)
+  respond(user_answer: any): boolean {
+    const is_correct = this.evaluate(user_answer)
 
     this.trainer.register(is_correct);
 
     return is_correct;
   }
 
-  async train() {
+  async train(): Promise<void> {
     const verdict_element = document.getElementById('verdict')!;
 
-    while (!this.trainer.complete) {
-      display_item(this.current_item)
+    while (!this.trainer.is_complete) {
+      this.renderer.render(this.question)
 
       let user_input = await get_user_input();
 
@@ -260,7 +305,7 @@ class MemoryTrainer {
             break;
           }
 
-          if (this.check_answer(await get_user_input())) {
+          if (this.evaluate(await get_user_input())) {
             verdict_element.innerText = 'correct';
             break;
           }
@@ -279,12 +324,80 @@ class MemoryTrainer {
         }
       }
 
-      this.trainer.next_item();
+      this.trainer.get_next_question();
     }
 
   }
 }
 
-const memory_trainer = new MemoryTrainer(state_capitals);
+class TextRenderer extends BaseRenderer {
+  render(question: string) {
+    this.rendering_area.innerHTML = `
+    <h2>${question}</h2>
+    `
+  }
+}
+
+class MusicNotationRenderer extends BaseRenderer {
+  render_context;
+
+  constructor (rendering_area: HTMLElement) {
+    super(rendering_area);
+
+    const Renderer = window.Vex.Flow.Renderer;
+
+    const renderer = new Renderer(this.rendering_area, Renderer.Backends.SVG);
+
+    // Configure the rendering context.
+    renderer.resize(300, 200);
+
+    this.render_context = renderer.getContext();
+  }
+
+  render([clef, pitch, accidental]: [string, string]) {
+    // Clear existing notes from the staff.
+    const notation = document.querySelectorAll(
+      '.vf-stavenote, .vf-stave');
+
+    for (const element of notation) {
+      element.remove();
+    }
+
+    const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
+
+    const stave = new Stave(...Object.values({
+      left: 10,
+      top: 30,
+      width: 280
+    }));
+
+    stave.addClef(clef);
+
+    stave.setContext(this.render_context).draw();
+
+    const note = new StaveNote({ clef: clef, keys: [pitch], duration: "w" });
+
+    if (accidental !== '')
+      note.addModifier(new Accidental(accidental));
+
+    const voices = [
+      new Voice({
+          num_beats: 4,
+          beat_value: 4,
+      }).addTickables([note]),
+    ];
+
+    new Formatter().joinVoices(voices).format(voices, 200);
+
+    for (const voice of voices) {
+      voice.draw(this.render_context, stave);
+    }
+  }
+}
+
+const memory_trainer = new MemoryTrainer(
+  music_notation,
+  new MusicNotationRenderer(question_display_base)
+);
 
 memory_trainer.train();

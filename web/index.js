@@ -18,14 +18,15 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Trainer_current_item, _Trainer_return_collection, _Trainer_winning_streak;
-import { state_capitals } from "./data.js";
+var _Trainer_current_question, _Trainer_return_collection, _Trainer_winning_streak;
+import { music_notation } from "./data.js";
 // Disable form submission
 window.onload = function () {
     document.getElementById("answer_form").onsubmit = function (submit_event) {
         submit_event.preventDefault();
     };
 };
+const question_display_base = document.getElementById('item_display');
 /**
  * Shuffles an array in place.
  */
@@ -35,10 +36,20 @@ function shuffleArray(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
+/**
+ * The main training class. Determines which questions to ask and when by
+ * keeping track of correct and incorrect answer.
+ *
+ * This class doesn't actually know what the questions or answers are, it
+ * works with question *indexes*, so wherever you see "question" used in this
+ * class, think "question index."
+ */
 class Trainer {
     constructor(question_count) {
-        _Trainer_current_item.set(this, void 0);
+        _Trainer_current_question.set(this, void 0);
         _Trainer_return_collection.set(this, void 0);
+        // The number of times each question needs be correctly answered in a row in
+        // order to complete training
         _Trainer_winning_streak.set(this, 3);
         const questions = [...Array(question_count).keys()];
         shuffleArray(questions);
@@ -52,10 +63,10 @@ class Trainer {
             weight: 1,
         };
         this.stats = new Map(questions.map(question => [question, Object.create(stats)]));
-        __classPrivateFieldSet(this, _Trainer_current_item, null, "f");
+        __classPrivateFieldSet(this, _Trainer_current_question, null, "f");
     }
     ;
-    get complete() {
+    get is_complete() {
         for (const item of this.stats.values()) {
             if (item['streak'] < __classPrivateFieldGet(this, _Trainer_winning_streak, "f")) {
                 return false;
@@ -63,47 +74,47 @@ class Trainer {
         }
         return true;
     }
-    get current_item() {
-        if (__classPrivateFieldGet(this, _Trainer_current_item, "f") === null) {
-            this.next_item();
+    get current_question() {
+        if (__classPrivateFieldGet(this, _Trainer_current_question, "f") === null) {
+            this.get_next_question();
         }
-        return __classPrivateFieldGet(this, _Trainer_current_item, "f");
+        return __classPrivateFieldGet(this, _Trainer_current_question, "f");
     }
     get focus_stats() {
-        return new Map(this.focus_questions.map(item => [item, this.stats.get(item)]));
+        return new Map(this.focus_questions.map(question => [question, this.stats.get(question)]));
     }
-    next_item() {
+    get_next_question() {
         const focus_questions_count = this.focus_questions.length;
         // Probability of choosing a focus question (at least 50%):
         const P_focus = focus_questions_count / (focus_questions_count + .5);
         const random_index = Math.floor(Math.random() * this.focus_questions.length);
-        let next_item;
+        let next_question;
         if (Math.random() < P_focus || (this.unasked_questions.length === 0 &&
             this.comfortable_questions.length === 0)) { // If a focus question is randomly chosen or is the only option
-            next_item = this.focus_questions.splice(random_index, 1)[0];
-            __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_item, "f"));
+            next_question = this.focus_questions.splice(random_index, 1)[0];
+            __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             __classPrivateFieldSet(this, _Trainer_return_collection, this.focus_questions, "f");
         }
         else if (this.unasked_questions.length > 0) {
-            next_item = this.unasked_questions.pop();
-            if (__classPrivateFieldGet(this, _Trainer_current_item, "f")) {
-                __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_item, "f"));
+            next_question = this.unasked_questions.pop();
+            if (__classPrivateFieldGet(this, _Trainer_current_question, "f")) {
+                __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             }
             __classPrivateFieldSet(this, _Trainer_return_collection, this.unasked_questions, "f");
         }
         else {
-            next_item = this.focus_questions.splice(random_index, 1)[0];
+            next_question = this.focus_questions.splice(random_index, 1)[0];
             // Return current item to a collection
-            __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_item, "f"));
+            __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             // Where to return an item to if it's skipped
             __classPrivateFieldSet(this, _Trainer_return_collection, this.comfortable_questions, "f");
         }
-        this.stats.get(next_item)['count'] += 1;
-        __classPrivateFieldSet(this, _Trainer_current_item, next_item, "f");
-        return next_item;
+        this.stats.get(next_question)['count'] += 1;
+        __classPrivateFieldSet(this, _Trainer_current_question, next_question, "f");
+        return next_question;
     }
     register(is_correct) {
-        const current_item_stats = this.stats.get(this.current_item);
+        const current_item_stats = this.stats.get(this.current_question);
         __classPrivateFieldSet(this, _Trainer_return_collection, this.focus_questions, "f");
         if (is_correct) {
             current_item_stats['correct'] += 1;
@@ -120,8 +131,11 @@ class Trainer {
         return is_correct;
     }
 }
-_Trainer_current_item = new WeakMap(), _Trainer_return_collection = new WeakMap(), _Trainer_winning_streak = new WeakMap();
+_Trainer_current_question = new WeakMap(), _Trainer_return_collection = new WeakMap(), _Trainer_winning_streak = new WeakMap();
 ;
+/**
+ * Input interpreter.
+ */
 function get_user_input() {
     return new Promise((resolve) => {
         const submit_button = document.getElementById('submit');
@@ -134,46 +148,65 @@ function get_user_input() {
         submit_button.addEventListener('click', listener);
     });
 }
-function display_item(item) {
-    document.getElementById('item_display').innerText = item;
-}
 /**
- * Class which manages memory training.
+ * Output renderer. Controls how questions are visually presented.
+ */
+class BaseRenderer {
+    constructor(rendering_area) {
+        this.rendering_area = rendering_area;
+    }
+    render(question) {
+        this.rendering_area.innerText =
+            `No renderer implemented for this data: ${question}`;
+    }
+}
+;
+/**
+ * Class which manages associative memory training.
  *
  * Wrapper around a Trainer.
  */
 class MemoryTrainer {
-    constructor(answer_key) {
+    constructor(answer_key, renderer) {
         const questions = [...answer_key.keys()];
         const answers = [...answer_key.values()];
         this.questions = questions;
         this.answers = answers;
         this.trainer = new Trainer(questions.length);
+        this.renderer = renderer;
     }
     get answer() {
-        return this.answers[this.trainer.current_item];
+        return this.answers[this.trainer.current_question];
     }
     get hint() {
         return this.answer[0];
     }
-    get current_item() {
-        return this.questions[this.trainer.current_item];
+    get question() {
+        return this.questions[this.trainer.current_question];
     }
-    check_answer(user_answer) {
-        const correct_answer = String(this.answers[this.trainer.current_item])
+    /**
+     * Input evaluator.
+     *
+     * Determines whether an answer was correct or incorrect.
+     *
+     * Note: This could later be extended to give a degree of correctness in the
+     * range 0–1.
+     */
+    evaluate(user_answer) {
+        const correct_answer = String(this.answers[this.trainer.current_question])
             .toLowerCase();
         return String(user_answer).toLowerCase() === correct_answer;
     }
     respond(user_answer) {
-        const is_correct = this.check_answer(user_answer);
+        const is_correct = this.evaluate(user_answer);
         this.trainer.register(is_correct);
         return is_correct;
     }
     train() {
         return __awaiter(this, void 0, void 0, function* () {
             const verdict_element = document.getElementById('verdict');
-            while (!this.trainer.complete) {
-                display_item(this.current_item);
+            while (!this.trainer.is_complete) {
+                this.renderer.render(this.question);
                 let user_input = yield get_user_input();
                 if (this.respond(user_input)) {
                     verdict_element.innerText = 'correct';
@@ -193,7 +226,7 @@ class MemoryTrainer {
                                 `${this.answer}`;
                             break;
                         }
-                        if (this.check_answer(yield get_user_input())) {
+                        if (this.evaluate(yield get_user_input())) {
                             verdict_element.innerText = 'correct';
                             break;
                         }
@@ -208,10 +241,55 @@ class MemoryTrainer {
                         console.log(`${key}: ${accuracy * 100}%: ${JSON.stringify(score)}`);
                     }
                 }
-                this.trainer.next_item();
+                this.trainer.get_next_question();
             }
         });
     }
 }
-const memory_trainer = new MemoryTrainer(state_capitals);
+class TextRenderer extends BaseRenderer {
+    render(question) {
+        this.rendering_area.innerHTML = `
+    <h2>${question}</h2>
+    `;
+    }
+}
+class MusicNotationRenderer extends BaseRenderer {
+    constructor(rendering_area) {
+        super(rendering_area);
+        const Renderer = window.Vex.Flow.Renderer;
+        const renderer = new Renderer(this.rendering_area, Renderer.Backends.SVG);
+        // Configure the rendering context.
+        renderer.resize(300, 200);
+        this.render_context = renderer.getContext();
+    }
+    render([clef, pitch, accidental]) {
+        // Clear existing notes from the staff.
+        const notation = document.querySelectorAll('.vf-stavenote, .vf-stave');
+        for (const element of notation) {
+            element.remove();
+        }
+        const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
+        const stave = new Stave(...Object.values({
+            left: 10,
+            top: 30,
+            width: 280
+        }));
+        stave.addClef(clef);
+        stave.setContext(this.render_context).draw();
+        const note = new StaveNote({ clef: clef, keys: [pitch], duration: "w" });
+        if (accidental !== '')
+            note.addModifier(new Accidental(accidental));
+        const voices = [
+            new Voice({
+                num_beats: 4,
+                beat_value: 4,
+            }).addTickables([note]),
+        ];
+        new Formatter().joinVoices(voices).format(voices, 200);
+        for (const voice of voices) {
+            voice.draw(this.render_context, stave);
+        }
+    }
+}
+const memory_trainer = new MemoryTrainer(music_notation, new MusicNotationRenderer(question_display_base));
 memory_trainer.train();

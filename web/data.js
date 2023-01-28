@@ -1,4 +1,8 @@
-export let state_capitals = new Map([
+/**
+ * Map item schema:
+ * (state: string) : (capital: string)
+ */
+export const state_capitals = new Map([
   ["Alabama", "Montgomery"],
   ["Alaska", "Juneau"],
   ["Arizona", "Phoenix"],
@@ -49,4 +53,23 @@ export let state_capitals = new Map([
   ["West Virginia", "Charleston"],
   ["Wisconsin", "Madison"],
   ["Wyoming", "Cheyenne"],
-])
+]);
+
+/**
+ * Map item schema:
+ * [
+ *   (`clef name`: string),
+ *   (pitch: string),
+ *   (accidental: string),
+ *   (register: number)
+ * ]: (`MIDI note number`: number)
+ */
+export const music_notation = new Map([
+  [['treble', 'C/4', ''], 60],
+  [['treble', 'B/3', ''], 59],
+  [['treble', 'B/3', 'b'], 58],
+  [['treble', 'A/3', '#'], 58],
+  [['treble', 'A/3', ''], 57],
+  [['bass', 'A/3', ''], 57],
+  [['treble', 'A/2', ''], 45],
+]);
