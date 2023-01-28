@@ -62,13 +62,13 @@ class Trainer {
             streak: 1,
             weight: 1,
         };
-        this.stats = new Map(questions.map(question => [question, Object.create(stats)]));
+        this.stats = questions.map(_ => Object.create(stats));
         __classPrivateFieldSet(this, _Trainer_current_question, null, "f");
     }
     ;
     get is_complete() {
-        for (const item of this.stats.values()) {
-            if (item['streak'] < __classPrivateFieldGet(this, _Trainer_winning_streak, "f")) {
+        for (const stat of this.stats) {
+            if (stat['streak'] < __classPrivateFieldGet(this, _Trainer_winning_streak, "f")) {
                 return false;
             }
         }
@@ -81,40 +81,41 @@ class Trainer {
         return __classPrivateFieldGet(this, _Trainer_current_question, "f");
     }
     get focus_stats() {
-        return new Map(this.focus_questions.map(question => [question, this.stats.get(question)]));
+        return new Map(this.focus_questions.map(question => [question, this.stats[question]]));
     }
     get_next_question() {
         const focus_questions_count = this.focus_questions.length;
         // Probability of choosing a focus question (at least 50%):
         const P_focus = focus_questions_count / (focus_questions_count + .5);
-        const random_index = Math.floor(Math.random() * this.focus_questions.length);
         let next_question;
         if (Math.random() < P_focus || (this.unasked_questions.length === 0 &&
             this.comfortable_questions.length === 0)) { // If a focus question is randomly chosen or is the only option
+            const random_index = Math.floor(Math.random() * this.focus_questions.length);
             next_question = this.focus_questions.splice(random_index, 1)[0];
             __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             __classPrivateFieldSet(this, _Trainer_return_collection, this.focus_questions, "f");
         }
         else if (this.unasked_questions.length > 0) {
             next_question = this.unasked_questions.pop();
-            if (__classPrivateFieldGet(this, _Trainer_current_question, "f")) {
+            if (__classPrivateFieldGet(this, _Trainer_current_question, "f") !== null) {
                 __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             }
             __classPrivateFieldSet(this, _Trainer_return_collection, this.unasked_questions, "f");
         }
         else {
-            next_question = this.focus_questions.splice(random_index, 1)[0];
+            const random_index = Math.floor(Math.random() * this.comfortable_questions.length);
+            next_question = this.comfortable_questions.splice(random_index, 1)[0];
             // Return current item to a collection
             __classPrivateFieldGet(this, _Trainer_return_collection, "f").push(__classPrivateFieldGet(this, _Trainer_current_question, "f"));
             // Where to return an item to if it's skipped
             __classPrivateFieldSet(this, _Trainer_return_collection, this.comfortable_questions, "f");
         }
-        this.stats.get(next_question)['count'] += 1;
+        this.stats[next_question]['count'] += 1;
         __classPrivateFieldSet(this, _Trainer_current_question, next_question, "f");
         return next_question;
     }
     register(is_correct) {
-        const current_item_stats = this.stats.get(this.current_question);
+        const current_item_stats = this.stats[this.current_question];
         __classPrivateFieldSet(this, _Trainer_return_collection, this.focus_questions, "f");
         if (is_correct) {
             current_item_stats['correct'] += 1;
@@ -167,13 +168,13 @@ class BaseRenderer {
  * Wrapper around a Trainer.
  */
 class MemoryTrainer {
-    constructor(answer_key, renderer) {
+    constructor(answer_key, Renderer = BaseRenderer) {
         const questions = [...answer_key.keys()];
         const answers = [...answer_key.values()];
         this.questions = questions;
         this.answers = answers;
         this.trainer = new Trainer(questions.length);
-        this.renderer = renderer;
+        this.renderer = new Renderer(question_display_base);
     }
     get answer() {
         return this.answers[this.trainer.current_question];
@@ -193,7 +194,7 @@ class MemoryTrainer {
      * range 0–1.
      */
     evaluate(user_answer) {
-        const correct_answer = String(this.answers[this.trainer.current_question])
+        const correct_answer = String(this.answers[this.trainer.current_question][1])
             .toLowerCase();
         return String(user_answer).toLowerCase() === correct_answer;
     }
@@ -233,14 +234,14 @@ class MemoryTrainer {
                     }
                 }
                 // Print stats
-                for (const [key, score] of Array.from(this.trainer.stats).sort()) {
-                    console.log(key, score);
+                this.trainer.stats.forEach((score, index) => {
+                    console.log(index, score);
                     if (score['count'] > 0) {
                         const accuracy = score['count'] > 0 ?
                             score['correct'] / score['count'] : 0;
-                        console.log(`${key}: ${accuracy * 100}%: ${JSON.stringify(score)}`);
+                        console.log(`${index}: ${accuracy * 100}%: ${JSON.stringify(score)}`);
                     }
-                }
+                });
                 this.trainer.get_next_question();
             }
         });
@@ -250,6 +251,13 @@ class TextRenderer extends BaseRenderer {
     render(question) {
         this.rendering_area.innerHTML = `
     <h2>${question}</h2>
+    `;
+    }
+}
+class ImageRenderer extends BaseRenderer {
+    render(image_source) {
+        this.rendering_area.innerHTML = `
+    <img src="${image_source}"/>
     `;
     }
 }
@@ -272,9 +280,9 @@ class MusicNotationRenderer extends BaseRenderer {
         }
         const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
         const stave = new Stave(...Object.values({
-            left: 0,
+            left: 1,
             top: 25,
-            width: 100
+            width: 101
         }));
         stave.addClef(clef);
         stave.setContext(this.render_context).draw();
@@ -293,5 +301,5 @@ class MusicNotationRenderer extends BaseRenderer {
         }
     }
 }
-const memory_trainer = new MemoryTrainer(music_notation, new MusicNotationRenderer(question_display_base));
+const memory_trainer = new MemoryTrainer(music_notation, MusicNotationRenderer);
 memory_trainer.train();

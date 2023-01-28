@@ -6,7 +6,6 @@ declare global {
   }
 }
 
-
 // Disable form submission
 window.onload = function() {
   document.getElementById("answer_form")!.onsubmit = function(submit_event) {
@@ -58,7 +57,7 @@ class Trainer {
 
   comfortable_questions: number[];
 
-  stats: Map<number, QuestionStats>;
+  stats: QuestionStats[];
 
   constructor(question_count: number) {
     const questions = [...Array(question_count).keys()];
@@ -78,15 +77,14 @@ class Trainer {
       weight: 1,
     };
 
-    this.stats = new Map(
-      questions.map(question => [question, Object.create(stats)]));
+    this.stats = questions.map(_ => Object.create(stats));
 
     this.#current_question = null;
   };
 
   get is_complete(): boolean {
-    for (const item of this.stats.values()) {
-      if (item['streak'] < this.#winning_streak) { return false; }
+    for (const stat of this.stats) {
+      if (stat['streak'] < this.#winning_streak) { return false; }
     }
 
     return true;
@@ -99,7 +97,7 @@ class Trainer {
 
   get focus_stats(): Map<number, QuestionStats> {
     return new Map(this.focus_questions.map(
-      question => [question, this.stats.get(question)])
+      question => [question, this.stats[question]])
     );
   }
 
@@ -109,43 +107,45 @@ class Trainer {
     // Probability of choosing a focus question (at least 50%):
     const P_focus = focus_questions_count / (focus_questions_count + .5)
 
-    const random_index = Math.floor(
-      Math.random() * this.focus_questions.length);
-
     let next_question: number;
 
     if (Math.random() < P_focus || (
         this.unasked_questions.length === 0 &&
         this.comfortable_questions.length === 0
         )
-      ) { // If a focus question is randomly chosen or is the only option
+    ) { // If a focus question is randomly chosen or is the only option
+      const random_index = Math.floor(
+        Math.random() * this.focus_questions.length);
 
-        next_question = this.focus_questions.splice(random_index, 1)[0];
+      next_question = this.focus_questions.splice(random_index, 1)[0];
 
-        this.#return_collection.push(this.#current_question);
+      this.#return_collection.push(this.#current_question);
 
-        this.#return_collection = this.focus_questions;
+      this.#return_collection = this.focus_questions;
     }
     else if (this.unasked_questions.length > 0) {
-        next_question = this.unasked_questions.pop();
+      next_question = this.unasked_questions.pop();
 
-        if (this.#current_question) {
-          this.#return_collection.push(this.#current_question);
-        }
+      if (this.#current_question !== null) {
+        this.#return_collection.push(this.#current_question);
+      }
 
-        this.#return_collection = this.unasked_questions;
+      this.#return_collection = this.unasked_questions;
     }
     else {
-        next_question = this.focus_questions.splice(random_index, 1)[0];
+      const random_index = Math.floor(
+        Math.random() * this.comfortable_questions.length);
 
-        // Return current item to a collection
-        this.#return_collection.push(this.#current_question);
+      next_question = this.comfortable_questions.splice(random_index, 1)[0];
 
-        // Where to return an item to if it's skipped
-        this.#return_collection = this.comfortable_questions;
+      // Return current item to a collection
+      this.#return_collection.push(this.#current_question);
+
+      // Where to return an item to if it's skipped
+      this.#return_collection = this.comfortable_questions;
     }
 
-    this.stats.get(next_question)['count'] += 1;
+    this.stats[next_question]['count'] += 1;
 
     this.#current_question = next_question;
 
@@ -153,7 +153,7 @@ class Trainer {
   }
 
   register(is_correct: boolean): boolean {
-    const current_item_stats = this.stats.get(this.current_question);
+    const current_item_stats = this.stats[this.current_question];
 
     this.#return_collection = this.focus_questions;
 
@@ -194,7 +194,6 @@ function get_user_input() {
   });
 }
 
-
 /**
  * Output renderer. Controls how questions are visually presented.
  */
@@ -225,7 +224,10 @@ class MemoryTrainer {
 
   answers: any[];
 
-  constructor(answer_key: Map<any, any>, renderer: BaseRenderer) {
+  constructor(
+      answer_key: Map<any, any>,
+      Renderer:typeof BaseRenderer=BaseRenderer
+    ) {
     const questions = [...answer_key.keys()];
 
     const answers = [...answer_key.values()];
@@ -236,7 +238,7 @@ class MemoryTrainer {
 
     this.trainer = new Trainer(questions.length);
 
-    this.renderer = renderer;
+    this.renderer = new Renderer(question_display_base);
   }
 
   get answer(): any {
@@ -261,7 +263,7 @@ class MemoryTrainer {
    */
   evaluate(user_answer: any): boolean {
     const correct_answer = String(
-        this.answers[this.trainer.current_question]
+        this.answers[this.trainer.current_question][1]
       )
       .toLowerCase();
 
@@ -313,16 +315,17 @@ class MemoryTrainer {
       }
 
       // Print stats
-      for (const [key, score] of Array.from(this.trainer.stats).sort()) {
-        console.log(key, score);
+      this.trainer.stats.forEach((score, index) => {
+        console.log(index, score);
         if (score['count'] > 0) {
 
           const accuracy = score['count'] > 0 ?
             score['correct'] / score['count'] : 0;
 
-          console.log(`${key}: ${accuracy * 100}%: ${JSON.stringify(score)}`);
+          console.log(
+            `${index}: ${accuracy * 100}%: ${JSON.stringify(score)}`);
         }
-      }
+      });
 
       this.trainer.get_next_question();
     }
@@ -334,6 +337,14 @@ class TextRenderer extends BaseRenderer {
   render(question: string) {
     this.rendering_area.innerHTML = `
     <h2>${question}</h2>
+    `
+  }
+}
+
+class ImageRenderer extends BaseRenderer {
+  render(image_source: string): void {
+    this.rendering_area.innerHTML = `
+    <img src="${image_source}"/>
     `
   }
 }
@@ -370,9 +381,9 @@ class MusicNotationRenderer extends BaseRenderer {
     const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
 
     const stave = new Stave(...Object.values({
-      left: 0,
+      left: 1,
       top: 25,
-      width: 100
+      width: 101
     }));
 
     stave.addClef(clef);
@@ -400,8 +411,6 @@ class MusicNotationRenderer extends BaseRenderer {
 }
 
 const memory_trainer = new MemoryTrainer(
-  music_notation,
-  new MusicNotationRenderer(question_display_base)
-);
+  music_notation, MusicNotationRenderer);
 
 memory_trainer.train();
