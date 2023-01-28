@@ -1,4 +1,8 @@
-export let state_capitals = new Map([
+/**
+ * Map item schema:
+ * (state: string) : (capital: string)
+ */
+export const state_capitals = new Map([
   ["Alabama", "Montgomery"],
   ["Alaska", "Juneau"],
   ["Arizona", "Phoenix"],
@@ -49,4 +53,39 @@ export let state_capitals = new Map([
   ["West Virginia", "Charleston"],
   ["Wisconsin", "Madison"],
   ["Wyoming", "Cheyenne"],
-])
+]);
+
+/**
+ * Map item schema:
+ * [
+ *   (`clef name`: string),
+ *   (pitch: string),
+ *   (accidental: string),
+ *   (register: number)
+ * ]: (`MIDI note number`: number)
+ */
+export const music_notation = new Map([
+  [['treble', 'C/4', ''], [60, 'C']],
+  [['treble', 'B/3', ''], [59, 'B']],
+  [['treble', 'B/3', 'b'], [58, 'Bb']],
+  [['treble', 'A/3', '#'], [58, 'A#']],
+  [['treble', 'A/3', ''], [57, 'A']],
+  [['bass', 'B/3', ''], [59, 'B']],
+  [['bass', 'B/3', 'b'], [58, 'Bb']],
+  [['bass', 'A/3', '#'], [58, 'A#']],
+  [['bass', 'A/3', ''], [57, 'A']],
+]);
+
+export const flags = new Map([
+  ['https://jetpunk.b-cdn.net/img/user-photo-library/89/892037c361-450.png', 'USA']
+]);
+
+// Quiz data schema
+// [
+//   {
+//     question: '',
+//     answer: '',
+//     hint: '',
+//     renderer: '',
+//   },
+// ]

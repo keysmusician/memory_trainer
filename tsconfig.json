@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "lib": ["dom", "dom.iterable", "es2017"],
+    },
+    "files": [
+        "index.ts",
+    ],
+}

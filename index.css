@@ -1,6 +1,5 @@
 html {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
-    background-color: rgb(115, 114, 134);
 }
 
 h1, h2, input, form, p{
@@ -18,5 +17,5 @@ input {
 }
 
 #item_display {
-    padding: 60px;
+    text-align: center;
 }
