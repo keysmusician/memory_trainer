@@ -70,8 +70,10 @@ export const music_notation = new Map([
   [['treble', 'B/3', 'b'], [58, 'Bb']],
   [['treble', 'A/3', '#'], [58, 'A#']],
   [['treble', 'A/3', ''], [57, 'A']],
+  [['bass', 'B/3', ''], [59, 'B']],
+  [['bass', 'B/3', 'b'], [58, 'Bb']],
+  [['bass', 'A/3', '#'], [58, 'A#']],
   [['bass', 'A/3', ''], [57, 'A']],
-  [['treble', 'A/2', ''], [45, 'A']],
 ]);
 
 export const flags = new Map([
