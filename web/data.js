@@ -65,11 +65,25 @@ export const state_capitals = new Map([
  * ]: (`MIDI note number`: number)
  */
 export const music_notation = new Map([
-  [['treble', 'C/4', ''], 60],
-  [['treble', 'B/3', ''], 59],
-  [['treble', 'B/3', 'b'], 58],
-  [['treble', 'A/3', '#'], 58],
-  [['treble', 'A/3', ''], 57],
-  [['bass', 'A/3', ''], 57],
-  [['treble', 'A/2', ''], 45],
+  [['treble', 'C/4', ''], [60, 'C']],
+  [['treble', 'B/3', ''], [59, 'B']],
+  [['treble', 'B/3', 'b'], [58, 'Bb']],
+  [['treble', 'A/3', '#'], [58, 'A#']],
+  [['treble', 'A/3', ''], [57, 'A']],
+  [['bass', 'A/3', ''], [57, 'A']],
+  [['treble', 'A/2', ''], [45, 'A']],
 ]);
+
+export const flags = new Map([
+  ['https://jetpunk.b-cdn.net/img/user-photo-library/89/892037c361-450.png', 'USA']
+]);
+
+// Quiz data schema
+// [
+//   {
+//     question: '',
+//     answer: '',
+//     hint: '',
+//     renderer: '',
+//   },
+// ]
