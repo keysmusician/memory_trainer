@@ -330,6 +330,7 @@ class MemoryTrainer {
       this.trainer.get_next_question();
     }
 
+    question_display_base.innerHTML = `<h2>Complete!<h2>`
   }
 }
 
