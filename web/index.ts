@@ -349,12 +349,16 @@ class MusicNotationRenderer extends BaseRenderer {
     const renderer = new Renderer(this.rendering_area, Renderer.Backends.SVG);
 
     // Configure the rendering context.
-    renderer.resize(300, 200);
+    renderer.resize(208, 350);
 
-    this.render_context = renderer.getContext();
+    const render_context = renderer.getContext();
+
+    render_context.scale(2, 2);
+
+    this.render_context = render_context
   }
 
-  render([clef, pitch, accidental]: [string, string]) {
+  render([clef, pitch, accidental]: [string, string, string]) {
     // Clear existing notes from the staff.
     const notation = document.querySelectorAll(
       '.vf-stavenote, .vf-stave');
@@ -366,9 +370,9 @@ class MusicNotationRenderer extends BaseRenderer {
     const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
 
     const stave = new Stave(...Object.values({
-      left: 10,
-      top: 30,
-      width: 280
+      left: 0,
+      top: 25,
+      width: 100
     }));
 
     stave.addClef(clef);

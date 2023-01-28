@@ -259,8 +259,10 @@ class MusicNotationRenderer extends BaseRenderer {
         const Renderer = window.Vex.Flow.Renderer;
         const renderer = new Renderer(this.rendering_area, Renderer.Backends.SVG);
         // Configure the rendering context.
-        renderer.resize(300, 200);
-        this.render_context = renderer.getContext();
+        renderer.resize(208, 350);
+        const render_context = renderer.getContext();
+        render_context.scale(2, 2);
+        this.render_context = render_context;
     }
     render([clef, pitch, accidental]) {
         // Clear existing notes from the staff.
@@ -270,9 +272,9 @@ class MusicNotationRenderer extends BaseRenderer {
         }
         const { Accidental, Formatter, Stave, StaveNote, Voice } = window.Vex.Flow;
         const stave = new Stave(...Object.values({
-            left: 10,
-            top: 30,
-            width: 280
+            left: 0,
+            top: 25,
+            width: 100
         }));
         stave.addClef(clef);
         stave.setContext(this.render_context).draw();
