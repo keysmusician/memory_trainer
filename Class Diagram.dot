@@ -1,0 +1,13 @@
+/**
+ * Class diagram for Memory Trainer.
+ **/
+digraph {
+    // Independent nodes -> Dependent nodes
+    "Training algorithm"
+    "Quiz" -> "App"
+    "Training algorithm" -> "Quiz"
+    "Answer key" -> "Quiz"
+    "Renderer" -> "Quiz"
+    "Reciever" -> "Quiz"
+    "Evaluator" -> "Quiz"
+}

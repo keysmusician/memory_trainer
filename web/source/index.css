@@ -9,13 +9,14 @@ h1, h2, input, form, p{
 }
 
 input {
-    width: 25%;
+    width: 100%;
 }
 
 #memory_trainer {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 50px;
-}
-
-#item_display {
-    text-align: center;
+    width: 100%;
 }
