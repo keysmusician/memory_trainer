@@ -22,7 +22,11 @@ function Quizzes(props: QuizzesProps) {
           const input_id = String(index())
 
           return (
-            <div class={quiz_list_item} onClick={[selectQuiz, [quiz, index]]}>
+            <div
+              class={quiz_list_item}
+              onClick={[selectQuiz, [quiz, index]]}
+              tabIndex={-1}
+            >
               <label for={input_id}>{quiz.name}</label>
 
               <input

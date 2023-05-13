@@ -71,7 +71,7 @@
     font-size: large;
 }
 
-.quiz_list_item:hover, .quiz_list_item:focus-within  {
+.quiz_list_item:hover, .quiz_list_item:focus-within {
     display: inline-block;
     box-shadow: 0px 00px 10px var(--selection-dark-blue);
 }
