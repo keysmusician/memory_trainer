@@ -13,5 +13,3 @@ export default defineConfig({
   },
   root: "source",
 });
-
-console.log()

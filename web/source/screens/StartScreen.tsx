@@ -22,7 +22,7 @@ function Quizzes(props: QuizzesProps) {
           const input_id = String(index())
 
           return (
-            <div class={quiz_list_item}>
+            <div class={quiz_list_item} onClick={[selectQuiz, [quiz, index]]}>
               <label for={input_id}>{quiz.name}</label>
 
               <input
@@ -31,7 +31,6 @@ function Quizzes(props: QuizzesProps) {
                 type="radio"
                 name="quiz"
                 style={{'float': 'right'}}
-                onClick={[selectQuiz, [quiz, index]]}
               />
             </div>
           )
