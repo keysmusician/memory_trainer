@@ -4,6 +4,7 @@ import { StartScreen } from './screens/StartScreen'
 import { defaultQuiz, Quiz } from './quizzes'
 import { TrainScreen } from './screens/TrainScreen'
 import { ScoreScreen } from './screens/ScoreScreen'
+import { title } from './Styles.module.css'
 
 
 export type Screen = 'Start' | 'Train' | 'Score'
@@ -19,7 +20,7 @@ function MemoryTrainer() {
 
   return (
     <main>
-      <h1>Memory Trainer</h1>
+      <h1 class={title}>Memory Trainer</h1>
 
       <div id="memory_trainer">
         <Switch fallback={

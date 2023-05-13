@@ -1,7 +1,7 @@
 import { Setter, For, createSignal } from "solid-js"
 import { Screen } from "../App"
 import { Quiz, quizzes } from "../quizzes"
-import { screen_change_button, quiz_list_item, start_button } from './Styles.module.css'
+import { column_layout, quiz_list_item, start_button } from '../Styles.module.css'
 
 
 const [quizIndex, setQuizIndex] = createSignal(0)
@@ -16,25 +16,28 @@ function Quizzes(props: QuizzesProps) {
   }
 
   return (
-    <For each={quizzes}>
-      {(quiz, index) => {
-        const input_id = String(index())
+    <div class={column_layout}>
+      <For each={quizzes}>
+        {(quiz, index) => {
+          const input_id = String(index())
 
-        return (
-          <div class={quiz_list_item}>
-            <label for={input_id}>{quiz.name}</label>
+          return (
+            <div class={quiz_list_item}>
+              <label for={input_id}>{quiz.name}</label>
 
-            <input
-              checked={index() === quizIndex()}
-              id={input_id}
-              type="radio"
-              name="quiz"
-              onClick={[selectQuiz, [quiz, index]]}
-            />
-          </div>
-        )
-      }}
-    </For>
+              <input
+                checked={index() === quizIndex()}
+                id={input_id}
+                type="radio"
+                name="quiz"
+                style={{'float': 'right'}}
+                onClick={[selectQuiz, [quiz, index]]}
+              />
+            </div>
+          )
+        }}
+      </For>
+    </div>
   )
 }
 
@@ -48,7 +51,7 @@ export function StartScreen(props: StartScreenProps) {
   return (
     <>
       <Quizzes setQuiz={props.setQuiz} />
-      <form style={{ 'margin': '20px' }}>
+      <form>
         <button
           onClick={beginTraining}
           class={start_button}

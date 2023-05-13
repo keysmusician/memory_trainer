@@ -2,7 +2,7 @@ import { MemoryTrainerApp, MemoryTrainerInputs } from "../MemoryTrainer"
 import { Setter } from "solid-js"
 import { Screen } from "../App"
 import { Quiz } from "../quizzes"
-import { quit_button, submit_button, response_box, standard_text} from './Styles.module.css'
+import { quit_button, submit_button, response_box, standard_text, training_buttons } from '../Styles.module.css'
 
 
 interface TrainScreenProps {
@@ -19,7 +19,11 @@ export function TrainScreen(props: TrainScreenProps) {
   ) as HTMLButtonElement
 
   const user_input_element = (
-    <input type="text" class={response_box} title="Please enter a response"/>
+    <input
+      type="text"
+      class={response_box}
+      title="Please enter a response"
+    />
   ) as HTMLInputElement
 
   const on_grade = props.quiz.on_grade ?
@@ -56,17 +60,23 @@ export function TrainScreen(props: TrainScreenProps) {
           "align-items": "center",
         }}
       >
-        <label for="user_input" class={standard_text} title="Answer"/>
+        <label for="user_input" class={standard_text} title="Answer" />
+
         {user_input_element}
+
+        <div class={training_buttons}>
+
         {answer_submit_button}
+
+        <button
+          class={quit_button}
+          onClick={() => props.setScreen('Start')}
+          >
+          Quit
+        </button>
+          </div>
       </form>
 
-      <button
-        class={quit_button}
-        onClick={() => props.setScreen('Start')}
-      >
-        Quit
-      </button>
     </>
   )
 }

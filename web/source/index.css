@@ -2,14 +2,10 @@ html {
     font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
 
-h1, h2, input, form, p{
+h1, h2, form, p{
     text-align: center;
     display: block;
     margin: auto;
-}
-
-input {
-    width: 100%;
 }
 
 #memory_trainer {
@@ -17,6 +13,5 @@ input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 50px;
     width: 100%;
 }

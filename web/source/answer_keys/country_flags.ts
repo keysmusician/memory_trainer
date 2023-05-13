@@ -257,11 +257,15 @@ const country_code_name_map = {
   "zw": "Zimbabwe"
 }
 
+type FlagCDN_JPG_Heights = 20 | 24 | 40 | 60 | 80 | 120 | 240
+
+export const image_height: FlagCDN_JPG_Heights = 240
+
 /**
  * Country flags.
  */
 export const country_flags = new Map(Object.entries(country_code_name_map).map(
   ([country_code, country_name]) => [
-    `https://flagcdn.com/h240/${country_code}.jpg`, country_name
+    `https://flagcdn.com/h${image_height}/${country_code}.jpg`, country_name
   ]
 ))

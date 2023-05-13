@@ -1,0 +1,107 @@
+:root {
+    --selection-light-blue: rgb(95, 214, 253);
+    --selection-dark-blue: rgb(60, 195, 240);
+    --quit-light-red: rgb(255, 70, 70);
+    --quit-dark-red: rgb(239, 41, 41);
+
+    --title-size: 50px;
+    --large-text-size: 40px;
+    --standard-text-size: 30px;
+
+    --standard-margin: 15px;
+    --standard-border-thickness: 3px
+}
+
+.standard_text {
+    font: 'DM Sans', sans-serif;
+    font-size: var(--standard-text-size);
+}
+
+.title {
+    composes: standard_text;
+    font-size: var(--title-size);
+    font-weight: bolder;
+}
+
+.large_text {
+    composes: standard_text;
+    font-size: var(--large-text-size);
+}
+
+.standard_border {
+    border: solid black var(--standard-border-thickness);
+    border-radius: 50px;
+}
+
+.base_button {
+    composes: standard_border standard_text;
+    width: 125px;
+    height: 75px;
+    cursor: pointer;
+}
+
+.start_button {
+    composes: base_button;
+    background-color: var(--selection-light-blue);
+}
+
+.start_button:hover {
+    background-color: var(--selection-dark-blue);
+}
+
+.quit_button {
+    composes: base_button;
+    background-color: var(--quit-light-red);
+}
+
+.quit_button:hover {
+    background-color: var(--quit-dark-red);
+}
+
+.submit_button {
+    composes: base_button;
+}
+
+
+.quiz_list_item {
+    composes: standard_border standard_text;
+    border-color: var(--selection-light-blue);
+    padding: 15px;
+    margin: var(--standard-margin);
+    font-size: large;
+}
+
+.quiz_list_item:hover, .quiz_list_item:focus-within  {
+    display: inline-block;
+    box-shadow: 0px 00px 10px var(--selection-dark-blue);
+}
+
+.response_box {
+    composes: standard_border standard_text;
+    margin: var(--standard-margin);
+    border-color: lightgray;
+    width: 100%;
+}
+
+.row_layout {
+    display: flex;
+    flex-direction: row;
+}
+
+.column_layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: var(--standard-margin);
+}
+
+.training_buttons {
+    composes: row_layout;
+    margin: var(--standard-margin);
+    justify-content: space-around;
+    width: 100%;
+}
+
+.image_renderer {
+    box-shadow: 0px 2px 10px black;
+}

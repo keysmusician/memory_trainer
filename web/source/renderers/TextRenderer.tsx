@@ -1,5 +1,5 @@
 import { BaseRenderer } from "./BaseRenderer"
-import { standard_text } from "../screens/Styles.module.css"
+import { standard_text, large_text } from "../Styles.module.css"
 
 
 /**
@@ -7,11 +7,9 @@ import { standard_text } from "../screens/Styles.module.css"
  */
 export class TextRenderer extends BaseRenderer<string> {
     render(question: string) {
-      const heading = (
+      const heading =
         <p class={standard_text} >What's the capital of:</p>
-      )
-      const text_element = document.createElement('h2')
-      text_element.innerText = question + "?"
+      const text_element = <h2 class={large_text}>{question + "?"}</h2>
       this.rendering_area.replaceChildren(heading, text_element)
     }
   }
