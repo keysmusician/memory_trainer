@@ -22,7 +22,5 @@ export function compare_strings(response: string, answer: string): boolean {
 export function compare_music_notation(
   response: string, answer: string
 ): boolean {
-    const normalize = (text: string) => text.toLowerCase().replaceAll(' ', '')
-
-    return normalize(response) === normalize(answer[1])
+    return compare_strings(response, answer)
   }

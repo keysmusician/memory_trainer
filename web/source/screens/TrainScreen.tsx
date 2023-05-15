@@ -1,8 +1,15 @@
 import { MemoryTrainerApp, MemoryTrainerInputs } from "../MemoryTrainer"
-import { Setter } from "solid-js"
+import { Setter, onMount } from "solid-js"
 import { Screen } from "../App"
 import { Quiz } from "../quizzes"
-import { quit_button, submit_button, response_box, standard_text, training_buttons } from '../Styles.module.css'
+import {
+  quit_button,
+  submit_button,
+  response_box,
+  standard_text,
+  training_buttons,
+  verdict
+} from '../Styles.module.css'
 
 
 interface TrainScreenProps {
@@ -12,7 +19,7 @@ interface TrainScreenProps {
 export function TrainScreen(props: TrainScreenProps) {
   const question_render_root = document.createElement("div")
 
-  const verdict_render_area = <div class={standard_text} />
+  const verdict_render_area = <div class={verdict} />
 
   const answer_submit_button = (
     <button class={submit_button}>Submit</button>
@@ -25,6 +32,8 @@ export function TrainScreen(props: TrainScreenProps) {
       title="Please enter a response"
     />
   ) as HTMLInputElement
+
+  onMount(() => user_input_element.focus())
 
   const on_grade = props.quiz.on_grade ?
     props.quiz.on_grade(verdict_render_area) : undefined
@@ -46,7 +55,7 @@ export function TrainScreen(props: TrainScreenProps) {
     <>
       {verdict_render_area}
 
-      <div style={{ 'margin': '25px' }}>
+      <div>
         {question_render_root}
       </div>
 
@@ -66,14 +75,15 @@ export function TrainScreen(props: TrainScreenProps) {
 
         <div class={training_buttons}>
 
-        {answer_submit_button}
-
         <button
           class={quit_button}
           onClick={() => props.setScreen('Start')}
+          type="button"
           >
           Quit
         </button>
+
+        {answer_submit_button}
           </div>
       </form>
 

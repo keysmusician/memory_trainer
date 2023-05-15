@@ -4,7 +4,7 @@ import { StartScreen } from './screens/StartScreen'
 import { defaultQuiz, Quiz } from './quizzes'
 import { TrainScreen } from './screens/TrainScreen'
 import { ScoreScreen } from './screens/ScoreScreen'
-import { title } from './Styles.module.css'
+import { title, content_box } from './Styles.module.css'
 
 
 export type Screen = 'Start' | 'Train' | 'Score'
@@ -19,10 +19,10 @@ function MemoryTrainer() {
   const [screen, setScreen] = createSignal<Screen>('Start')
 
   return (
-    <main>
+    <>
       <h1 class={title}>Memory Trainer</h1>
 
-      <div id="memory_trainer">
+      <section id="memory_trainer" class={content_box}>
         <Switch fallback={
           <StartScreen
             setScreenName={setScreen}
@@ -37,8 +37,8 @@ function MemoryTrainer() {
             <ScoreScreen setScreen={setScreen} />
           </Match>
         </Switch>
-      </div>
-    </main>
+      </section>
+    </>
   )
 }
 

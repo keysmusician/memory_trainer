@@ -19,17 +19,11 @@ function build_on_grade(verdict_render_area: HTMLElement) {
     if (grade) {
       verdict_render_area.innerText = 'Correct!'
 
-      setTimeout(() => verdict_render_area.innerText = '', 1000)
-
       return false
     }
     else {
       switch (regrades) {
         case 0: {
-          verdict_render_area.innerText = 'Try again'
-          return true
-        }
-        case 1: {
           verdict_render_area.innerText = `Hint: ${answer[0]}`
           return true
         }
