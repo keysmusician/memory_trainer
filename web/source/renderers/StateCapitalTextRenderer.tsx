@@ -3,9 +3,9 @@ import { standard_text, large_text } from "../Styles.module.css"
 
 
 /**
- * Renders string-type questions as text.
+ * Renders state capital questions.
  */
-export class TextRenderer extends BaseRenderer<string> {
+export class StateCapitalTextRenderer extends BaseRenderer<string> {
     render(question: string) {
       const heading =
         <p class={standard_text} >What's the capital of:</p>

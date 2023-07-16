@@ -24,3 +24,12 @@ export function compare_music_notation(
 ): boolean {
     return compare_strings(response, answer)
   }
+
+/**
+ * Compares two objects for strict equality.
+ **/
+export function compare_strictly_equal<T=any>(
+  response: T, answer: T
+): boolean {
+    return response === answer
+}
