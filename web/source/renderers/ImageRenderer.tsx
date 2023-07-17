@@ -1,14 +1,20 @@
-import { BaseRenderer } from "./BaseRenderer"
-import { image_renderer } from '../Styles.module.css'
+/**
+ * Image renderer.
+ */
+import { Renderer } from "./Renderer"
+import * as style from '../Styles.module.css'
 import { image_height } from "../answer_keys/country_flags"
 
 
 /**
- * Renders URLs to images.
+ * Renders images from their URLs.
  */
-export class ImageRenderer extends BaseRenderer<string> {
-  render(question: string): void {
-    const image_element = <img src={question} class={image_renderer} height={image_height}/>
-    this.rendering_area.replaceChildren(image_element)
-  }
+export const image_renderer: Renderer<string> = function(props) {
+  return (
+    <img
+      src={props.question}
+      class={style.image_renderer}
+      height={image_height}
+    />
+  )
 }

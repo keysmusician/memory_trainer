@@ -1,5 +1,5 @@
-import type { BaseRenderer } from "./renderers/BaseRenderer"
 import type { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
+
 
 export interface GradingInfo<QuestionType=any, AnswerType=any>{
   grade: any
@@ -13,7 +13,7 @@ export interface MemoryTrainerInputs<QuestionType, AnswerType> {
   evaluate: (response: unknown, answer: AnswerType) => any
   fetch_response: () => Promise<unknown>
   on_grade?: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
-  renderer: BaseRenderer<QuestionType>
+  set_question: (question: QuestionType) => void
   training_algorithm: typeof BaseTrainingAlgorithm
 }
 
@@ -24,7 +24,7 @@ export class MemoryTrainerApp {
   answers: any[]
   evaluate: (response: any, answer: any) => any
   questions: any[]
-  renderer: BaseRenderer<any>
+  set_question: (question: any) => void
   on_grade: (gradingInfo: GradingInfo) => boolean
   fetch_response: () => any
   trainer: BaseTrainingAlgorithm
@@ -34,7 +34,7 @@ export class MemoryTrainerApp {
     evaluate,
     fetch_response,
     on_grade: on_grade,
-    renderer,
+    set_question: set_question,
     training_algorithm,
   }: MemoryTrainerInputs<any, any>) {
     const questions = [...answer_key.keys()]
@@ -49,7 +49,7 @@ export class MemoryTrainerApp {
 
     this.on_grade = on_grade || (() => false)
 
-    this.renderer = renderer
+    this.set_question = set_question
 
     this.fetch_response = fetch_response
 
@@ -66,7 +66,7 @@ export class MemoryTrainerApp {
 
   async train(): Promise<void> {
     while (!this.trainer.is_complete) {
-      this.renderer.render(this.question)
+      this.set_question(this.question)
 
       let grade
 

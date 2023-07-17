@@ -2,7 +2,7 @@
 /**
  * SolidJS based renderer.
  */
-import { BaseRenderer } from "./BaseRenderer"
+import { BaseRenderer } from "./Renderer"
 import { Component, createSignal, Setter } from "solid-js"
 import solid_web from "solid-js/web"
 

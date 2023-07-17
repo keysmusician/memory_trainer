@@ -1,5 +1,5 @@
 import { VexNotation } from "../answer_keys/music_notation";
-import { BaseRenderer } from "./BaseRenderer";
+import { BaseRenderer, Renderer } from "./Renderer";
 
 
 declare global {
@@ -11,7 +11,7 @@ declare global {
 /**
  * Renders music notation.
  */
-export class MusicNotationRenderer extends BaseRenderer<VexNotation> {
+class MusicNotationRenderer extends BaseRenderer<VexNotation> {
     render_context;
 
     constructor (rendering_area: HTMLElement) {
@@ -30,8 +30,6 @@ export class MusicNotationRenderer extends BaseRenderer<VexNotation> {
 
       this.render_context = render_context
     }
-
-    protected override setUp(): void {}
 
 
     render(
@@ -77,3 +75,19 @@ export class MusicNotationRenderer extends BaseRenderer<VexNotation> {
       }
     }
   }
+
+
+/**
+ * Renders music notation.
+ */
+export const music_notation_renderer: Renderer<VexNotation> = function(props) {
+
+  return (
+    <div
+      id="music_notation_renderer"
+      ref={ (element) =>
+        new MusicNotationRenderer(element).render(props.question)
+      }
+    />
+  )
+}

@@ -1,15 +1,15 @@
-import { BaseRenderer } from "./BaseRenderer"
+import { Renderer } from "./Renderer"
 import { standard_text, large_text } from "../Styles.module.css"
 
 
 /**
  * Renders state capital questions.
  */
-export class StateCapitalTextRenderer extends BaseRenderer<string> {
-    render(question: string) {
-      const heading =
-        <p class={standard_text} >What's the capital of:</p>
-      const text_element = <h2 class={large_text}>{question + "?"}</h2>
-      this.rendering_area.replaceChildren(heading, text_element)
-    }
-  }
+export const state_capital_text_renderer: Renderer<string> = (props) => {
+  return (
+    <div>
+      <p class={standard_text} >What's the capital of:</p>
+      <h2 class={large_text}>{props.question + "?"}</h2>
+    </div>
+  )
+}

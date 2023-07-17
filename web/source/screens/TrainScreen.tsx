@@ -1,5 +1,5 @@
 import { MemoryTrainerApp, MemoryTrainerInputs } from "../MemoryTrainer"
-import { Setter, createReaction, createSignal, onMount } from "solid-js"
+import { Setter, createReaction, createSignal } from "solid-js"
 import { Screen } from "../App"
 import { Quiz } from "../quizzes"
 import {
@@ -9,6 +9,8 @@ import {
   verdict
 } from '../Styles.module.css'
 
+type GetQuestionType<C extends Quiz> = C extends Quiz<infer Q> ? Q : unknown;
+
 
 interface TrainScreenProps {
   setScreen: Setter<Screen>
@@ -17,6 +19,8 @@ interface TrainScreenProps {
 export function TrainScreen(props: TrainScreenProps) {
 
   const [response, set_response] = createSignal()
+
+  const [question, set_question] = createSignal<unknown>()
 
   const question_render_root = document.createElement("div")
 
@@ -38,7 +42,7 @@ export function TrainScreen(props: TrainScreenProps) {
 
   const quizSettings: MemoryTrainerInputs<any, any> = {
     ...props.quiz,
-    renderer: new props.quiz.renderer(question_render_root),
+    set_question: set_question,
     fetch_response: fetch_response,
     on_grade: on_grade,
   }
@@ -52,7 +56,7 @@ export function TrainScreen(props: TrainScreenProps) {
       {verdict_render_area}
 
       <div>
-        {question_render_root}
+        <props.quiz.renderer question={question()} />
       </div>
 
       <form

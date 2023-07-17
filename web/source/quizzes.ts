@@ -1,18 +1,18 @@
 import { GradingInfo } from "./MemoryTrainer"
 import { country_flags } from "./answer_keys/country_flags"
 import { SmartTrainer } from "./training_algorithms/SmartTrainer"
-import { ImageRenderer } from "./renderers/ImageRenderer"
+import { image_renderer } from "./renderers/ImageRenderer"
 import { compare_music_notation, compare_strictly_equal, compare_strings } from "./evaluators/evaluators"
-import { BaseRenderer } from "./renderers/BaseRenderer"
+import { Renderer } from "./renderers/Renderer"
 import { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
 import { music_notation } from "./answer_keys/music_notation"
-import { MusicNotationRenderer } from "./renderers/MusicNotationRenderer"
+import { music_notation_renderer } from "./renderers/MusicNotationRenderer"
 import { US_state_capitals } from "./answer_keys/state_capitals"
-import { StateCapitalTextRenderer } from "./renderers/StateCapitalTextRenderer"
+import { state_capital_text_renderer } from "./renderers/StateCapitalTextRenderer"
 import { Mora, hiragana } from "./answer_keys/hiragana"
 import { string_fetcher } from "./user_input_fetchers/string_fetcher"
 import { mora_fetcher } from "./user_input_fetchers/mora_fetcher"
-import { HiraganaRenderer } from "./renderers/HiraganaRenderer"
+import { hiragana_renderer } from "./renderers/HiraganaRenderer"
 import { empty } from "./answer_keys/empty"
 import { Component, Setter } from "solid-js"
 
@@ -60,7 +60,7 @@ export interface Quiz<
   evaluate: (response: ResponseType, answer: AnswerType) => any
   response_fetcher: ResponseFetcher<ResponseType>
   name: string
-  renderer: typeof BaseRenderer<QuestionType>
+  renderer: Renderer<QuestionType>
   on_grade?: (verdict_render_area: HTMLElement) => (
     (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
   )
@@ -85,7 +85,7 @@ const obj: Quiz = validateQuizType({
   evaluate: compare_strings,
   response_fetcher: string_fetcher,
   on_grade: build_on_grade,
-  renderer: ImageRenderer,
+  renderer: image_renderer,
   training_algorithm: SmartTrainer,
 })
 
@@ -96,7 +96,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     evaluate: compare_strings,
     response_fetcher: string_fetcher,
     on_grade: build_on_grade,
-    renderer: ImageRenderer,
+    renderer: image_renderer,
     training_algorithm: SmartTrainer,
   }),
   validateQuizType({
@@ -105,7 +105,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     evaluate: compare_music_notation,
     response_fetcher: string_fetcher,
     on_grade: build_on_grade,
-    renderer: MusicNotationRenderer,
+    renderer: music_notation_renderer,
     training_algorithm: SmartTrainer,
   }),
   validateQuizType({
@@ -114,7 +114,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     evaluate: compare_strings,
     response_fetcher: string_fetcher,
     on_grade: build_on_grade,
-    renderer: StateCapitalTextRenderer,
+    renderer: state_capital_text_renderer,
     training_algorithm: SmartTrainer,
   }),
   validateQuizType(
@@ -124,7 +124,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     evaluate: compare_strictly_equal<Mora>,
     response_fetcher: mora_fetcher,
     on_grade: build_on_grade,
-    renderer: HiraganaRenderer,
+    renderer: hiragana_renderer,
     training_algorithm: SmartTrainer,
   }),
   // {
@@ -132,7 +132,7 @@ export const quizzes: Quiz<any, any, any>[] = [
   //   answer_key: empty,
   //   evaluate: () => true,
   //   fetch_response: build_fetch_string,
-  //   renderer: BaseRenderer,
+  //   renderer: Renderer,
   //   training_algorithm: BaseTrainingAlgorithm,
   // }
 ]
