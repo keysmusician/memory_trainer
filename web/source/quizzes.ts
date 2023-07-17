@@ -10,9 +10,11 @@ import { MusicNotationRenderer } from "./renderers/MusicNotationRenderer"
 import { US_state_capitals } from "./answer_keys/state_capitals"
 import { StateCapitalTextRenderer } from "./renderers/StateCapitalTextRenderer"
 import { Mora, hiragana } from "./answer_keys/hiragana"
-import { build_fetch_string } from "./user_input_fetchers/string_fetcher"
-import { build_fetch_mora } from "./user_input_fetchers/mora_fetcher"
+import { string_fetcher } from "./user_input_fetchers/string_fetcher"
+import { mora_fetcher } from "./user_input_fetchers/mora_fetcher"
 import { HiraganaRenderer } from "./renderers/HiraganaRenderer"
+import { empty } from "./answer_keys/empty"
+import { Component, Setter } from "solid-js"
 
 
 function build_on_grade(verdict_render_area: HTMLElement) {
@@ -42,13 +44,21 @@ function build_on_grade(verdict_render_area: HTMLElement) {
   }
 }
 
-export interface Quiz<QuestionType=any, AnswerType=any, ResponseType=any> {
+export interface ResponseFetcherProps<ResponseType=unknown> {
+  set_response: Setter<ResponseType>
+}
+
+export type ResponseFetcher<ResponseType=unknown> =
+  Component<ResponseFetcherProps<ResponseType>>
+
+export interface Quiz<
+  QuestionType=unknown,
+  AnswerType=unknown,
+  ResponseType=unknown
+> {
   answer_key: Map<QuestionType, AnswerType>
   evaluate: (response: ResponseType, answer: AnswerType) => any
-  fetch_response: (
-    answer_submit_button: HTMLButtonElement,
-    user_input_element: HTMLInputElement
-  ) => (() => Promise<ResponseType>)
+  response_fetcher: ResponseFetcher<ResponseType>
   name: string
   renderer: typeof BaseRenderer<QuestionType>
   on_grade?: (verdict_render_area: HTMLElement) => (
@@ -73,18 +83,18 @@ const obj: Quiz = validateQuizType({
   name: "Country flags",
   answer_key: country_flags,
   evaluate: compare_strings,
-  fetch_response: build_fetch_string,
+  response_fetcher: string_fetcher,
   on_grade: build_on_grade,
   renderer: ImageRenderer,
   training_algorithm: SmartTrainer,
 })
 
-export const quizzes: Quiz[] = [
+export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
     name: "Country flags",
     answer_key: country_flags,
     evaluate: compare_strings,
-    fetch_response: build_fetch_string,
+    response_fetcher: string_fetcher,
     on_grade: build_on_grade,
     renderer: ImageRenderer,
     training_algorithm: SmartTrainer,
@@ -93,7 +103,7 @@ export const quizzes: Quiz[] = [
     name: "Music notation",
     answer_key: music_notation,
     evaluate: compare_music_notation,
-    fetch_response: build_fetch_string,
+    response_fetcher: string_fetcher,
     on_grade: build_on_grade,
     renderer: MusicNotationRenderer,
     training_algorithm: SmartTrainer,
@@ -102,16 +112,17 @@ export const quizzes: Quiz[] = [
     name: "U.S. State capitals",
     answer_key: US_state_capitals,
     evaluate: compare_strings,
-    fetch_response: build_fetch_string,
+    response_fetcher: string_fetcher,
     on_grade: build_on_grade,
     renderer: StateCapitalTextRenderer,
     training_algorithm: SmartTrainer,
   }),
-  validateQuizType({
+  validateQuizType(
+    {
     name: "Hiragana",
     answer_key: hiragana,
     evaluate: compare_strictly_equal<Mora>,
-    fetch_response: build_fetch_mora,
+    response_fetcher: mora_fetcher,
     on_grade: build_on_grade,
     renderer: HiraganaRenderer,
     training_algorithm: SmartTrainer,
@@ -120,7 +131,7 @@ export const quizzes: Quiz[] = [
   //   name: 'Empty',
   //   answer_key: empty,
   //   evaluate: () => true,
-  //   fetch_response: build_fetch_response,
+  //   fetch_response: build_fetch_string,
   //   renderer: BaseRenderer,
   //   training_algorithm: BaseTrainingAlgorithm,
   // }

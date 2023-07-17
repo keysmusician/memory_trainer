@@ -10,8 +10,8 @@ export interface GradingInfo<QuestionType=any, AnswerType=any>{
 
 export interface MemoryTrainerInputs<QuestionType, AnswerType> {
   answer_key: Map<QuestionType, AnswerType>
-  evaluate: (response: any, answer: AnswerType) => any
-  fetch_response: () => any
+  evaluate: (response: unknown, answer: AnswerType) => any
+  fetch_response: () => Promise<unknown>
   on_grade?: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
   renderer: BaseRenderer<QuestionType>
   training_algorithm: typeof BaseTrainingAlgorithm

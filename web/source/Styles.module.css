@@ -1,5 +1,6 @@
 :root {
     --large-text-size: 40px;
+    --enormous-text-size: 80px;
     --quit-dark-red: rgb(239, 41, 41);
     --quit-light-red: rgb(255, 70, 70);
     --selection-dark-blue: rgb(60, 195, 240);
@@ -24,6 +25,11 @@
 .large_text {
     composes: standard_text;
     font-size: var(--large-text-size);
+}
+
+.enormous_text {
+    composes: standard_text;
+    font-size: var(--enormous-text-size);
 }
 
 .content_box {
@@ -66,9 +72,9 @@
     background-color: var(--quit-dark-red);
 }
 
-.submit_button {
+/* .submit_button {
     composes: base_button;
-}
+} */
 
 
 .quiz_list_item {
@@ -85,12 +91,12 @@
     display: inline-block;
 }
 
-.response_box {
+/* .response_box {
     composes: standard_border standard_text;
     border-color: lightgray;
     margin: var(--standard-margin);
     width: 100%;
-}
+} */
 
 .row_layout {
     display: flex;
