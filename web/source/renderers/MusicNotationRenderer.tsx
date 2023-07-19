@@ -1,5 +1,6 @@
+import { JSXElement, createEffect } from "solid-js";
 import { VexNotation } from "../answer_keys/music_notation";
-import { BaseRenderer, Renderer } from "./Renderer";
+import { Renderer } from "./Renderer";
 
 
 declare global {
@@ -11,15 +12,14 @@ declare global {
 /**
  * Renders music notation.
  */
-class MusicNotationRenderer extends BaseRenderer<VexNotation> {
+class MusicNotationRenderer {
     render_context;
 
-    constructor (rendering_area: HTMLElement) {
-      super(rendering_area);
+    constructor (rendering_area: JSXElement) {
 
       const Renderer = window.Vex.Flow.Renderer;
 
-      const renderer = new Renderer(this.rendering_area, Renderer.Backends.SVG);
+      const renderer = new Renderer(rendering_area, Renderer.Backends.SVG);
 
       // Configure the rendering context.
       renderer.resize(208, 350);
@@ -32,9 +32,7 @@ class MusicNotationRenderer extends BaseRenderer<VexNotation> {
     }
 
 
-    render(
-      [clef, pitch, accidental]: VexNotation // BUG?: I shouldn't have to specify the type here...
-    ) {
+    render([clef, pitch, accidental]: VexNotation) {
       // Clear existing notes from the staff.
       const notation = document.querySelectorAll(
         '.vf-stavenote, .vf-stave');
@@ -81,13 +79,11 @@ class MusicNotationRenderer extends BaseRenderer<VexNotation> {
  * Renders music notation.
  */
 export const music_notation_renderer: Renderer<VexNotation> = function(props) {
+  const music_notation_root_element = <div/>
 
-  return (
-    <div
-      id="music_notation_renderer"
-      ref={ (element) =>
-        new MusicNotationRenderer(element).render(props.question)
-      }
-    />
-  )
+  const renderer = new MusicNotationRenderer(music_notation_root_element)
+
+  createEffect(() => renderer.render(props.question))
+
+  return music_notation_root_element
 }
