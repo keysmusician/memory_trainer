@@ -1,6 +1,6 @@
 type Accidental = '' | 'b' | '#'
 
-const pitch_classes = [
+export const pitch_classes = [
   'A#' , 'B#' , 'C#' , 'D#' , 'E#' , 'F#' , 'G#' ,
   'A'  , 'B'  , 'C'  , 'D'  , 'E'  , 'F'  , 'G'  ,
   'Ab' , 'Bb' , 'Cb' , 'Db' , 'Eb' , 'Fb' , 'Gb' ,

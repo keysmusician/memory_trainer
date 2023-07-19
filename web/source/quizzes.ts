@@ -15,6 +15,9 @@ import { mora_fetcher } from "./user_input_fetchers/mora_fetcher"
 import { hiragana_renderer } from "./renderers/HiraganaRenderer"
 import { empty } from "./answer_keys/empty"
 import { Component, Setter } from "solid-js"
+import { country_fetcher } from "./user_input_fetchers/country_fetcher"
+import { state_capital_fetcher } from "./user_input_fetchers/state_capital_fetcher"
+import { musical_keyboard } from "./user_input_fetchers/musical_keyboard"
 
 
 function build_on_grade(verdict_render_area: HTMLElement) {
@@ -79,22 +82,12 @@ function validateQuizType<
   >
 >(obj: Q) {return obj}
 
-const obj: Quiz = validateQuizType({
-  name: "Country flags",
-  answer_key: country_flags,
-  evaluate: compare_strings,
-  response_fetcher: string_fetcher,
-  on_grade: build_on_grade,
-  renderer: image_renderer,
-  training_algorithm: SmartTrainer,
-})
-
 export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
     name: "Country flags",
     answer_key: country_flags,
     evaluate: compare_strings,
-    response_fetcher: string_fetcher,
+    response_fetcher: country_fetcher,
     on_grade: build_on_grade,
     renderer: image_renderer,
     training_algorithm: SmartTrainer,
@@ -103,7 +96,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     name: "Music notation",
     answer_key: music_notation,
     evaluate: compare_music_notation,
-    response_fetcher: string_fetcher,
+    response_fetcher: musical_keyboard,
     on_grade: build_on_grade,
     renderer: music_notation_renderer,
     training_algorithm: SmartTrainer,
@@ -112,7 +105,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     name: "U.S. State capitals",
     answer_key: US_state_capitals,
     evaluate: compare_strings,
-    response_fetcher: string_fetcher,
+    response_fetcher: state_capital_fetcher,
     on_grade: build_on_grade,
     renderer: state_capital_text_renderer,
     training_algorithm: SmartTrainer,
