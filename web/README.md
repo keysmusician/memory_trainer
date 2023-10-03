@@ -9,3 +9,7 @@ Memory Speed Trainer
 Recall Trainer
 Memory Coach
 -->
+
+# To-do
+- Add a quiz configuration screen
+- Add a quiz builder interface
