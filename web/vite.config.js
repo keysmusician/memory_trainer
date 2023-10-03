@@ -9,7 +9,9 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    outDir: "../distributable"
+    outDir: "../distributable",
+
   },
   root: "source",
+  base: "./",
 });
