@@ -144,7 +144,7 @@ const country_code_name_map = {
   "mc": "Monaco",
   "md": "Moldova",
   "me": "Montenegro",
-  "mf": "Saint Martin",
+  // "mf": "Saint Martin",
   "mg": "Madagascar",
   "mh": "Marshall Islands",
   "mk": "North Macedonia",

@@ -1,6 +1,6 @@
 import { MemoryTrainerApp, MemoryTrainerInputs } from "../MemoryTrainer"
-import { Setter, createReaction, createSignal } from "solid-js"
-import { Screen } from "../App"
+import { createReaction, createSignal } from "solid-js"
+import { useScreen } from "../App"
 import { Quiz } from "../quizzes"
 import {
   quit_button,
@@ -13,7 +13,6 @@ type GetQuestionType<C extends Quiz> = C extends Quiz<infer Q> ? Q : unknown;
 
 
 interface TrainScreenProps {
-  setScreen: Setter<Screen>
   quiz: Quiz
 }
 export function TrainScreen(props: TrainScreenProps) {
@@ -21,6 +20,8 @@ export function TrainScreen(props: TrainScreenProps) {
   const [response, set_response] = createSignal()
 
   const [question, set_question] = createSignal<unknown>()
+
+  const [screen, setScreen] = useScreen()!;
 
   const question_render_root = document.createElement("div")
 
@@ -47,40 +48,40 @@ export function TrainScreen(props: TrainScreenProps) {
     on_grade: on_grade,
   }
 
-  new MemoryTrainerApp(quizSettings).train().then(
-      () => props.setScreen('Score')
-    )
+  new MemoryTrainerApp(quizSettings).train().then(() => setScreen('Score'))
 
   return (
-    <>
+    <div
+      style={{
+        display: 'flex',
+        "flex-direction": 'column',
+        "align-items": 'center',
+        "justify-content": 'center',
+        height: '100%'
+      }}
+    >
       {verdict_render_area}
 
       <div>
         <props.quiz.renderer question={question()} />
       </div>
 
-      <form
-        action=""
-        id="answer_form"
-        onsubmit={submit_event => submit_event.preventDefault()}
-        style={{
-          "display": "flex",
-          "flex-direction": 'column',
-          "align-items": "center",
-        }}
-      >
-        <props.quiz.response_fetcher set_response={set_response} />
+      <div style={{ margin: "1em" }}>
+        <props.quiz.response_fetcher
+          set_response={set_response}
+          quiz={props.quiz}
+        />
+      </div>
 
-        <div class={training_buttons}>
-          <button
-            class={quit_button}
-            onClick={() => props.setScreen('Start')}
-            type="button"
-          >
-            Quit
-          </button>
-        </div>
-      </form>
-    </>
+      <div class={training_buttons}>
+        <button
+          class={quit_button}
+          onClick={() => setScreen('Start')}
+          type="button"
+        >
+          Quit
+        </button>
+      </div>
+    </div>
   )
 }

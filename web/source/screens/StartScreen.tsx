@@ -1,8 +1,11 @@
 import { Setter, For, createSignal } from "solid-js"
-import { Screen } from "../App"
+import { useScreen } from "../App"
 import { Quiz, quizzes } from "../quizzes"
 import { column_layout, quiz_list_item, start_button } from '../Styles.module.css'
 
+for (const quiz of quizzes) {
+  quiz.unselected_answer_key ??= new Map()
+}
 
 const [quizIndex, setQuizIndex] = createSignal(0)
 
@@ -15,53 +18,83 @@ function Quizzes(props: QuizzesProps) {
     setQuizIndex(index)
   }
 
+  const [, setScreen] = useScreen()!;
+
   return (
-    <div class={column_layout}>
+    <ul class={column_layout}>
       <For each={quizzes}>
         {(quiz, index) => {
           const input_id = String(index())
 
           return (
-            <div
+            <li
               class={quiz_list_item}
               onClick={[selectQuiz, [quiz, index]]}
               tabIndex={-1}
             >
               <label for={input_id}>{quiz.name}</label>
 
-              <input
-                checked={index() === quizIndex()}
-                id={input_id}
-                type="radio"
-                name="quiz"
-                style={{'float': 'right'}}
-              />
-            </div>
+              <div
+                style={{ 'float': 'right' }}
+              >
+                <input
+                  checked={index() === quizIndex()}
+                  id={input_id}
+                  type="radio"
+                  name="quiz"
+                />
+                <button
+                  onClick={[setScreen, "Edit"]}
+                  style={{ 'margin-left': '0.5rem' }}
+                >
+                  Configure
+                </button>
+
+                <button
+                  onClick={() => {
+                    props.setQuiz(quiz)
+                    setScreen('Train')
+                  }}
+                  style={{ 'margin-left': '0.5rem' }}
+                >
+                  Start
+                </button>
+              </div>
+            </li>
           )
         }}
       </For>
-    </div>
+    </ul>
   )
 }
 
 interface StartScreenProps {
-  setScreenName: Setter<Screen>
   setQuiz: Setter<Quiz>
 }
 export function StartScreen(props: StartScreenProps) {
-  function beginTraining() { props.setScreenName('Train') }
 
   return (
-    <>
-      <Quizzes setQuiz={props.setQuiz} />
-      <form>
-        <button
-          onClick={beginTraining}
-          class={start_button}
-        >
-          Start
-        </button>
-      </form>
-    </>
+    <Quizzes setQuiz={props.setQuiz} />
+  )
+}
+
+interface StartButtonProps {
+  onClick?: () => void
+}
+export function StartButton(props: StartButtonProps) {
+  const [, setScreen] = useScreen()!;
+
+  function beginTraining() {
+    if (props.onClick) { props.onClick() }
+    setScreen('Train')
+  }
+
+  return (
+    <button
+      onClick={beginTraining}
+      class={start_button}
+    >
+      Start
+    </button>
   )
 }

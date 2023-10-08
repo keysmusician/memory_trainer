@@ -1,17 +1,15 @@
-import { Setter } from "solid-js"
-import { Screen } from "../App"
+import { useScreen } from "../App"
 
 
-interface ScoreScreenProps{
-    setScreen: Setter<Screen>
-}
-export function ScoreScreen(props: ScoreScreenProps) {
+export function ScoreScreen() {
+    const [, setScreen] = useScreen()!;
+
     return (
         <>
             <h2>Complete!</h2>
 
             <button
-                onClick={() => props.setScreen('Start')}
+                onClick={() => setScreen('Start')}
             >
                 Restart
             </button>

@@ -13,7 +13,7 @@
 
 .standard_text {
     font-size: var(--standard-text-size);
-    font: "DM Sans", sans-serif;
+    font-family: "DM Sans", sans-serif;
 }
 
 .title {
@@ -127,4 +127,12 @@
 
 .verdict::before {
     content: '\feff';
+}
+
+li {
+    list-style-type: none;
+}
+
+ul {
+    padding: 0;
 }

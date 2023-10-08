@@ -47,17 +47,18 @@ function build_on_grade(verdict_render_area: HTMLElement) {
   }
 }
 
-export interface ResponseFetcherProps<ResponseType=unknown> {
+export interface ResponseFetcherProps<ResponseType = unknown> {
   set_response: Setter<ResponseType>
+  quiz?: Quiz
 }
 
-export type ResponseFetcher<ResponseType=unknown> =
+export type ResponseFetcher<ResponseType = unknown> =
   Component<ResponseFetcherProps<ResponseType>>
 
 export interface Quiz<
-  QuestionType=unknown,
-  AnswerType=unknown,
-  ResponseType=unknown
+  QuestionType = unknown,
+  AnswerType = unknown,
+  ResponseType = unknown
 > {
   answer_key: Map<QuestionType, AnswerType>
   evaluate: (response: ResponseType, answer: AnswerType) => any
@@ -80,7 +81,7 @@ function validateQuizType<
     MapValueType<Q['answer_key']>,
     Parameters<Q['evaluate']>[0]
   >
->(obj: Q) {return obj}
+>(obj: Q) { return obj }
 
 export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
@@ -112,14 +113,14 @@ export const quizzes: Quiz<any, any, any>[] = [
   }),
   validateQuizType(
     {
-    name: "Hiragana",
-    answer_key: hiragana,
-    evaluate: compare_strictly_equal<Mora>,
-    response_fetcher: mora_fetcher,
-    on_grade: build_on_grade,
-    renderer: hiragana_renderer,
-    training_algorithm: SmartTrainer,
-  }),
+      name: "Hiragana",
+      answer_key: hiragana,
+      evaluate: compare_strictly_equal<Mora>,
+      response_fetcher: mora_fetcher,
+      on_grade: build_on_grade,
+      renderer: hiragana_renderer,
+      training_algorithm: SmartTrainer,
+    }),
   // {
   //   name: 'Empty',
   //   answer_key: empty,
