@@ -1,7 +1,12 @@
+/**
+ * This file contains the main class for the memory trainer. It is responsible
+ * for connecting all the quiz components together and running the training
+ * loop.
+ **/
 import type { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
 
 
-export interface GradingInfo<QuestionType=any, AnswerType=any>{
+export interface GradingInfo<QuestionType = any, AnswerType = any> {
   grade: any
   regrades: number
   question: QuestionType
@@ -10,7 +15,7 @@ export interface GradingInfo<QuestionType=any, AnswerType=any>{
 
 export interface MemoryTrainerInputs<QuestionType, AnswerType> {
   answer_key: Map<QuestionType, AnswerType>
-  evaluate: (response: unknown, answer: AnswerType) => any
+  evaluator: (response: unknown, answer: AnswerType) => any
   fetch_response: () => Promise<unknown>
   on_grade?: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
   set_question: (question: QuestionType) => void
@@ -18,7 +23,7 @@ export interface MemoryTrainerInputs<QuestionType, AnswerType> {
 }
 
 /**
- * Class which manages I/O for the MemoryTrainer.
+ * Connects all the quiz components together and defines the training loop.
  */
 export class MemoryTrainerApp {
   answers: any[]
@@ -31,7 +36,7 @@ export class MemoryTrainerApp {
 
   constructor({
     answer_key,
-    evaluate,
+    evaluator,
     fetch_response,
     on_grade: on_grade,
     set_question: set_question,
@@ -53,7 +58,7 @@ export class MemoryTrainerApp {
 
     this.fetch_response = fetch_response
 
-    this.evaluate = evaluate
+    this.evaluate = evaluator
   }
 
   get answer(): any {

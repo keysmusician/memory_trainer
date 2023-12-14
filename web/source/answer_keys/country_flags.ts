@@ -77,7 +77,7 @@ const country_code_name_map = {
   "fr": "France",
   "ga": "Gabon",
   "gb": "United Kingdom",
-  "gb-eng": "England",
+  // "gb-eng": "England",
   // "gb-nir": "Northern Ireland",
   // "gb-sct": "Scotland",
   // "gb-wls": "Wales",

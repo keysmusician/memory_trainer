@@ -1,15 +1,14 @@
 import { For, Setter } from "solid-js"
-import { Quiz } from "../quizzes"
 import { StartButton } from "./StartScreen"
-import { useScreen } from "../App"
-import { base_button } from "../Styles.module.css"
+import { AppNavigator, routes, useQuiz } from "../App"
+import { styleGroup } from "../Style"
+import { Quiz } from "../quiz";
+import { useNavigate } from "@solidjs/router";
 
 
-interface EditScreenProps {
-  quiz: Quiz
-  setQuiz: Setter<Quiz>
-}
-export function EditScreen(props: EditScreenProps) {
+export function EditScreen() {
+  const [quiz, setQuiz] = useQuiz()!;
+
   return (
     <div
       style={{
@@ -21,10 +20,10 @@ export function EditScreen(props: EditScreenProps) {
       }}
     >
       <h2>
-        Editing <i>{props.quiz.name}</i>
+        Editing <i>{quiz.name}</i>
       </h2>
 
-      <AnswerKeyEditor quiz={props.quiz} setQuiz={props.setQuiz} />
+      <AnswerKeyEditor quiz={quiz} setQuiz={setQuiz} />
 
       <div style={{ 'display': 'flex', 'gap': '1em', 'flex-direction': 'row' }}>
 
@@ -123,15 +122,16 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
 }
 
 
-function HomeButton() {
-  const [, setScreen] = useScreen()!
+export function HomeButton() {
+  const navigate = useNavigate() as AppNavigator
 
   return (
     <button
-      onClick={[setScreen, 'Start']}
-      type='button'
-      class={base_button}
-      style={{ 'margin-left': '0.5rem' }}
+      onClick={() => navigate(routes.start)}
+      style={{
+        ...styleGroup.button,
+        'margin-left': '0.5rem'
+      }}
     >
       Home
     </button>

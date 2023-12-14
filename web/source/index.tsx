@@ -1,7 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import './index.css';
-import MemoryTrainer from './App';
+import App from './App';
 
 const rootElement = document.getElementById('memory_trainer_app_root');
 
@@ -11,4 +11,4 @@ if (import.meta.env.DEV && !(rootElement instanceof HTMLElement)) {
   );
 }
 
-render(() => <MemoryTrainer />, rootElement!);
+render(() => <App />, rootElement!);

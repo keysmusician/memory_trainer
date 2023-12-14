@@ -1,4 +1,5 @@
-:root {
+/* being deprecated */
+/* :root {
     --large-text-size: 40px;
     --enormous-text-size: 80px;
     --quit-dark-red: rgb(239, 41, 41);
@@ -9,50 +10,23 @@
     --standard-margin: 15px;
     --standard-text-size: 30px;
     --title-size: 50px;
-}
+} */
 
-.standard_text {
+/* .standard_text {
     font-size: var(--standard-text-size);
-    font-family: "DM Sans", sans-serif;
-}
-
-.title {
-    composes: standard_text;
-    font-size: var(--title-size);
-    font-weight: bolder;
-}
-
-.large_text {
-    composes: standard_text;
-    font-size: var(--large-text-size);
-}
-
-.enormous_text {
-    composes: standard_text;
-    font-size: var(--enormous-text-size);
-}
-
-.content_box {
-    align-items: center;
-    box-sizing: border-box;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: space-evenly;
-    width: 100%;
 }
 
 .standard_border {
     border-radius: 50px;
     border: solid black var(--standard-border-thickness);
-}
+} */
 
-.base_button {
+/* .base_button {
     composes: standard_border standard_text;
     cursor: pointer;
     height: 75px;
     width: 125px;
-}
+} */
 
 .start_button {
     composes: base_button;
@@ -68,6 +42,17 @@
     background-color: var(--quit-light-red);
 }
 
+.nested_button {
+    composes: base_button;
+    border: 1px solid red;
+    background-color: var(--selection-light-blue);
+    height: 100%;
+}
+
+.nested_button:hover {
+    background-color: var(--selection-dark-blue);
+}
+
 .quit_button:hover {
     background-color: var(--quit-dark-red);
 }
@@ -77,13 +62,12 @@
 } */
 
 
-.quiz_list_item {
+/* .quiz_list_item {
     composes: standard_border standard_text;
     border-color: var(--selection-light-blue);
     font-size: large;
     margin: var(--standard-margin);
-    padding: 15px;
-}
+} */
 
 .quiz_list_item:hover,
 .quiz_list_item:focus-within {
@@ -98,17 +82,17 @@
     width: 100%;
 } */
 
-.row_layout {
+/* .row_layout {
     display: flex;
     flex-direction: row;
-}
+} */
 
-.column_layout {
+/* .column_layout {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin: var(--standard-margin);
-}
+} */
 
 .training_buttons {
     composes: row_layout;
@@ -117,22 +101,10 @@
     width: 100%;
 }
 
-.image_renderer {
-    box-shadow: 0px 2px 10px black;
-}
-
-.verdict {
+/* .verdict {
     composes: standard_text;
-}
+} */
 
 .verdict::before {
     content: '\feff';
-}
-
-li {
-    list-style-type: none;
-}
-
-ul {
-    padding: 0;
 }

@@ -1,64 +1,66 @@
 import { createStore } from 'solid-js/store'
 import {
-  createSignal,
   createContext,
   useContext,
-  Match,
-  Switch,
-  Accessor,
   Setter,
 } from 'solid-js'
 import {
+  CreateScreen,
+  EditScreen,
+  ScoreScreen,
   StartScreen,
   TrainScreen,
-  ScoreScreen,
-  EditScreen
 } from './screens/Screens.barrel'
-import { defaultQuiz, Quiz } from './quizzes'
-import { title, content_box } from './Styles.module.css'
+import { Quiz } from './quiz'
+import { defaultQuiz, empty_quiz } from './quizzes'
+import { Router, Routes, Route } from '@solidjs/router'
+import { styleGroup } from './Style'
 
 
-export type Screen = 'Start' | 'Train' | 'Score' | 'Edit'
+export namespace routes {
+  export const start = '/'
+  export const train = '/train'
+  export const score = '/score'
+  export const edit = '/edit'
+  export const create = '/create'
+}
 
-const ScreenContext = createContext<[
-  Accessor<Screen>,
-  Setter<Screen>
-]>(['Start', () => { }]);
+export type AppRoute = typeof routes[keyof typeof routes]
 
-export function useScreen() { return useContext(ScreenContext); }
+export type AppNavigator = (route: AppRoute, params?: Record<string, string>) => void
+
+const QuizContext = createContext<[
+  Quiz,
+  Setter<Quiz>
+]>([new Quiz(empty_quiz), () => new Quiz(empty_quiz)]);
+
+export function useQuiz() { return useContext(QuizContext)!; }
 
 /**
  * Memory Trainer application root component.
  */
-function MemoryTrainer() {
-  const [screen, setScreen] = createSignal<Screen>('Start')
-
-  const [quiz, setQuiz] = createStore<Quiz>({ ...defaultQuiz })
-
+function App() {
   return (
-    <ScreenContext.Provider value={[screen, setScreen]}>
-      <h1 class={title}>Memory Trainer</h1>
+    <Router>
+      <QuizContext.Provider value={createStore<Quiz>(new Quiz(defaultQuiz))}>
+        <h1 style={styleGroup.title}>Memory Trainer</h1>
 
-      <section id="memory_trainer" class={content_box}>
-        <Switch fallback={
-          <StartScreen setQuiz={setQuiz} />
-        }>
+        <section id='memory_trainer' style={styleGroup.contentBox}>
+          <Routes>
+            <Route path={[routes.start, '*']} element={<StartScreen />} />
 
-          <Match when={screen() === 'Edit'}>
-            <EditScreen quiz={quiz} setQuiz={setQuiz} />
-          </Match>
+            <Route path={routes.edit} element={<EditScreen />} />
 
-          <Match when={screen() === 'Train'}>
-            <TrainScreen quiz={quiz} />
-          </Match>
+            <Route path={routes.create} element={<CreateScreen />} />
 
-          <Match when={screen() === 'Score'}>
-            <ScoreScreen />
-          </Match>
-        </Switch>
-      </section>
-    </ScreenContext.Provider>
+            <Route path={routes.train} element={<TrainScreen />} />
+
+            <Route path={routes.score} element={<ScoreScreen />} />
+          </Routes>
+        </section>
+      </QuizContext.Provider>
+    </Router >
   )
 }
 
-export default MemoryTrainer
+export default App

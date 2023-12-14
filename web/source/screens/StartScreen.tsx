@@ -1,34 +1,44 @@
-import { Setter, For, createSignal } from "solid-js"
-import { useScreen } from "../App"
-import { Quiz, quizzes } from "../quizzes"
-import { column_layout, quiz_list_item, start_button } from '../Styles.module.css'
+import { For, createSignal } from 'solid-js'
+import { useQuiz, routes, AppNavigator } from '../App'
+import { Quiz } from '../quiz'
+import { quizzes as serialized_quizzes } from '../quizzes'
+// import { column_layout, quiz_list_item, start_button, nested_button } from '../Styles.module.css'
+import { useNavigate } from '@solidjs/router'
+import { styleGroup, style } from '../Style'
 
-for (const quiz of quizzes) {
-  quiz.unselected_answer_key ??= new Map()
-}
+
+export const quizzes = serialized_quizzes.map(quiz => new Quiz(quiz))
 
 const [quizIndex, setQuizIndex] = createSignal(0)
 
-interface QuizzesProps {
-  setQuiz: Setter<Quiz>
+export function StartScreen() {
+
+  return (
+    <Quizzes />
+  )
 }
-function Quizzes(props: QuizzesProps) {
+
+function Quizzes() {
+  const [, setQuiz] = useQuiz()
+
+  const navigate = useNavigate() as AppNavigator
+
   const selectQuiz = ([quiz, index]: [Quiz, number]) => {
-    props.setQuiz(quiz)
+    setQuiz(quiz)
     setQuizIndex(index)
   }
 
-  const [, setScreen] = useScreen()!;
-
   return (
-    <ul class={column_layout}>
+    <ul style={styleGroup.column}>
       <For each={quizzes}>
         {(quiz, index) => {
           const input_id = String(index())
 
           return (
             <li
-              class={quiz_list_item}
+              style={{
+                width: '100%',
+              }}
               onClick={[selectQuiz, [quiz, index]]}
               tabIndex={-1}
             >
@@ -38,24 +48,27 @@ function Quizzes(props: QuizzesProps) {
                 style={{ 'float': 'right' }}
               >
                 <input
+                  style={{
+                    'margin': '0 0.5rem 0 0',
+                  }}
                   checked={index() === quizIndex()}
                   id={input_id}
-                  type="radio"
-                  name="quiz"
+                  type='radio'
+                  name='quiz'
                 />
                 <button
-                  onClick={[setScreen, "Edit"]}
-                  style={{ 'margin-left': '0.5rem' }}
+                  onClick={() => navigate(routes.edit)}
+                // style={nested_button}
                 >
                   Configure
                 </button>
 
                 <button
                   onClick={() => {
-                    props.setQuiz(quiz)
-                    setScreen('Train')
+                    setQuiz(quiz)
+                    navigate(routes.train)
                   }}
-                  style={{ 'margin-left': '0.5rem' }}
+                // style={nested_button}
                 >
                   Start
                 </button>
@@ -64,17 +77,11 @@ function Quizzes(props: QuizzesProps) {
           )
         }}
       </For>
+
+      <li>
+        <NewQuizButton />
+      </li>
     </ul>
-  )
-}
-
-interface StartScreenProps {
-  setQuiz: Setter<Quiz>
-}
-export function StartScreen(props: StartScreenProps) {
-
-  return (
-    <Quizzes setQuiz={props.setQuiz} />
   )
 }
 
@@ -82,19 +89,39 @@ interface StartButtonProps {
   onClick?: () => void
 }
 export function StartButton(props: StartButtonProps) {
-  const [, setScreen] = useScreen()!;
+
+  const navigate = useNavigate()
 
   function beginTraining() {
     if (props.onClick) { props.onClick() }
-    setScreen('Train')
+    navigate(routes.train)
   }
 
   return (
     <button
       onClick={beginTraining}
-      class={start_button}
+      style={styleGroup.startButton}
     >
       Start
+    </button>
+  )
+}
+
+
+function NewQuizButton() {
+  const navigate = useNavigate()
+
+  return (
+    <button
+      onClick={() => navigate(routes.create)}
+      tabIndex={0}
+      style={{
+        ...styleGroup.startButton,
+        'margin-right': '0.5rem',
+      }}
+      type='button'
+    >
+      New Quiz
     </button>
   )
 }

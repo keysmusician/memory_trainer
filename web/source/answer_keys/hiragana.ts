@@ -1,3 +1,5 @@
+import { Mora } from './_mora'
+
 export type HiraganaCharacter =
   'あ' | 'い' | 'う' | 'え' | 'お' |
   'か' | 'き' | 'く' | 'け' | 'こ' |
@@ -6,61 +8,10 @@ export type HiraganaCharacter =
   'な' | 'に' | 'ぬ' | 'ね' | 'の' |
   'は' | 'ひ' | 'ふ' | 'へ' | 'ほ' |
   'ま' | 'み' | 'む' | 'め' | 'も' |
-  'や' |        'ゆ' |       'よ' |
+  'や' | 'ゆ' | 'よ' |
   'ら' | 'り' | 'る' | 'れ' | 'ろ' |
-  'わ' | 'ゐ' |        'ゑ' | 'を' |
+  'わ' | 'ゐ' | 'ゑ' | 'を' |
   'ん'
-
-export enum Mora {
-  a = 'a',
-  i = 'i',
-  u = 'u',
-  e = 'e',
-  o = 'o',
-  ka = 'ka',
-  ki = 'ki',
-  ku = 'ku',
-  ke = 'ke',
-  ko = 'ko',
-  sa = 'sa',
-  shi = 'shi',
-  su = 'su',
-  se = 'se',
-  so = 'so',
-  ta = 'ta',
-  chi = 'chi',
-  tsu = 'tsu',
-  te = 'te',
-  to = 'to',
-  na = 'na',
-  ni = 'ni',
-  nu = 'nu',
-  ne = 'ne',
-  no = 'no',
-  ha = 'ha',
-  hi = 'hi',
-  fu = 'fu',
-  he = 'he',
-  ho = 'ho',
-  ma = 'ma',
-  mi = 'mi',
-  mu = 'mu',
-  me = 'me',
-  mo = 'mo',
-  ya = 'ya',
-  yu = 'yu',
-  yo = 'yo',
-  ra = 'ra',
-  ri = 'ri',
-  ru = 'ru',
-  re = 're',
-  ro = 'ro',
-  wa = 'wa',
-  wi = 'wi',
-  we = 'we',
-  wo = 'wo',
-  n = 'n',
-}
 
 export const hiragana: Map<HiraganaCharacter, Mora> = new Map([
   ['あ', Mora.a,],

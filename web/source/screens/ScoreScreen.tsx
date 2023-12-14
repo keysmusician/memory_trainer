@@ -1,15 +1,16 @@
-import { useScreen } from "../App"
+import { useNavigate } from "@solidjs/router"
+import { AppNavigator, routes } from "../App"
 
 
 export function ScoreScreen() {
-    const [, setScreen] = useScreen()!;
+    const navigate = useNavigate() as AppNavigator
 
     return (
         <>
             <h2>Complete!</h2>
 
             <button
-                onClick={() => setScreen('Start')}
+                onClick={() => navigate(routes.start)}
             >
                 Restart
             </button>

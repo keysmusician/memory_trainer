@@ -1,23 +1,30 @@
 import { GradingInfo } from "./MemoryTrainer"
 import { country_flags } from "./answer_keys/country_flags"
 import { SmartTrainer } from "./training_algorithms/SmartTrainer"
-import { image_renderer } from "./renderers/ImageRenderer"
+import {
+  type Renderer,
+  image_renderer,
+  state_capital_text_renderer,
+  music_notation_renderer,
+  empty_renderer,
+} from "./renderers/Renderers.barrel"
 import { compare_music_notation, compare_strictly_equal, compare_strings } from "./evaluators/evaluators"
-import { Renderer } from "./renderers/Renderer"
 import { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
-import { music_notation } from "./answer_keys/music_notation"
-import { music_notation_renderer } from "./renderers/MusicNotationRenderer"
-import { US_state_capitals } from "./answer_keys/state_capitals"
-import { state_capital_text_renderer } from "./renderers/StateCapitalTextRenderer"
-import { Mora, hiragana } from "./answer_keys/hiragana"
+import {
+  type Mora,
+  hiragana,
+  katakana,
+  music_notation,
+  US_state_capitals,
+} from "./answer_keys/answer_keys.barrel"
 import { string_fetcher } from "./user_input_fetchers/string_fetcher"
 import { mora_fetcher } from "./user_input_fetchers/mora_fetcher"
-import { hiragana_renderer } from "./renderers/HiraganaRenderer"
 import { empty } from "./answer_keys/empty"
 import { Component, Setter } from "solid-js"
 import { country_fetcher } from "./user_input_fetchers/country_fetcher"
 import { state_capital_fetcher } from "./user_input_fetchers/state_capital_fetcher"
 import { musical_keyboard } from "./user_input_fetchers/musical_keyboard"
+import { character_renderer } from "./renderers/CharacterRenderer"
 
 
 function build_on_grade(verdict_render_area: HTMLElement) {
@@ -61,7 +68,7 @@ export interface Quiz<
   ResponseType = unknown
 > {
   answer_key: Map<QuestionType, AnswerType>
-  evaluate: (response: ResponseType, answer: AnswerType) => any
+  evaluator: (response: ResponseType, answer: AnswerType) => any
   response_fetcher: ResponseFetcher<ResponseType>
   name: string
   renderer: Renderer<QuestionType>
@@ -79,7 +86,7 @@ function validateQuizType<
   Q extends Quiz<
     MapKeyType<Q['answer_key']>,
     MapValueType<Q['answer_key']>,
-    Parameters<Q['evaluate']>[0]
+    Parameters<Q['evaluator']>[0]
   >
 >(obj: Q) { return obj }
 
@@ -87,7 +94,7 @@ export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
     name: "Country flags",
     answer_key: country_flags,
-    evaluate: compare_strings,
+    evaluator: compare_strings,
     response_fetcher: country_fetcher,
     on_grade: build_on_grade,
     renderer: image_renderer,
@@ -96,7 +103,7 @@ export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
     name: "Music notation",
     answer_key: music_notation,
-    evaluate: compare_music_notation,
+    evaluator: compare_music_notation,
     response_fetcher: musical_keyboard,
     on_grade: build_on_grade,
     renderer: music_notation_renderer,
@@ -105,7 +112,7 @@ export const quizzes: Quiz<any, any, any>[] = [
   validateQuizType({
     name: "U.S. State capitals",
     answer_key: US_state_capitals,
-    evaluate: compare_strings,
+    evaluator: compare_strings,
     response_fetcher: state_capital_fetcher,
     on_grade: build_on_grade,
     renderer: state_capital_text_renderer,
@@ -115,20 +122,39 @@ export const quizzes: Quiz<any, any, any>[] = [
     {
       name: "Hiragana",
       answer_key: hiragana,
-      evaluate: compare_strictly_equal<Mora>,
+      evaluator: compare_strictly_equal<Mora>,
       response_fetcher: mora_fetcher,
       on_grade: build_on_grade,
-      renderer: hiragana_renderer,
+      renderer: character_renderer,
+      training_algorithm: SmartTrainer,
+    }),
+  validateQuizType(
+    {
+      name: "Katakana",
+      answer_key: katakana,
+      evaluator: compare_strictly_equal<Mora>,
+      response_fetcher: mora_fetcher,
+      on_grade: build_on_grade,
+      renderer: character_renderer,
       training_algorithm: SmartTrainer,
     }),
   // {
   //   name: 'Empty',
   //   answer_key: empty,
-  //   evaluate: () => true,
+  //   evaluator: () => true,
   //   fetch_response: build_fetch_string,
   //   renderer: Renderer,
   //   training_algorithm: BaseTrainingAlgorithm,
   // }
 ]
+
+export const empty_quiz: Quiz = {
+  name: 'Empty',
+  answer_key: empty,
+  evaluator: () => true,
+  response_fetcher: () => '',
+  renderer: empty_renderer,
+  training_algorithm: BaseTrainingAlgorithm,
+}
 
 export const defaultQuiz = quizzes[0]
