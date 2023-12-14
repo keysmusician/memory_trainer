@@ -95,7 +95,7 @@ export const quizzes: Quiz<any, any, any>[] = [
     name: "Country flags",
     answer_key: country_flags,
     evaluator: compare_strings,
-    response_fetcher: country_fetcher,
+    response_fetcher: country_fetcher as ResponseFetcher<string>,
     on_grade: build_on_grade,
     renderer: image_renderer,
     training_algorithm: SmartTrainer,

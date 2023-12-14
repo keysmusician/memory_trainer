@@ -1,6 +1,6 @@
 import { For, createSignal } from "solid-js";
-import { HomeButton } from "./EditScreen";
-import { StartButton } from "./StartScreen";
+import { HomeButton } from "./Edit";
+import { StartButton } from "./Start";
 import { useQuiz } from "../App";
 
 

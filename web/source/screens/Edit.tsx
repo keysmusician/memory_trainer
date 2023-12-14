@@ -1,5 +1,5 @@
 import { For, Setter } from "solid-js"
-import { StartButton } from "./StartScreen"
+import { StartButton } from "./Start"
 import { AppNavigator, routes, useQuiz } from "../App"
 import { styleGroup } from "../Style"
 import { Quiz } from "../quiz";

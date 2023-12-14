@@ -1,4 +1,4 @@
-import { For, createSignal } from 'solid-js'
+import { For, JSX, createSignal } from 'solid-js'
 import { useQuiz, routes, AppNavigator } from '../App'
 import { Quiz } from '../quiz'
 import { quizzes as serialized_quizzes } from '../quizzes'
@@ -28,8 +28,13 @@ function Quizzes() {
     setQuizIndex(index)
   }
 
+  const quizzesStyle: JSX.CSSProperties = {
+    ...styleGroup.column,
+    'overflow-y': 'scroll',
+  }
+
   return (
-    <ul style={styleGroup.column}>
+    <ul style={quizzesStyle}>
       <For each={quizzes}>
         {(quiz, index) => {
           const input_id = String(index())
@@ -38,16 +43,24 @@ function Quizzes() {
             <li
               style={{
                 width: '100%',
+                'padding': '0.5rem 0',
               }}
               onClick={[selectQuiz, [quiz, index]]}
               tabIndex={-1}
             >
-              <label for={input_id}>{quiz.name}</label>
+              <label
+                for={input_id}
+                style={{
+                  'margin': '0 0.5rem 0 0',
+                }}
+              >
+                {quiz.name}
+              </label>
 
               <div
                 style={{ 'float': 'right' }}
               >
-                <input
+                {/* <input
                   style={{
                     'margin': '0 0.5rem 0 0',
                   }}
@@ -55,7 +68,7 @@ function Quizzes() {
                   id={input_id}
                   type='radio'
                   name='quiz'
-                />
+                /> */}
                 <button
                   onClick={() => navigate(routes.edit)}
                 // style={nested_button}
