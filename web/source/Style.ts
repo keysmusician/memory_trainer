@@ -57,7 +57,7 @@ export namespace designSystem {
 // fulfills, not the specific design system element that it is.
 export namespace style {
 	export namespace color {
-		export const primary = designSystem.color.white
+		export const primary = designSystem.color.black
 		export const secondary = designSystem.color.black
 		export const accent = designSystem.color.paleBlue
 	}

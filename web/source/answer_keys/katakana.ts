@@ -58,8 +58,8 @@ export const katakana: Map<KatakanaCharacter, Mora> = new Map([
   ['レ', Mora.re,],
   ['ロ', Mora.ro,],
   ['ワ', Mora.wa,],
-  ['ヰ', Mora.wi,],
-  ['ヱ', Mora.we,],
+  // ['ヰ', Mora.wi,],
+  // ['ヱ', Mora.we,],
   ['ヲ', Mora.wo,],
   ['ン', Mora.n,],
 ])

@@ -1,30 +1,36 @@
 import { GradingInfo } from "./MemoryTrainer"
-import { country_flags } from "./answer_keys/country_flags"
 import { SmartTrainer } from "./training_algorithms/SmartTrainer"
+import { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
 import {
   type Renderer,
+  character_renderer,
   image_renderer,
   state_capital_text_renderer,
   music_notation_renderer,
   empty_renderer,
 } from "./renderers/Renderers.barrel"
-import { compare_music_notation, compare_strictly_equal, compare_strings } from "./evaluators/evaluators"
-import { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
+import {
+  compare_music_notation,
+  compare_strictly_equal,
+  compare_strings
+} from "./evaluators/evaluators"
 import {
   type Mora,
+  country_flags,
   hiragana,
   katakana,
   music_notation,
   US_state_capitals,
+  empty
 } from "./answer_keys/answer_keys.barrel"
-import { string_fetcher } from "./user_input_fetchers/string_fetcher"
-import { mora_fetcher } from "./user_input_fetchers/mora_fetcher"
-import { empty } from "./answer_keys/empty"
+import {
+  mora_fetcher_builder,
+  country_fetcher,
+  state_capital_fetcher,
+  musical_keyboard,
+  string_fetcher
+} from "./user_input_fetchers/user_input_fetchers.barrel"
 import { Component, Setter } from "solid-js"
-import { country_fetcher } from "./user_input_fetchers/country_fetcher"
-import { state_capital_fetcher } from "./user_input_fetchers/state_capital_fetcher"
-import { musical_keyboard } from "./user_input_fetchers/musical_keyboard"
-import { character_renderer } from "./renderers/CharacterRenderer"
 
 
 function build_on_grade(verdict_render_area: HTMLElement) {
@@ -123,7 +129,7 @@ export const quizzes: Quiz<any, any, any>[] = [
       name: "Hiragana",
       answer_key: hiragana,
       evaluator: compare_strictly_equal<Mora>,
-      response_fetcher: mora_fetcher,
+      response_fetcher: mora_fetcher_builder(hiragana),
       on_grade: build_on_grade,
       renderer: character_renderer,
       training_algorithm: SmartTrainer,
@@ -133,7 +139,7 @@ export const quizzes: Quiz<any, any, any>[] = [
       name: "Katakana",
       answer_key: katakana,
       evaluator: compare_strictly_equal<Mora>,
-      response_fetcher: mora_fetcher,
+      response_fetcher: mora_fetcher_builder(katakana),
       on_grade: build_on_grade,
       renderer: character_renderer,
       training_algorithm: SmartTrainer,

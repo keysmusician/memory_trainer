@@ -14,6 +14,7 @@ Memory Coach
 - Add a quiz configuration screen
 - Add a quiz builder interface
 - Need a way to add & select quiz presets, which are basically sub-quizzes, so should quizzes form tree structures?
+- Add a Hebrew quiz
 
 ## References
 Interesting TS solution with type guards:

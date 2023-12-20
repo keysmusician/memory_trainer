@@ -3,10 +3,15 @@ import { Mora } from './_mora'
 export type HiraganaCharacter =
   'あ' | 'い' | 'う' | 'え' | 'お' |
   'か' | 'き' | 'く' | 'け' | 'こ' |
+  'が' | 'ぎ' | 'ぐ' | 'げ' | 'ご' |
   'さ' | 'し' | 'す' | 'せ' | 'そ' |
+  'ざ' | 'じ' | 'ず' | 'ぜ' | 'ぞ' |
   'た' | 'ち' | 'つ' | 'て' | 'と' |
+  'だ' | 'ぢ' | 'づ' | 'で' | 'ど' |
   'な' | 'に' | 'ぬ' | 'ね' | 'の' |
   'は' | 'ひ' | 'ふ' | 'へ' | 'ほ' |
+  'ば' | 'び' | 'ぶ' | 'べ' | 'ぼ' |
+  'ぱ' | 'ぴ' | 'ぷ' | 'ぺ' | 'ぽ' |
   'ま' | 'み' | 'む' | 'め' | 'も' |
   'や' | 'ゆ' | 'よ' |
   'ら' | 'り' | 'る' | 'れ' | 'ろ' |
@@ -62,4 +67,29 @@ export const hiragana: Map<HiraganaCharacter, Mora> = new Map([
   ['ゑ', Mora.we,],
   ['を', Mora.wo,],
   ['ん', Mora.n,],
+  ['が', Mora.ga,],
+  ['ぎ', Mora.gi,],
+  ['ぐ', Mora.gu,],
+  ['げ', Mora.ge,],
+  ['ご', Mora.go,],
+  ['ざ', Mora.za,],
+  ['じ', Mora.ji,],
+  ['ず', Mora.zu,],
+  ['ぜ', Mora.ze,],
+  ['ぞ', Mora.zo,],
+  ['だ', Mora.da,],
+  ['ぢ', Mora.ji,],
+  ['づ', Mora.zu,],
+  ['で', Mora.de,],
+  ['ど', Mora.do,],
+  ['ば', Mora.ba,],
+  ['び', Mora.bi,],
+  ['ぶ', Mora.bu,],
+  ['べ', Mora.be,],
+  ['ぼ', Mora.bo,],
+  ['ぱ', Mora.pa,],
+  ['ぴ', Mora.pi,],
+  ['ぷ', Mora.pu,],
+  ['ぺ', Mora.pe,],
+  ['ぽ', Mora.po,],
 ])

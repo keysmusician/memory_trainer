@@ -1,4 +1,5 @@
 export type { Renderer } from './Renderer';
+export { character_renderer } from './CharacterRenderer';
 export { hiragana_renderer } from './HiraganaRenderer';
 export { image_renderer } from './ImageRenderer';
 export { music_notation_renderer } from './MusicNotationRenderer';
