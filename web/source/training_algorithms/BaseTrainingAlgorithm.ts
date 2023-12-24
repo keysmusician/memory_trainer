@@ -12,7 +12,7 @@ export class BaseTrainingAlgorithm {
 
     #current_question: number
 
-    question_count: number
+    readonly question_count: number
 
     static complete: 'complete'
 
@@ -34,11 +34,11 @@ export class BaseTrainingAlgorithm {
 
     get is_complete(): boolean {return this.#is_complete}
 
-    next_question(): number | 'complete' {
+    next_question(): number | undefined {
         if ((this.current_question + 1) === this.question_count) {
         this.#is_complete = true
 
-        return BaseTrainingAlgorithm.complete
+        return undefined
         }
 
         this.#current_question += 1

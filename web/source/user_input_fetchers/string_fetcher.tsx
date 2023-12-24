@@ -1,5 +1,5 @@
 import { createSignal, onMount } from "solid-js"
-import { ResponseFetcherProps } from "../quizzes"
+import { ResponseFetcherProps } from "../quizzes/quizzes"
 
 /**
  * String user input fetcher.
@@ -8,14 +8,14 @@ export function string_fetcher(props: ResponseFetcherProps<string>) {
   const [response, set_response] = createSignal('')
 
   const set_and_clear_response = (response: string) => {
-    props.set_response(response)
+    props.setResponse(response)
     set_response('')
   }
 
   return (
     <div>
       <input
-        ref={(input_element) => {onMount(() => input_element.focus())}}
+        ref={(input_element) => { onMount(() => input_element.focus()) }}
         type="text"
         onInput={e => set_response(e.currentTarget.value)}
         value={response()}

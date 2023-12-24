@@ -2,7 +2,7 @@
  * Image renderer.
  */
 import { Renderer } from "./Renderer"
-import { image_height } from "../answer_keys/country_flags"
+import { image_height } from "../quizzes/country flags/country_flags"
 import { Show, createEffect, createSignal } from "solid-js"
 
 

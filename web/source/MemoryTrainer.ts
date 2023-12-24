@@ -8,9 +8,10 @@ import type { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAl
 
 export interface GradingInfo<QuestionType = any, AnswerType = any> {
   grade: any
-  regrades: number
   question: QuestionType
   answer: AnswerType
+  regrades: number
+  responseCount: number
 }
 
 export interface MemoryTrainerInputs<QuestionType, AnswerType> {
@@ -86,7 +87,6 @@ export class MemoryTrainerApp {
 
           regrade = this.on_grade({
             grade: grade,
-            regrades: regrades,
             question: this.question,
             answer: this.answer,
           })

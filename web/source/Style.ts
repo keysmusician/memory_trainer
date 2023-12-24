@@ -145,6 +145,7 @@ export namespace styleGroup {
 		flex: 1,
 		'justify-content': 'space-evenly',
 		width: '100%',
+		'margin': 0
 	}
 
 	export const button = {

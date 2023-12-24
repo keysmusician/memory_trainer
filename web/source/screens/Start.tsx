@@ -1,7 +1,7 @@
 import { For, JSX, createSignal } from 'solid-js'
 import { useQuiz, routes, AppNavigator } from '../App'
 import { Quiz } from '../quiz'
-import { quizzes as serialized_quizzes } from '../quizzes'
+import { quizzes as serialized_quizzes } from '../quizzes/quizzes'
 // import { column_layout, quiz_list_item, start_button, nested_button } from '../Styles.module.css'
 import { useNavigate } from '@solidjs/router'
 import { styleGroup, style } from '../Style'

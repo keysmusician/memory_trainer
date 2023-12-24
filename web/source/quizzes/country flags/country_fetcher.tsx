@@ -1,14 +1,14 @@
-import { Quiz, ResponseFetcherProps } from "../quizzes";
-import { country_flags } from "../answer_keys/country_flags";
-import { enum_fetcher } from "./enum_fetcher";
+import { IQuiz, ResponseFetcherProps } from "../../quiz";
+import { country_flags } from "./country_flags";
+import { enum_fetcher } from "../../user_input_fetchers/enum_fetcher";
 import { Setter } from "solid-js";
 
 /**
  * Fetches a country.
  */
 interface CountryFetcherProps extends ResponseFetcherProps<string> {
-    quiz?: Quiz<URL, string, string>
-    set_response: Setter<string>
+    quiz?: IQuiz<URL, string, string>
+    setResponse: Setter<string>
 }
 export function country_fetcher(props: CountryFetcherProps) {
     const EnumFetcher = enum_fetcher<string>;
@@ -20,12 +20,15 @@ export function country_fetcher(props: CountryFetcherProps) {
             <input
                 type="text"
                 placeholder="Country"
-                onChange={(event) => { props.set_response(event.target.value) }}
+                onChange={(event) => {
+                    props.setResponse(event.target.value)
+                    event.currentTarget.value = ''
+                }}
                 style={{ width: "100%" }}
             />
             <EnumFetcher
                 items={country_flags_items}
-                set_response={props.set_response}
+                setResponse={props.setResponse}
             />
         </>
     )

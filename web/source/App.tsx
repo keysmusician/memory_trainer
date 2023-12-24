@@ -11,8 +11,8 @@ import {
   StartScreen,
   TrainScreen,
 } from './screens/Screens.barrel'
-import { Quiz } from './quiz'
-import { defaultQuiz, empty_quiz } from './quizzes'
+import { IQuiz } from './quiz'
+import { empty_quiz } from './quizzes/quizzes'
 import { Router, Routes, Route } from '@solidjs/router'
 import { styleGroup } from './Style'
 
@@ -29,10 +29,9 @@ export type AppRoute = typeof routes[keyof typeof routes]
 
 export type AppNavigator = (route: AppRoute, params?: Record<string, string>) => void
 
-const QuizContext = createContext<[
-  Quiz,
-  Setter<Quiz>
-]>([new Quiz(empty_quiz), () => new Quiz(empty_quiz)]);
+
+const [quizValue, setQuizValue] = createStore<IQuiz>(empty_quiz);
+const QuizContext = createContext<[IQuiz, Setter<IQuiz>]>([quizValue, setQuizValue]);
 
 export function useQuiz() { return useContext(QuizContext)!; }
 
@@ -42,7 +41,7 @@ export function useQuiz() { return useContext(QuizContext)!; }
 function App() {
   return (
     <Router>
-      <QuizContext.Provider value={createStore<Quiz>(new Quiz(defaultQuiz))}>
+      <QuizContext.Provider value={[quizValue, setQuizValue]}>
         <h1 style={styleGroup.title}>Memory Trainer</h1>
 
         <section id='memory_trainer' style={styleGroup.contentBox}>

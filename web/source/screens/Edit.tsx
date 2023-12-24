@@ -109,8 +109,8 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
                       }}
                     />
                   </td>
-                  <td>{question}</td>
-                  <td>{answer}</td>
+                  <td>{JSON.stringify(question)}</td>
+                  <td>{JSON.stringify(answer)}</td>
                 </tr>
               )
             }}

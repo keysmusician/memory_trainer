@@ -1,6 +1,6 @@
-import { HiraganaCharacter } from "../answer_keys/hiragana"
-import { character_renderer } from "./CharacterRenderer"
-import { Renderer } from "./Renderer"
+import { HiraganaCharacter } from "./answer key"
+import { character_renderer } from "../../renderers/CharacterRenderer"
+import { Renderer } from "../../renderers/Renderer"
 
 /**
  * Renders Hiragana questions.
