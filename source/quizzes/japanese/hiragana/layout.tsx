@@ -1,6 +1,6 @@
-import { Mora } from "../../answer_keys/_mora"
-import { IQuiz } from "../../quiz"
-import { styleGroup } from "../../Style"
+import { Mora } from "../../../answer_keys/_mora"
+import { IQuiz } from "../../../quiz"
+import { styleGroup } from "../../../Style"
 
 export interface QuizLayoutProps {
 	quiz: IQuiz,

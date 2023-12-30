@@ -1,7 +1,6 @@
 import { SmartTrainer } from "../training_algorithms/SmartTrainer"
 import { BaseTrainingAlgorithm } from "../training_algorithms/BaseTrainingAlgorithm"
 import {
-  character_renderer,
   image_renderer,
   state_capital_text_renderer,
   music_notation_renderer,
@@ -9,31 +8,28 @@ import {
 } from "../renderers/Renderers.barrel"
 import {
   compare_music_notation,
-  compare_strictly_equal,
   compare_strings
 } from "../evaluators/evaluators"
 import {
-  type Mora,
   country_flags,
-  katakana,
   music_notation,
   US_state_capitals,
   empty
 } from "../answer_keys/answer_keys.barrel"
 import {
-  mora_fetcher_builder,
   country_fetcher,
-  state_capital_fetcher,
   musical_keyboard,
+  EnumFetcher,
 } from "../user_input_fetchers/user_input_fetchers.barrel"
-import { hiragana } from "./hiragana/quiz"
+import { hiragana } from "./japanese/hiragana/quiz"
+import { katakana } from "./japanese/katakana/quiz"
 import { IQuiz, Quiz, ResponseFetcher, defaultOnResponse } from "../quiz"
-import { JapaneseQuizzesLayout } from "./hiragana/layout"
+import { hebrew } from "./hebrew/quiz"
 
 
 export const quizzes: IQuiz<any, any, any>[] = [
   new Quiz({
-    name: "Country flags",
+    title: "Country flags",
     answer_key: country_flags,
     evaluator: compare_strings,
     response_fetcher: country_fetcher as ResponseFetcher<string>,
@@ -42,7 +38,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
     training_algorithm: SmartTrainer,
   }),
   new Quiz({
-    name: "Music notation",
+    title: "Music notation",
     answer_key: music_notation,
     evaluator: compare_music_notation,
     response_fetcher: musical_keyboard,
@@ -51,26 +47,17 @@ export const quizzes: IQuiz<any, any, any>[] = [
     training_algorithm: SmartTrainer,
   }),
   new Quiz({
-    name: "U.S. State capitals",
+    title: "U.S. State capitals",
     answer_key: US_state_capitals,
     evaluator: compare_strings,
-    response_fetcher: state_capital_fetcher,
+    response_fetcher: (props) => <EnumFetcher<string> {...props} sort />,
     onResponse: defaultOnResponse,
     renderer: state_capital_text_renderer,
     training_algorithm: SmartTrainer,
   }),
-  new Quiz(hiragana),
-  new Quiz(
-    {
-      name: "Katakana",
-      answer_key: katakana,
-      evaluator: compare_strictly_equal<Mora>,
-      response_fetcher: mora_fetcher_builder(katakana),
-      onResponse: defaultOnResponse,
-      renderer: character_renderer,
-      layout: JapaneseQuizzesLayout,
-      training_algorithm: SmartTrainer,
-    }),
+  hiragana,
+  katakana,
+  hebrew,
   // {
   //   name: 'Empty',
   //   answer_key: empty,
@@ -82,7 +69,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
 ]
 
 export const empty_quiz = new Quiz({
-  name: 'Empty',
+  title: 'Empty',
   answer_key: empty,
   evaluator: () => true,
   response_fetcher: () => '',

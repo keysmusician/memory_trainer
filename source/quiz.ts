@@ -41,7 +41,7 @@ export interface IQuiz<
 	answer_key: Map<QuestionType, AnswerType>
 	evaluator: (response: ResponseType, answer: AnswerType) => any
 	response_fetcher: ResponseFetcher<ResponseType>
-	name: string
+	title: string
 	renderer: Renderer<QuestionType>
 	onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
 	training_algorithm: typeof BaseTrainingAlgorithm
@@ -61,7 +61,7 @@ export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<Quest
 	answer_key: Map<QuestionType, AnswerType>
 	evaluator: (response: ResponseType, answer: AnswerType) => any
 	response_fetcher: ResponseFetcher<ResponseType>
-	name: string
+	title: string
 	renderer: Renderer<QuestionType>
 	onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
 	training_algorithm: typeof BaseTrainingAlgorithm
@@ -71,7 +71,7 @@ export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<Quest
 		answer_key,
 		evaluator,
 		response_fetcher,
-		name,
+		title,
 		renderer,
 		onResponse = defaultOnResponse,
 		training_algorithm = SmartTrainer,
@@ -80,7 +80,7 @@ export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<Quest
 		this.answer_key = answer_key
 		this.evaluator = evaluator
 		this.response_fetcher = response_fetcher
-		this.name = name
+		this.title = title
 		this.renderer = renderer
 		this.onResponse = onResponse
 		this.training_algorithm = training_algorithm

@@ -20,7 +20,7 @@ export function EditScreen() {
       }}
     >
       <h2>
-        Editing <i>{quiz.name}</i>
+        Editing <i>{quiz.title}</i>
       </h2>
 
       <AnswerKeyEditor quiz={quiz} setQuiz={setQuiz} />

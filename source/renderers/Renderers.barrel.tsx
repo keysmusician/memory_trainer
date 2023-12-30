@@ -1,6 +1,6 @@
 export type { Renderer } from './Renderer';
-export { character_renderer } from './CharacterRenderer';
-export { hiragana_renderer } from '../quizzes/hiragana/renderer';
+export { CharacterRenderer } from './CharacterRenderer';
+export { JapaneseCharacterRenderer } from '../quizzes/japanese/JapaneseCharacterRenderer';
 export { image_renderer } from './ImageRenderer';
 export { music_notation_renderer } from './MusicNotationRenderer';
 export { state_capital_text_renderer } from './StateCapitalTextRenderer';

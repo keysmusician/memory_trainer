@@ -1,14 +1,19 @@
-import { For, createEffect, createSignal, onMount } from "solid-js";
-import { ResponseFetcherProps } from "../quizzes/quizzes";
+import { For, createSignal, onMount } from "solid-js";
+import { ResponseFetcherProps } from "../quiz";
 import { Key } from 'ts-key-enum';
 
 /**
  * Fetches a selection from an enumeration.
  */
-export function enum_fetcher<ResponseType>(
-    props: ResponseFetcherProps<ResponseType> & { items: Array<ResponseType> }
+export function EnumFetcher<ResponseType>(
+    props: ResponseFetcherProps<ResponseType>,
+    sort?: boolean
 ) {
-    const [selection, set_selection] = createSignal<ResponseType>(props.items[0]);
+    const answers = Array.from(props.quiz.answer_key.values())
+    console.log(sort)
+    if (sort) { answers.sort() }
+
+    const [selection, set_selection] = createSignal<ResponseType>(answers[0]);
 
     return (
         <div>
@@ -22,7 +27,7 @@ export function enum_fetcher<ResponseType>(
                 }}
                 title="Please select your answer here."
             >
-                <For each={props.items}>
+                <For each={answers}>
                     {item => <option value={item}>{item}</option>}
                 </For>
             </select>

@@ -54,7 +54,7 @@ function Quizzes() {
                   'margin': '0 0.5rem 0 0',
                 }}
               >
-                {quiz.name}
+                {quiz.title}
               </label>
 
               <div
