@@ -1,9 +1,0 @@
-Quiz data schema
-[
-  {
-    question: '',
-    answer: '',
-    hint: '',
-    renderer: '',
-  },
-]
