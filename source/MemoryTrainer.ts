@@ -3,7 +3,7 @@
  * for connecting all the quiz components together and running the training
  * loop.
  **/
-import type { BaseTrainingAlgorithm } from "./training_algorithms/BaseTrainingAlgorithm"
+import type { BaseTrainingAlgorithm } from "./training algorithms/BaseTrainingAlgorithm"
 
 
 export interface GradingInfo<QuestionType = any, AnswerType = any> {

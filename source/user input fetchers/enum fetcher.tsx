@@ -2,16 +2,27 @@ import { For, createSignal, onMount } from "solid-js";
 import { ResponseFetcherProps } from "../quiz";
 import { Key } from 'ts-key-enum';
 
+interface EnumFetcherProps<
+    ResponseType,
+    QuestionType = unknown,
+    AnswerType = unknown
+> extends ResponseFetcherProps<ResponseType, QuestionType, AnswerType> {
+    sort?: boolean
+}
+
 /**
  * Fetches a selection from an enumeration.
- */
-export function EnumFetcher<ResponseType>(
-    props: ResponseFetcherProps<ResponseType>,
-    sort?: boolean
+ **/
+export function EnumFetcher<
+    ResponseType,
+    QuestionType = unknown,
+    AnswerType = unknown
+>(
+    props: EnumFetcherProps<ResponseType, QuestionType, AnswerType>
 ) {
     const answers = Array.from(props.quiz.answer_key.values())
-    console.log(sort)
-    if (sort) { answers.sort() }
+
+    if (props.sort) { answers.sort() }
 
     const [selection, set_selection] = createSignal<ResponseType>(answers[0]);
 

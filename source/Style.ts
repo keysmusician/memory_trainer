@@ -9,6 +9,7 @@ export namespace designSystem {
 		export const lightRed = 'rgb(255, 70, 70)'
 		export const mediumBlue = 'rgb(60, 195, 240)'
 		export const paleBlue = 'rgb(95, 214, 253)'
+		export const gray = 'rgb(198, 198, 198)'
 	}
 
 	export namespace typography {
@@ -60,6 +61,7 @@ export namespace style {
 		export const primary = designSystem.color.black
 		export const secondary = designSystem.color.black
 		export const accent = designSystem.color.paleBlue
+		export const focused = designSystem.color.gray
 	}
 
 	export namespace typography {
@@ -153,9 +155,10 @@ export namespace styleGroup {
 		...column,
 		border: style.layout.primaryBorder,
 		'border-radius': designSystem.layout.border.radiusWide,
+		'box-sizing': 'border-box',
 		cursor: 'pointer',
 		height: style.layout.buttonHeight,
-		margin: style.layout.primaryMargin,
+		margin: 'auto',
 	}
 
 	export const startButton = {

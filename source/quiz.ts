@@ -1,9 +1,10 @@
 import { GradingInfo } from './MemoryTrainer'
-import { Component, JSXElement, createUniqueId } from 'solid-js'
+import { Component, JSXElement } from 'solid-js'
 import { Renderer } from './renderers/Renderer'
 import { QuizLayoutProps, DefaultQuizLayout } from './defaultQuizLayout'
-import { BaseTrainingAlgorithm } from './training_algorithms/BaseTrainingAlgorithm'
-import { SmartTrainer } from './training_algorithms/SmartTrainer'
+import { BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
+import { SmartTrainer } from './training algorithms/SmartTrainer'
+import { compare_strictly_equal } from './evaluators/evaluators'
 
 
 // export interface Quiz extends SerializedQuiz {
@@ -27,11 +28,15 @@ export function defaultOnResponse({ grade, regrades }: GradingInfo): boolean {
 	return grade || regrades == 1
 }
 
-export interface ResponseFetcherProps<ResponseType = unknown> extends QuizLayoutProps {
+export interface ResponseFetcherProps<
+	ResponseType,
+	QuestionType = unknown,
+	AnswerType = unknown
+> extends QuizLayoutProps<QuestionType, AnswerType, ResponseType> {
 }
 
-export type ResponseFetcher<ResponseType = unknown> =
-	Component<ResponseFetcherProps<ResponseType>>
+export type ResponseFetcher<QuestionType, AnswerType, ResponseType> =
+	Component<ResponseFetcherProps<ResponseType, QuestionType, AnswerType>>
 
 export interface IQuiz<
 	QuestionType = unknown,
@@ -40,7 +45,7 @@ export interface IQuiz<
 > {
 	answer_key: Map<QuestionType, AnswerType>
 	evaluator: (response: ResponseType, answer: AnswerType) => any
-	response_fetcher: ResponseFetcher<ResponseType>
+	response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	title: string
 	renderer: Renderer<QuestionType>
 	onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
@@ -58,18 +63,18 @@ type QuizParameters<QuestionType, AnswerType, ResponseType> =
 	}>
 
 export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<QuestionType, AnswerType, ResponseType> {
-	answer_key: Map<QuestionType, AnswerType>
-	evaluator: (response: ResponseType, answer: AnswerType) => any
-	response_fetcher: ResponseFetcher<ResponseType>
-	title: string
-	renderer: Renderer<QuestionType>
-	onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
-	training_algorithm: typeof BaseTrainingAlgorithm
-	layout: any
+	readonly answer_key: Map<QuestionType, AnswerType>
+	readonly evaluator: (response: ResponseType, answer: AnswerType) => any
+	readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
+	readonly title: string
+	readonly renderer: Renderer<QuestionType>
+	readonly onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
+	readonly training_algorithm: typeof BaseTrainingAlgorithm
+	readonly layout: any
 
 	constructor({
 		answer_key,
-		evaluator,
+		evaluator = compare_strictly_equal<ResponseType>,
 		response_fetcher,
 		title,
 		renderer,

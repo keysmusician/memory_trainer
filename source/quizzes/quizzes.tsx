@@ -1,7 +1,6 @@
-import { SmartTrainer } from "../training_algorithms/SmartTrainer"
-import { BaseTrainingAlgorithm } from "../training_algorithms/BaseTrainingAlgorithm"
+import { SmartTrainer } from "../training algorithms/SmartTrainer"
+import { BaseTrainingAlgorithm } from "../training algorithms/BaseTrainingAlgorithm"
 import {
-  image_renderer,
   state_capital_text_renderer,
   music_notation_renderer,
   empty_renderer,
@@ -11,32 +10,26 @@ import {
   compare_strings
 } from "../evaluators/evaluators"
 import {
-  country_flags,
   music_notation,
   US_state_capitals,
   empty
-} from "../answer_keys/answer_keys.barrel"
+} from "../answer keys/answer_keys.barrel"
 import {
-  country_fetcher,
   musical_keyboard,
   EnumFetcher,
-} from "../user_input_fetchers/user_input_fetchers.barrel"
+} from "../user input fetchers/user_input_fetchers.barrel"
 import { hiragana } from "./japanese/hiragana/quiz"
 import { katakana } from "./japanese/katakana/quiz"
-import { IQuiz, Quiz, ResponseFetcher, defaultOnResponse } from "../quiz"
+import { IQuiz, Quiz, defaultOnResponse } from "../quiz"
 import { hebrew } from "./hebrew/quiz"
+import { periodic_table } from "./periodic table/quiz"
+import { country_flags } from "./country flags/quiz"
+import { kanji as kanji_recognition } from "./japanese/kanji/recognition/quiz"
+import { kanji as kanji_writing } from "./japanese/kanji/writing/quiz"
 
 
 export const quizzes: IQuiz<any, any, any>[] = [
-  new Quiz({
-    title: "Country flags",
-    answer_key: country_flags,
-    evaluator: compare_strings,
-    response_fetcher: country_fetcher as ResponseFetcher<string>,
-    onResponse: defaultOnResponse,
-    renderer: image_renderer,
-    training_algorithm: SmartTrainer,
-  }),
+  country_flags,
   new Quiz({
     title: "Music notation",
     answer_key: music_notation,
@@ -57,7 +50,10 @@ export const quizzes: IQuiz<any, any, any>[] = [
   }),
   hiragana,
   katakana,
+  kanji_recognition,
+  kanji_writing,
   hebrew,
+  periodic_table
   // {
   //   name: 'Empty',
   //   answer_key: empty,

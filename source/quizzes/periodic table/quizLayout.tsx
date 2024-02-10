@@ -1,9 +1,10 @@
-import { IQuiz } from "./quiz"
-import { styleGroup } from "./Style"
+import { IQuiz } from "../../quiz"
+import { styleGroup } from "../../Style"
+import { PeriodicTable } from "./answer key"
 
 export interface QuizLayoutProps<
 	QuestionType = unknown,
-	AnswerType = unknown,
+	AnswerType = PeriodicTable.Element,
 	ResponseType = unknown
 > {
 	quiz: IQuiz<QuestionType, AnswerType, ResponseType>
@@ -17,7 +18,7 @@ export interface QuizLayoutProps<
 	setResponse: (response: ResponseType) => void,
 	responseCount: number,
 }
-export function DefaultQuizLayout(props: QuizLayoutProps) {
+export function PeriodicTableQuizLayout(props: QuizLayoutProps) {
 	return (
 		<article
 			style={{
@@ -26,7 +27,7 @@ export function DefaultQuizLayout(props: QuizLayoutProps) {
 				'align-items': "center",
 			}}
 		>
-			<DefaultFeedbackRenderer
+			<FeedbackRenderer
 				answer={props.answer}
 				grade={props.grade}
 				regrades={props.regrades}
@@ -53,12 +54,12 @@ export function DefaultQuizLayout(props: QuizLayoutProps) {
 }
 
 interface FeedbackRendererProps {
-	answer: unknown,
+	answer: PeriodicTable.Element,
 	grade: boolean,
 	regrades: number,
 }
-function DefaultFeedbackRenderer(props: FeedbackRendererProps) {
-	var previousAnswer = props.answer
+function FeedbackRenderer(props: FeedbackRendererProps) {
+	var previousAnswer = props.answer.name
 
 	const feedback = () => {
 		if (props.grade === undefined) {
@@ -66,10 +67,10 @@ function DefaultFeedbackRenderer(props: FeedbackRendererProps) {
 		} else if (props.grade) {
 			return "Correct!"
 		} else if (props.regrades > 0) {
-			return `Hint: ${(props.answer as string)[0]}` // Assumes the answer is a string
+			return `Hint: ${props.answer.symbol}`
 		} else {
 			const text = `The answer was ${previousAnswer}`
-			previousAnswer = props.answer
+			previousAnswer = props.answer.name
 			return text
 		}
 	}

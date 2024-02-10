@@ -1,16 +1,17 @@
 import { styleGroup } from "../Style"
+import { Renderer } from "./Renderer"
 
 
 /**
  * Renders text character questions.
  */
-interface ICharacterRendererProps {
+interface CharacterRendererProps extends Renderer {
 	/** The prompt to display above the question. */
 	prompt: string
 	/** The question to display. */
 	question: string
 }
-export function CharacterRenderer(props) {
+export function CharacterRenderer(props: CharacterRendererProps) {
 	return (
 		<div>
 			<p style={styleGroup.baseText}>{props.prompt}</p>

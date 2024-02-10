@@ -1,12 +1,15 @@
-import { IQuiz, ResponseFetcherProps } from "../../quiz";
-import { EnumFetcher } from "../../user_input_fetchers/enum fetcher";
+import { ResponseFetcherProps } from "../../quiz";
+import { EnumFetcher } from "../../user input fetchers/enum fetcher";
 import { Setter } from "solid-js";
 
 /**
  * Fetches a country.
  */
-interface CountryFetcherProps extends ResponseFetcherProps<string> {
-    quiz?: IQuiz<URL, string, string>
+interface CountryFetcherProps extends ResponseFetcherProps<
+    string,
+    URL,
+    string
+> {
     setResponse: Setter<string>
 }
 export function CountryFetcher(props: CountryFetcherProps) {
@@ -21,7 +24,7 @@ export function CountryFetcher(props: CountryFetcherProps) {
                 }}
                 style={{ width: "100%" }}
             />
-            <EnumFetcher<string> {...props} sort />
+            <EnumFetcher<string, URL, string> {...props} sort />
         </>
     )
 }

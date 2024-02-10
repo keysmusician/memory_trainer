@@ -1,3 +1,6 @@
 {
-	"terminal.integrated.cwd": "source"
+	"terminal.integrated.cwd": "source",
+	"cSpell.words": [
+		"solidjs"
+	]
 }

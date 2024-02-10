@@ -80,7 +80,7 @@ export function TrainScreen() {
   const [registerGrade, setRegisterGrade] = createSignal<Boolean>(false)
 
   createEffect(on(responseCount, () => {
-    setGrade(quiz.evaluator(answer(), response()))
+    setGrade(quiz.evaluator(response(), answer()))
     const registerGrade = quiz.onResponse({
       grade: grade(),
       question: question(),

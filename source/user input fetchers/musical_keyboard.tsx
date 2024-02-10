@@ -1,5 +1,5 @@
 import { For } from "solid-js"
-import { pitch_classes } from "../answer_keys/music_notation"
+import { pitch_classes } from "../answer keys/music_notation"
 import { ResponseFetcherProps } from "../quizzes/quizzes"
 
 /**

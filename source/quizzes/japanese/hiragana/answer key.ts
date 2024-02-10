@@ -1,4 +1,4 @@
-import { Mora } from '../../../answer_keys/_mora'
+import { Mora } from '../../../answer keys/_mora'
 
 export type HiraganaCharacter =
   'あ' | 'い' | 'う' | 'え' | 'お' |

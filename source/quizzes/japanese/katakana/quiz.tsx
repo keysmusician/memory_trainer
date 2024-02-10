@@ -1,9 +1,9 @@
-import { Mora } from "../../../answer_keys/_mora";
-import { katakana as answerKey } from "../../../answer_keys/katakana";
+import { Mora } from "../../../answer keys/_mora";
+import { katakana as answerKey } from "../../../answer keys/katakana";
 import { compare_strictly_equal } from "../../../evaluators/evaluators";
 import { Quiz, defaultOnResponse } from "../../../quiz";
-import { SmartTrainer } from "../../../training_algorithms/SmartTrainer";
-import { mora_fetcher_builder } from "../../../user_input_fetchers/mora_fetcher";
+import { SmartTrainer } from "../../../training algorithms/SmartTrainer";
+import { mora_fetcher_builder } from "../../../user input fetchers/mora_fetcher";
 import { JapaneseCharacterRenderer } from "../JapaneseCharacterRenderer";
 import { JapaneseQuizzesLayout } from "../hiragana/layout";
 

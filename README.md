@@ -19,3 +19,5 @@ Memory Coach
 ## References
 Interesting TS solution with type guards:
 https://stackoverflow.com/a/51124423/10402691
+
+Better drawing canvas: https://dev.to/ascorbic/a-more-realistic-html-canvas-paint-tool-313b

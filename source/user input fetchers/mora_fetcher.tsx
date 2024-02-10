@@ -1,5 +1,5 @@
 import { For, JSX, Setter, createSignal } from "solid-js"
-import { Mora } from "../answer_keys/answer_keys.barrel"
+import { Mora } from "../answer keys/answer_keys.barrel"
 import { ResponseFetcherProps } from "../quiz";
 
 function convert_to_grid(

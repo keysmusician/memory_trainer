@@ -1,5 +1,5 @@
 // No longer used
-import { US_state_capitals } from "../answer_keys/US_state_capitals";
+import { US_state_capitals } from "../answer keys/US_state_capitals";
 import { ResponseFetcherProps } from "../quiz";
 import { enum_fetcher } from "./enum fetcher"
 
