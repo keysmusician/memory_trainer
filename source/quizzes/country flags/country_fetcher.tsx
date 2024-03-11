@@ -1,5 +1,5 @@
 import { ResponseFetcherProps } from "../../quiz";
-import { EnumFetcher } from "../../user input fetchers/enum fetcher";
+import { EnumFetcher } from "../../response fetchers/enum fetcher";
 import { Setter } from "solid-js";
 
 /**

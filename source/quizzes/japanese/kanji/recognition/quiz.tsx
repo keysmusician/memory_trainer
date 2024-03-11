@@ -1,6 +1,6 @@
 import { Quiz } from "../../../../quiz";
 import { CharacterRenderer } from "../../../../renderers/Renderers.barrel";
-import { AutofillEnumFetcher } from "../../../../user input fetchers/auto-fill enum fetcher";
+import { AutofillEnumFetcher } from "../../../../response fetchers/auto-fill enum fetcher";
 import { Kanji, answer_key } from "./answer key";
 
 

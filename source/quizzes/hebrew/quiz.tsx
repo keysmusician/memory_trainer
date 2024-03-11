@@ -1,7 +1,7 @@
 import { compare_strings } from "../../evaluators/evaluators";
 import { Quiz } from "../../quiz";
 import { CharacterRenderer } from "../../renderers/CharacterRenderer";
-import { EnumFetcher } from "../../user input fetchers/enum fetcher";
+import { EnumFetcher } from "../../response fetchers/enum fetcher";
 import { hebrew as answer_key } from "./answer key";
 
 

@@ -1,7 +1,6 @@
-import { GradingInfo } from './MemoryTrainer'
 import { Component, JSXElement } from 'solid-js'
 import { Renderer } from './renderers/Renderer'
-import { QuizLayoutProps, DefaultQuizLayout } from './defaultQuizLayout'
+import { DefaultQuizLayout } from './defaultQuizLayout'
 import { BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
 import { SmartTrainer } from './training algorithms/SmartTrainer'
 import { compare_strictly_equal } from './evaluators/evaluators'
@@ -23,9 +22,70 @@ import { compare_strictly_equal } from './evaluators/evaluators'
 // 	}
 // }
 
+export interface QuizLayoutProps<
+	QuestionType = unknown,
+	AnswerType = unknown,
+	ResponseType = unknown
+> {
+	quiz: IQuiz<QuestionType, AnswerType, ResponseType>
+	answer: AnswerType,
+	question: QuestionType,
+	/* This changes throughout the lifecycle of the quiz: */
+	trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>,
+	setResponse: (response: ResponseType) => void,
+}
 
-export function defaultOnResponse({ grade, regrades }: GradingInfo): boolean {
-	return grade || regrades == 1
+export class TrainingHistory<
+	QuestionType = any,
+	AnswerType = any,
+	ResponseType = any
+> extends Array<TrainingState<QuestionType, AnswerType, ResponseType>> {
+
+	constructor(...args: TrainingState<QuestionType, AnswerType, ResponseType>[]) {
+		super(...args)
+	}
+
+	/**
+	 * The most recent training state (question, answer, response, and grade).
+	 */
+	get last(): TrainingState<QuestionType, AnswerType, ResponseType> {
+		return this[this.length - 1]
+	}
+
+	/**
+	 * The number of times the user has attempted the most recent question.
+	 */
+	get retries() {
+		if (!this.last) {
+			return 0
+		}
+
+		var retries = 0
+
+		for (let index = this.length - 1; index >= 0; index--) {
+			if (
+				this[index].question === this.last.question &&
+				this[index].grade === false
+			) {
+				retries++
+			} else {
+				break
+			}
+		}
+
+		return retries
+	}
+}
+
+export type TrainingState<QuestionType, AnswerType, ResponseType> = {
+	grade: boolean
+	question: QuestionType
+	answer: AnswerType
+	response: ResponseType
+}
+
+export function defaultOnResponse(trainingHistory: TrainingHistory): boolean {
+	return trainingHistory.last.grade || trainingHistory.retries > 1
 }
 
 export interface ResponseFetcherProps<
@@ -48,7 +108,7 @@ export interface IQuiz<
 	response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	title: string
 	renderer: Renderer<QuestionType>
-	onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
+	onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 	training_algorithm: typeof BaseTrainingAlgorithm
 	layout: (props: QuizLayoutProps) => JSXElement
 }
@@ -57,7 +117,7 @@ type Modify<T, R> = Omit<T, keyof R> & R;
 
 type QuizParameters<QuestionType, AnswerType, ResponseType> =
 	Modify<IQuiz<QuestionType, AnswerType, ResponseType>, {
-		onResponse?: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
+		onResponse?: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 		training_algorithm?: typeof BaseTrainingAlgorithm
 		layout?: (props: QuizLayoutProps) => JSXElement
 	}>
@@ -68,7 +128,7 @@ export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<Quest
 	readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	readonly title: string
 	readonly renderer: Renderer<QuestionType>
-	readonly onResponse: (gradingInfo: GradingInfo<QuestionType, AnswerType>) => boolean
+	readonly onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 	readonly training_algorithm: typeof BaseTrainingAlgorithm
 	readonly layout: any
 

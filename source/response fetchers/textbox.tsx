@@ -1,10 +1,10 @@
 import { createSignal, onMount } from "solid-js"
-import { ResponseFetcherProps } from "../quizzes/quizzes"
+import { ResponseFetcherProps } from "../quiz"
 
 /**
- * String user input fetcher.
+ * Textbox. A user input fetcher for arbitrary string responses.
  */
-export function string_fetcher(props: ResponseFetcherProps<string>) {
+export function Textbox(props: ResponseFetcherProps<string>) {
   const [response, set_response] = createSignal('')
 
   const set_and_clear_response = (response: string) => {

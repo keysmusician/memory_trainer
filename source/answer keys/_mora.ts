@@ -179,7 +179,7 @@ export interface Mora {
 	readonly ipa: string
 }
 
-export const Mora: { readonly [key: string]: Mora } = {
+export const mora: { readonly [key: string]: Mora } = {
 	'a': { hiragana: 'あ', katakana: 'ア', romanization: 'a', ipa: 'a' },
 	'i': { hiragana: 'い', katakana: 'イ', romanization: 'i', ipa: 'i' },
 	'u': { hiragana: 'う', katakana: 'ウ', romanization: 'u', ipa: 'ɯ' },
@@ -246,9 +246,9 @@ export const Mora: { readonly [key: string]: Mora } = {
 	'ru': { hiragana: 'る', katakana: 'ル', romanization: 'ru', ipa: 'ɾɯ' },
 	're': { hiragana: 'れ', katakana: 'レ', romanization: 're', ipa: 'ɾe' },
 	'ro': { hiragana: 'ろ', katakana: 'ロ', romanization: 'ro', ipa: 'ɾo' },
-	'wa': { hiragana: 'わ', katakana: 'ワ', romanization: 'wa', ipa: 'wa' },
-	'wi': { hiragana: 'ゐ', katakana: 'ヰ', romanization: 'wi', ipa: 'wi' },
-	'we': { hiragana: 'ゑ', katakana: 'ヱ', romanization: 'we', ipa: 'we' },
-	'wo': { hiragana: 'を', katakana: 'ヲ', romanization: 'wo', ipa: 'wo' },
+	'wa': { hiragana: 'わ', katakana: 'ワ', romanization: 'wa', ipa: 'ɯa' },
+	'wi': { hiragana: 'ゐ', katakana: 'ヰ', romanization: 'wi', ipa: 'ɯi' },
+	'we': { hiragana: 'ゑ', katakana: 'ヱ', romanization: 'we', ipa: 'ɯe' },
+	'wo': { hiragana: 'を', katakana: 'ヲ', romanization: 'wo', ipa: 'ɯo' },
 	'n': { hiragana: 'ん', katakana: 'ン', romanization: 'n', ipa: 'n, ɲ, ŋ, ɴ' },
 } as const

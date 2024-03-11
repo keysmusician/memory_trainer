@@ -1,3 +1,7 @@
+// NOTE: DEPRECATED; NO LONGER IN USE
+// NOTE: DEPRECATED; NO LONGER IN USE
+// NOTE: DEPRECATED; NO LONGER IN USE
+// NOTE: DEPRECATED; NO LONGER IN USE
 /**
  * This file contains the main class for the memory trainer. It is responsible
  * for connecting all the quiz components together and running the training

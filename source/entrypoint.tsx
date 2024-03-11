@@ -12,3 +12,5 @@ if (import.meta.env.DEV && !(rootElement instanceof HTMLElement)) {
 }
 
 render(() => <App />, rootElement!);
+
+// document.body.style.color = 'linear-gradient(90deg, #ff0000, #00ff00, #0000ff)'

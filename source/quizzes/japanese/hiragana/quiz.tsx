@@ -2,10 +2,10 @@ import { Mora } from "../../../answer keys/answer_keys.barrel"
 import { compare_strictly_equal } from "../../../evaluators/evaluators"
 import { Quiz } from "../../../quiz"
 import { SmartTrainer } from "../../../training algorithms/SmartTrainer"
-import { mora_fetcher_builder } from "../../../user input fetchers/user_input_fetchers.barrel"
+import { mora_fetcher_builder } from "../../../response fetchers/user input fetchers.barrel"
 import { JapaneseCharacterRenderer } from "../JapaneseCharacterRenderer"
 import { HiraganaCharacter, answer_key } from "./answer key"
-import { JapaneseQuizzesLayout } from "./layout"
+import { JapaneseQuizzesLayout } from "../layout"
 
 
 export const hiragana = new Quiz<HiraganaCharacter, Mora, Mora>({

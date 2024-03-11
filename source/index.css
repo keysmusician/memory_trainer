@@ -4,6 +4,8 @@
  **/
 
 html {
+    background: linear-gradient(180deg, #eaf4f8 0%, #dbe0e4 100%);
+    background-attachment: fixed;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     height: 100vh;
 }

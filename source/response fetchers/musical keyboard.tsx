@@ -1,11 +1,11 @@
 import { For } from "solid-js"
 import { pitch_classes } from "../answer keys/music_notation"
-import { ResponseFetcherProps } from "../quizzes/quizzes"
+import { ResponseFetcherProps } from "../quiz"
 
 /**
  * Fetches a musical note.
  */
-export function musical_keyboard(props: ResponseFetcherProps<string>) {
+export function MusicalKeyboard(props: ResponseFetcherProps<string>) {
     return (
         <div style={{ 'display': 'grid' }}>
             <For each={pitch_classes}>

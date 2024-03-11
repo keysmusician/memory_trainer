@@ -1,6 +1,7 @@
-import { For, JSX, Setter, createSignal } from "solid-js"
-import { Mora } from "../answer keys/answer_keys.barrel"
-import { ResponseFetcherProps } from "../quiz";
+import { For, JSX, Setter, createEffect, createSignal, onCleanup, onMount } from "solid-js"
+import { mora as moras } from "../answer keys/answer_keys.barrel"
+import { ResponseFetcherProps, TrainingHistory } from "../quiz";
+import { Mora } from "../answer keys/_mora";
 
 function convert_to_grid(
   moras: Mora[],
@@ -52,7 +53,7 @@ export function mora_fetcher_builder(answerKey: Map<string, Mora>) {
   /**
    * Hiragana/Katakana mora fetcher.
    */
-  return function mora_fetcher(props: ResponseFetcherProps<Mora>) {
+  return function mora_fetcher(props: ResponseFetcherProps<Mora, string, Mora>) {
 
     const [format, setFormat] = createSignal<"romanization" | "ipa">("romanization")
 
@@ -62,7 +63,7 @@ export function mora_fetcher_builder(answerKey: Map<string, Mora>) {
           answerKey={answerKey}
           format={format}
           set_response={props.setResponse}
-          regrades={props.regrades}
+          trainingHistory={props.trainingHistory}
           answer={props.answer}
         />
         <FormatComboButton format={format} setFormat={setFormat} />
@@ -133,11 +134,16 @@ function FormatComboButton(props: FormatComboButtonProps) {
   )
 }
 
+interface SelectedCell {
+  consonant: string | undefined
+  vowel: string | undefined
+}
+
 interface MoraGridProps {
   answerKey: Map<string, Mora>
   format: () => "romanization" | "ipa"
   set_response: (response: Mora) => void
-  regrades: number
+  trainingHistory: TrainingHistory<string, Mora, Mora>
   answer: Mora
 }
 function MoraGrid(props: MoraGridProps) {
@@ -148,6 +154,34 @@ function MoraGrid(props: MoraGridProps) {
   }
 
   const grid_data = convert_to_grid([...new Set(props.answerKey.values())])
+
+  const [selectedCell, setSelectedCell] = createSignal<SelectedCell>({
+    consonant: undefined,
+    vowel: undefined,
+  })
+
+  function keypressHandler(keyboardEvent: KeyboardEvent) {
+    if ('aiueo'.includes(keyboardEvent.key)) {
+      setSelectedCell(selected => ({
+        consonant: selected.consonant,
+        vowel: keyboardEvent.key
+      }))
+    }
+    if ('kgszjtdcnhfbpmyrw'.includes(keyboardEvent.key)) {
+      setSelectedCell(selected => ({
+        consonant: keyboardEvent.key,
+        vowel: selected.vowel
+      }))
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener('keypress', keypressHandler)
+  })
+
+  onCleanup(() => {
+    document.removeEventListener('keypress', keypressHandler)
+  })
 
   return (
     <div style={grid_style}>
@@ -163,7 +197,12 @@ function MoraGrid(props: MoraGridProps) {
               if (cell_data) {
                 if (typeof cell_data == 'string') {
                   return (
-                    <span style={common_style}>{cell_data as string}</span>
+                    <span
+                      style={{
+                        ...common_style,
+                        'color': selectedCell().consonant == cell_data || selectedCell().vowel == cell_data ? 'red' : 'black'
+                      }}
+                    >{cell_data as string}</span>
                   )
                 } else {
                   return (
@@ -173,7 +212,14 @@ function MoraGrid(props: MoraGridProps) {
                         ...cell_data.romanization == 'n' ?
                           { 'grid-column': 'span 5' } : {},
                       }}
-                      onClick={[props.set_response, cell_data]}
+                      onClick={() => {
+                        setSelectedCell({
+                          consonant: undefined,
+                          vowel: undefined,
+                        })
+
+                        props.set_response(cell_data)
+                      }}
                     >{
                         typeof cell_data == 'string' ? cell_data :
                           `/${cell_data[props.format()]}/`

@@ -1,11 +1,11 @@
-import { Mora } from "../../../answer keys/_mora";
+import { mora } from "../../../answer keys/_mora";
 import { katakana as answerKey } from "../../../answer keys/katakana";
 import { compare_strictly_equal } from "../../../evaluators/evaluators";
 import { Quiz, defaultOnResponse } from "../../../quiz";
 import { SmartTrainer } from "../../../training algorithms/SmartTrainer";
-import { mora_fetcher_builder } from "../../../user input fetchers/mora_fetcher";
+import { mora_fetcher_builder } from "../../../response fetchers/mora fetcher";
 import { JapaneseCharacterRenderer } from "../JapaneseCharacterRenderer";
-import { JapaneseQuizzesLayout } from "../hiragana/layout";
+import { JapaneseQuizzesLayout } from "../layout";
 
 
 export const katakana = new Quiz(

@@ -15,9 +15,9 @@ import {
   empty
 } from "../answer keys/answer_keys.barrel"
 import {
-  musical_keyboard,
+  MusicalKeyboard,
   EnumFetcher,
-} from "../user input fetchers/user_input_fetchers.barrel"
+} from "../response fetchers/user input fetchers.barrel"
 import { hiragana } from "./japanese/hiragana/quiz"
 import { katakana } from "./japanese/katakana/quiz"
 import { IQuiz, Quiz, defaultOnResponse } from "../quiz"
@@ -34,7 +34,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
     title: "Music notation",
     answer_key: music_notation,
     evaluator: compare_music_notation,
-    response_fetcher: musical_keyboard,
+    response_fetcher: MusicalKeyboard,
     onResponse: defaultOnResponse,
     renderer: music_notation_renderer,
     training_algorithm: SmartTrainer,

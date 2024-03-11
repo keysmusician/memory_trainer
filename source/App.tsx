@@ -14,7 +14,7 @@ import {
 import { IQuiz } from './quiz'
 import { empty_quiz } from './quizzes/quizzes'
 import { Router, Routes, Route } from '@solidjs/router'
-import { styleGroup } from './Style'
+import { style, styleGroup } from './Style'
 
 
 export namespace routes {
@@ -42,7 +42,9 @@ function App() {
   return (
     <Router>
       <QuizContext.Provider value={[quizValue, setQuizValue]}>
-        <h1 style={styleGroup.title}>Memory Trainer</h1>
+        <h1 style={{
+          ...styleGroup.baseText,
+        }}>Memory Trainer</h1>
 
         <section id='memory_trainer' style={styleGroup.contentBox}>
           <Routes>

@@ -1,8 +1,7 @@
-import { batch, createEffect, createReaction, createSignal, getOwner, on, runWithOwner, untrack } from "solid-js"
+import { JSX, createReaction, createSignal, getOwner, runWithOwner } from "solid-js"
 import { useNavigate } from "@solidjs/router"
-// import { MemoryTrainerApp, MemoryTrainerInputs } from "../MemoryTrainer"
 import { AppNavigator, routes, useQuiz } from "../App"
-// import { Quiz } from "../quizzes/quizzes"
+import { TrainingHistory } from "../quiz"
 import { style, styleGroup } from "../Style"
 
 
@@ -25,95 +24,44 @@ export function TrainScreen() {
 
   const [response, setResponse] = createSignal()
 
-  const [responseCount, setResponseCount] = createSignal(0)
-
-  const [grade, setGrade] = createSignal()
-
-  const [regrades, setRegrades] = createSignal(0)
+  const [trainingHistory, setTrainingHistory] = createSignal<TrainingHistory>(new TrainingHistory())
 
 
-  ///
-  // const verdict_render_area = <div style={styleGroup.baseText} />
-
-  // const owner = getOwner();
-
-  // async function fetch_response() {
-  //   return new Promise((resolve) =>
-  //     runWithOwner(owner, () => {
-  //       const trackResponse = createReaction(() => {
-  //         resolve(response()!)
-  //         set_response(undefined)
-  //       })
-
-  //       trackResponse(() => response())
-  //     })
-  //   )
-  // }
-
-  // const on_grade = quiz.on_grade ?
-  //   quiz.on_grade(verdict_render_area) : undefined
-
-
-  ///
-
-
-  // const quizSettings: MemoryTrainerInputs<any, any> = {
-  //   ...quiz,
-  //   set_question: set_question,
-  //   fetch_response: fetch_response,
-  //   on_grade: on_grade,
-  // }
-
-  // async function fetch_response() {
-  //   return new Promise((resolve) =>
-  //     runWithOwner(owner, () => {
-  //       const trackResponse = createReaction(() => {
-  //         resolve(response()!)
-  //         set_response(undefined)
-  //       })
-
-  //       trackResponse(() => response())
-  //     })
-  //   )
-  // }
-
-  const [registerGrade, setRegisterGrade] = createSignal<Boolean>(false)
-
-  createEffect(on(responseCount, () => {
-    setGrade(quiz.evaluator(response(), answer()))
-    const registerGrade = quiz.onResponse({
-      grade: grade(),
-      question: question(),
-      answer: answer(),
-      responseCount: responseCount(),
-      regrades: regrades(),
-    })
-    setRegisterGrade(registerGrade)
-    setRegrades((regrades) => regrades + 1)
-  }, { defer: true }))
-
-
+  /* This is the new main training loop */
   async function train(): Promise<void> {
     const owner = getOwner();
-
-    const signalRegisterGrade = () => new Promise<void>(resolve => {
-      runWithOwner(owner, () => {
-        const trackRegisterGrade = createReaction(() => {
-          resolve()
-          setRegisterGrade(false)
-          setRegrades(0)
-        })
-
-        trackRegisterGrade(() => registerGrade())
-      })
-    })
 
     while (!trainer.is_complete) {
       setQuestionIndex(trainer.current_question)
 
-      await signalRegisterGrade()
+      // Wait for the user to respond to the question
+      const trainingHistory = await new Promise<TrainingHistory>((resolve) =>
+        runWithOwner(owner, () => {
+          const createTrainingHistoryWhen = createReaction(() => {
 
-      trainer.register(untrack(grade))
+            const _trainingHistory = setTrainingHistory((trainingHistory) =>
+              new TrainingHistory(...trainingHistory, {
+                grade: quiz.evaluator(response(), answer()),
+                question: question(),
+                answer: answer(),
+                response: response()
+              })
+            )
+
+            resolve(_trainingHistory)
+          })
+
+          // Will execute the reaction one time when the response changes:
+          createTrainingHistoryWhen(() => response())
+        })
+      )
+
+      if (!quiz.onResponse(trainingHistory)) { // Allows each quiz to determine if the user has passed the question and the grade should be registered with the Trainer. This is useful for quizzes that allow retries.
+        // TODO: Allow quizzes to adjust grades before registering them, for example, to penalize regrades.
+        continue
+      }
+
+      trainer.register(trainingHistory.last.grade)
 
       trainer.next_question()
     }
@@ -121,7 +69,6 @@ export function TrainScreen() {
 
   const navigate = useNavigate() as AppNavigator
 
-  // new MemoryTrainerApp(quizSettings).
   train().then(() => navigate(routes.score))
 
   return (
@@ -132,14 +79,8 @@ export function TrainScreen() {
         quiz={quiz}
         answer={answer()}
         question={question()}
-        grade={grade()}
-        regrades={regrades()}
-        response={response()}
-        setResponse={(response) => batch(() => {
-          setResponseCount((responseCount) => responseCount + 1)
-          setResponse(response)
-        })}
-        responseCount={responseCount()}
+        trainingHistory={trainingHistory()}
+        setResponse={setResponse}
       />
 
       <div style={{
@@ -147,7 +88,7 @@ export function TrainScreen() {
         margin: style.layout.primaryMargin,
       }}>
         <button
-          style={styleGroup.button}
+          style={styleGroup.button as JSX.CSSProperties}
           onClick={() => navigate(routes.start)}
           type="button"
         >

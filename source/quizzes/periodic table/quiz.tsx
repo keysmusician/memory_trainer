@@ -1,6 +1,6 @@
 import { Quiz } from "../../quiz";
 import { TextRenderer } from "../../renderers/TextRenderer";
-import { AutofillEnumFetcher } from "../../user input fetchers/auto-fill enum fetcher";
+import { AutofillEnumFetcher } from "../../response fetchers/auto-fill enum fetcher";
 import { PeriodicTable } from "./answer key";
 import { PeriodicTableQuizLayout } from "./quizLayout";
 

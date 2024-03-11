@@ -55,7 +55,40 @@ export function AutofillEnumFetcher<
 	}
 
 	return (
-		<div style={flexColumn as JSX.CSSProperties}>
+		<div style={flexColumn as JSX.CSSProperties}
+			onKeyPress={keyboardEvent => {
+				const index = options().indexOf(selection())
+
+				switch (keyboardEvent.key) {
+					case "ArrowDown": {
+						const next_option = options()[(index + 1) % options().length]
+						setSelection(next_option)
+						break
+					}
+					case "ArrowUp": {
+						const previous_option = options()[(index - 1) % options().length]
+						setSelection(previous_option)
+						break
+					}
+					case "Enter": {
+						if (options().includes(selection())) {
+							selectOption(selection())
+						}
+
+						const first_option = options()[0]
+
+						if (first_option !== undefined) {
+							if (first_option == selection()) {
+								submit()
+							} else {
+								selectOption(first_option)
+							}
+						}
+						break
+					}
+				}
+			}}
+		>
 			<div style={flexColumn as JSX.CSSProperties}>
 				<input
 					type="text"
@@ -66,28 +99,11 @@ export function AutofillEnumFetcher<
 						"box-sizing": "border-box",
 						'width': "100%",
 					}}
-					onKeyUp={keyboardEvent => {
-						switch (keyboardEvent.key) {
-							case "ArrowDown": {
-								break
-							}
-							case "ArrowUp": {
-								break
-							}
-							case "Enter": {
-								const first_option = options()[0]
-								if (first_option !== undefined) {
-									if (first_option == selection()) {
-										submit()
-									} else {
-										selectOption(first_option)
-									}
-								}
-								break
-							}
+					onKeyPress={e => {
+						if ([`Enter`, `ArrowDown`, `ArrowUp`].includes(e.key)) {
+							e.preventDefault()
 						}
-					}
-					}
+					}}
 				/>
 				<OptionList
 					options={options()}
