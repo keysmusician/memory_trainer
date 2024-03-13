@@ -1,4 +1,4 @@
-import { Component, JSXElement } from 'solid-js'
+import { Component, JSXElement, Setter } from 'solid-js'
 import { Renderer } from './renderers/Renderer'
 import { DefaultQuizLayout } from './defaultQuizLayout'
 import { BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
@@ -32,7 +32,7 @@ export interface QuizLayoutProps<
 	question: QuestionType,
 	/* This changes throughout the lifecycle of the quiz: */
 	trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>,
-	setResponse: (response: ResponseType) => void,
+	setResponse: Setter<ResponseType>
 }
 
 export class TrainingHistory<
@@ -80,8 +80,10 @@ export class TrainingHistory<
 export type TrainingState<QuestionType, AnswerType, ResponseType> = {
 	grade: boolean
 	question: QuestionType
+	questionsAskedCount: number
 	answer: AnswerType
 	response: ResponseType
+	responseTime: number
 }
 
 export function defaultOnResponse(trainingHistory: TrainingHistory): boolean {
@@ -124,7 +126,7 @@ type QuizParameters<QuestionType, AnswerType, ResponseType> =
 
 export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<QuestionType, AnswerType, ResponseType> {
 	readonly answer_key: Map<QuestionType, AnswerType>
-	readonly evaluator: (response: ResponseType, answer: AnswerType) => any
+	readonly evaluator: (response: ResponseType, answer: AnswerType) => any // TODO: This should be a number between 0 and 1.
 	readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	readonly title: string
 	readonly renderer: Renderer<QuestionType>

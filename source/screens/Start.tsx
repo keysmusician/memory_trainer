@@ -129,7 +129,7 @@ function NewQuizButton() {
       onClick={() => navigate(routes.create)}
       tabIndex={0}
       style={{
-        ...styleGroup.startButton,
+        ...styleGroup.button,
         'margin-right': '0.5rem',
       }}
       type='button'

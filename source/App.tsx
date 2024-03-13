@@ -43,7 +43,8 @@ function App() {
     <Router>
       <QuizContext.Provider value={[quizValue, setQuizValue]}>
         <h1 style={{
-          ...styleGroup.baseText,
+          ...styleGroup.title,
+          margin: ".5em",
         }}>Memory Trainer</h1>
 
         <section id='memory_trainer' style={styleGroup.contentBox}>

@@ -73,8 +73,9 @@ export const answer_key: Map<Kanji, string> = new Map([
 	// ['前', 'front'],
 	// ['後', 'back'],
 	// ['高', 'tall'],
-	/// before, ahead
+	['前', 'front/previous'],
 	['先', 'ahead/before/previous'],
+	['後', 'back/behind/after/later'],
 	/* Nature */
 	// ['日', 'sun/day'],
 	// ['月', 'moon/month'],
@@ -166,8 +167,6 @@ export const answer_key: Map<Kanji, string> = new Map([
 	['時', 'time/hour'],
 	['行', 'go/journey'],
 	['分', 'minute/part'],
-	['後', 'back/behind/after/later'],
-	['前', 'front/before/previous'],
 	['間', 'interval/space'],
 	['東', 'east'],
 	['今', 'now'],

@@ -2,7 +2,7 @@ import { Quiz } from "../../quiz";
 import { TextRenderer } from "../../renderers/TextRenderer";
 import { AutofillEnumFetcher } from "../../response fetchers/auto-fill enum fetcher";
 import { PeriodicTable } from "./answer key";
-import { PeriodicTableQuizLayout } from "./quizLayout";
+import { PeriodicTableQuizLayout } from "./layout";
 
 
 export const periodic_table = new Quiz<number, PeriodicTable.Element, string>({
@@ -15,7 +15,7 @@ export const periodic_table = new Quiz<number, PeriodicTable.Element, string>({
 		/>,
 	evaluator: (response, element) => response === element.name,
 	response_fetcher: (props) =>
-		<AutofillEnumFetcher
+		<AutofillEnumFetcher<number, PeriodicTable.Element>
 			{...props}
 			responses={
 				Array.from(PeriodicTable.answerKey.values()).map(element => element.name)

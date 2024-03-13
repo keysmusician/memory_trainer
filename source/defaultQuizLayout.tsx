@@ -1,4 +1,4 @@
-import { For } from "solid-js"
+import { For, createEffect, createSignal } from "solid-js"
 import { QuizLayoutProps, TrainingHistory } from "./quiz"
 import { styleGroup } from "./Style"
 
@@ -51,9 +51,6 @@ export function feedbackBuilder<QuestionType, AnswerType, ResponseType>(
 		(props) => `The answer was ${props.trainingHistory.last.answer}`,
 ) {
 	return (props: FeedbackRendererProps<QuestionType, AnswerType, ResponseType>) => {
-		console.log(props.trainingHistory.last)
-		console.log(props.question)
-		console.log(props.answer)
 		if (props.trainingHistory.last === undefined) {
 			return " "
 		} else if (props.trainingHistory.last.grade) {
@@ -97,48 +94,130 @@ export function DefaultFeedbackRenderer<
 }
 
 export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }) {
-	const enabled = true
+	const [visible, setVisible] = createSignal(false)
 
-	if (!enabled) {
-		return null
+	var panelRef: HTMLDivElement | undefined
+
+	createEffect(() => {
+		if (visible()) {
+			panelRef?.animate([
+				{ transform: "translateX(-100%)" },
+				{ transform: "translateX(0)" },
+			], {
+				duration: 200,
+				easing: "ease-in-out",
+				fill: "both",
+			})
+		} else {
+			panelRef?.animate([
+				{ transform: "translateX(0)" },
+				{ transform: "translateX(-100%)" },
+			], {
+				duration: 200,
+				easing: "ease-in-out",
+				fill: "both",
+			})
+		}
+	})
+
+	const backgroundColor = "rgba(0, 0, 0, .2)"
+
+	const trStyle = {
+		'border-bottom': '1px solid black',
 	}
 
+	// const localStyle = document.createElement('style')
+	// localStyle.appendChild(document.createTextNode(
+	// 	`button:hover{ background-color: #00ff00 }`
+	// ))
+	// document.getElementsByTagName('head')[0].appendChild(localStyle);
+
 	return (
-		<div
+		<section
+			ref={panelRef}
 			style={{
-				"display": "flex",
-				"position": "fixed",
-				"left": "0",
-				"top": "0",
+				'position': 'fixed',
+				'left': '0',
+				'top': '0',
 				"width": "20%",
-				"height": "100vh",
-				"flex-direction": "column",
-				"overflow": "auto",
-				"padding": "1em",
-				"background": "rgba(0, 0, 0, .2)",
-				"border-radius": "0 1em 1em 0",
-				"box-sizing": "border-box",
+				'height': '100vh',
 			}}
 		>
-			<For each={Array.from(props.trainingHistory).reverse()} fallback={<div>No history</div>}>
-				{(trainingState, index) => (
-					<div>
-						<p>{props.trainingHistory.length - index()}:</p>
-						<div>
-							<span>Question: {JSON.stringify(trainingState.question)}</span>
-						</div>
-						<div>
-							<span>Answer: {JSON.stringify(trainingState.answer)}</span>
-						</div>
-						<div>
-							<span>Response: {JSON.stringify(trainingState.response)}</span>
-						</div>
-						<div>
-							<span>Grade: {trainingState.grade ? "pass" : "fail"}</span>
-						</div>
-					</div>
-				)}
-			</For>
-		</div>
+			<span
+				style={{
+					'display': "flex",
+					'flex-direction': "column",
+					'gap': "2em",
+					'overflow': "auto",
+					'padding': "1em",
+					'background': backgroundColor,
+					'border-radius': "0 0 1em 0",
+					'box-sizing': "border-box",
+					'height': "100%",
+				}}
+			>
+				<For each={Array.from(props.trainingHistory).reverse()} fallback={<div>No history</div>}>
+					{(trainingState, index) => (
+						<table style={{
+							...trStyle,
+							'border-collapse': 'collapse',
+							'width': '100%',
+							'vertical-align': 'top',
+						}}
+						>
+							<thead>
+								<tr style={trStyle}>
+									<th colSpan={2}>
+										{props.trainingHistory.length - index()}
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr style={trStyle}>
+									<td>Question</td>
+									<td>{JSON.stringify(trainingState.question)}</td>
+								</tr>
+								<tr style={trStyle}>
+									<td>Answer</td>
+									<td>{JSON.stringify(trainingState.answer)}</td>
+								</tr>
+								<tr style={trStyle}>
+									<td>Response</td>
+									<td>{JSON.stringify(trainingState.response)}</td>
+								</tr>
+								<tr style={trStyle}>
+									<td>Response Time</td>
+									<td>{trainingState.responseTime / 1000} s</td>
+								</tr>
+								<tr style={trStyle}>
+									<td>Grade</td>
+									<td>{trainingState.grade ? "pass" : "fail"}</td>
+								</tr>
+							</tbody>
+						</table>
+					)}
+				</For>
+			</span>
+
+			{/* Show/hide clickable tab */}
+			<button
+				onClick={() => setVisible(!visible())}
+				style={{
+					'position': 'absolute',
+					'left': '100%',
+					'top': '0',
+					'background-color': backgroundColor,
+					'border-radius': '0 1em 1em 0',
+					'border': 'none',
+					'box-sizing': 'border-box',
+					'height': '2em',
+					'width': "2em",
+					'--test': 'test'
+				}}
+				title="Show/hide training history."
+				onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, .4)"}
+				onMouseLeave={(e) => e.currentTarget.style.backgroundColor = backgroundColor}
+			>{'?'}</button>
+		</section>
 	)
 }

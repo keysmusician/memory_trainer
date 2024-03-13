@@ -20,10 +20,11 @@ export namespace designSystem {
 		}
 
 		export namespace size {
+			export const extraSmall = ".6rem"
 			export const small = "1rem"
-			export const medium = "2rem"
-			export const large = "4rem"
-			export const extraLarge = "5rem"
+			export const medium = "1.3rem"
+			export const large = "1.6rem"
+			export const extraLarge = "2rem"
 		}
 
 		export namespace weight {
@@ -38,9 +39,9 @@ export namespace designSystem {
 	export namespace layout {
 		export namespace border {
 			export const radiusMediumRelative = "0.5rem"
-			export const radiusWide = "50px"
+			export const radiusWide = "50px"  // TODO: 3.125rem
 			export const widthThin = ".1rem"
-			export const marginMedium = "6px"
+			export const marginMedium = "6px" // TODO: 0.375rem
 		}
 	}
 
@@ -121,22 +122,21 @@ export namespace styleGroup {
 		display: 'flex',
 		'flex-direction': 'column',
 		'justify-content': 'space-between',
-		margin: style.layout.primaryMargin,
 	}
 
-	export const baseText = {
+	export const baseText: JSX.CSSProperties = {
 		'font-family': `${style.typography.typeface.primary}, ${style.typography.typeface.secondary}`,
 		'font-size': style.typography.size.primary,
 		color: style.color.primary,
 	}
 
-	export const title = {
+	export const title: JSX.CSSProperties = {
 		...baseText,
 		'font-size': style.typography.size.title,
 		'font-weight': designSystem.typography.weight.bolder,
 	}
 
-	export const largeText = {
+	export const largeText: JSX.CSSProperties = {
 		...baseText,
 		'font-size': designSystem.typography.size.large,
 	}
@@ -151,19 +151,15 @@ export namespace styleGroup {
 		'margin': 0
 	}
 
-	export const button = {
+	export const button: JSX.CSSProperties = {
 		...baseText,
 		...column,
 		border: style.layout.primaryBorder,
 		'border-radius': designSystem.layout.border.radiusWide,
 		'box-sizing': 'border-box',
 		cursor: 'pointer',
-		height: style.layout.buttonHeight,
+		// height: style.layout.buttonHeight,
 		margin: 'auto',
-	}
-
-	export const startButton = {
-		...button,
-		'border-color': style.color.accent,
+		padding: '.5em',
 	}
 }

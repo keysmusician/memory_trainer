@@ -22,7 +22,8 @@ export function TrainScreen() {
 
   const answer = () => answers[questionIndex()!]
 
-  const [response, setResponse] = createSignal()
+  const [response, setResponse] = createSignal(undefined,
+    { equals: () => false }) // Force a reaction to every update, even if the value is the same.
 
   const [trainingHistory, setTrainingHistory] = createSignal<TrainingHistory>(new TrainingHistory())
 
@@ -30,6 +31,7 @@ export function TrainScreen() {
   /* This is the new main training loop */
   async function train(): Promise<void> {
     const owner = getOwner();
+    var questionsAskedCount = 1
 
     while (!trainer.is_complete) {
       setQuestionIndex(trainer.current_question)
@@ -37,14 +39,18 @@ export function TrainScreen() {
       // Wait for the user to respond to the question
       const trainingHistory = await new Promise<TrainingHistory>((resolve) =>
         runWithOwner(owner, () => {
+          const askedAt = Date.now()
+
           const createTrainingHistoryWhen = createReaction(() => {
 
             const _trainingHistory = setTrainingHistory((trainingHistory) =>
               new TrainingHistory(...trainingHistory, {
                 grade: quiz.evaluator(response(), answer()),
                 question: question(),
+                questionsAskedCount: questionsAskedCount++,
                 answer: answer(),
-                response: response()
+                response: response(),
+                responseTime: Date.now() - askedAt,
               })
             )
 
@@ -64,6 +70,8 @@ export function TrainScreen() {
       trainer.register(trainingHistory.last.grade)
 
       trainer.next_question()
+
+      questionsAskedCount++
     }
   }
 
