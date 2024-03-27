@@ -2,5 +2,6 @@
 	"terminal.integrated.cwd": "source",
 	"cSpell.words": [
 		"solidjs"
-	]
+	],
+	"cmake.configureOnOpen": false
 }
