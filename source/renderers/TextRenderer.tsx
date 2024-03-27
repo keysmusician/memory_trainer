@@ -1,4 +1,4 @@
-import { styleGroup } from "../Style"
+import { style } from "../Style"
 import { Renderer, RendererProps } from "./Renderer"
 
 interface TextRendererProps extends RendererProps<string> {
@@ -11,8 +11,8 @@ interface TextRendererProps extends RendererProps<string> {
 export const TextRenderer: Renderer<string> = (props: TextRendererProps) => {
 	return (
 		<div>
-			<p style={styleGroup.baseText}>{props.prompt}</p>
-			<h2 style={styleGroup.largeText}>{props.question}</h2>
+			<p style={style.group.baseText}>{props.prompt}</p>
+			<h2 style={style.group.largeText}>{props.question}</h2>
 		</div>
 	)
 }

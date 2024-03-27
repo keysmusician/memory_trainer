@@ -1,5 +1,5 @@
 import { JSXElement, createEffect } from "solid-js";
-import { VexNotation } from "../answer keys/music_notation";
+import { VexNotation } from "../quizzes/music notation";
 import { Renderer } from "./Renderer";
 
 

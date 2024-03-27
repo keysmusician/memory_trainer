@@ -1,5 +1,5 @@
 import { JSX, createSignal } from "solid-js";
-import { styleGroup } from "./Style";
+import { style } from "./Style";
 
 export type ButtonProps = {
 	onClick?: () => void
@@ -16,7 +16,7 @@ export function Button(props: ButtonProps) {
 		<button
 			onClick={props.onClick}
 			style={{
-				...styleGroup.button,
+				...style.group.button,
 				...props.style,
 				...(hovered() && props.style ? props.style[':hover'] : {}),
 
@@ -28,7 +28,7 @@ export function Button(props: ButtonProps) {
 				props.children ??
 				<text
 					style={{
-						...styleGroup.baseText,
+						...style.group.baseText,
 						margin: "0.5em",
 					}}
 				>

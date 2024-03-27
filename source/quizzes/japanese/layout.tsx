@@ -1,5 +1,5 @@
-import { Mora } from "../../answer keys/_mora"
-import { DefaultFeedbackRenderer, feedbackBuilder } from "../../defaultQuizLayout"
+import { Mora } from "./_mora"
+import { DefaultFeedbackRenderer, TrainingHistoryPanel, feedbackBuilder } from "../../DefaultQuizLayout"
 import { QuizLayoutProps } from "../../quiz"
 
 
@@ -12,6 +12,8 @@ export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>
 				'align-items': "center",
 			}}
 		>
+			<TrainingHistoryPanel trainingHistory={props.trainingHistory} />
+
 			<DefaultFeedbackRenderer<string, Mora, Mora>
 				question={props.question}
 				answer={props.answer}

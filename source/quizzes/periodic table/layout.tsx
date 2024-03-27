@@ -1,4 +1,4 @@
-import { DefaultFeedbackRenderer, feedbackBuilder, TrainingHistoryPanel } from "../../defaultQuizLayout"
+import { DefaultFeedbackRenderer, feedbackBuilder, TrainingHistoryPanel } from "../../DefaultQuizLayout"
 import { QuizLayoutProps } from "../../quiz"
 import { PeriodicTable } from "./answer key"
 

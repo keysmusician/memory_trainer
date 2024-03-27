@@ -1,4 +1,4 @@
-import { mora } from './_mora'
+import { Mora, mora } from '../_mora'
 
 export type KatakanaCharacter =
   'ア' | 'イ' | 'ウ' | 'エ' | 'オ' |

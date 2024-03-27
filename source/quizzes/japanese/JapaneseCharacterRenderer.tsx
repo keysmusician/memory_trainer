@@ -1,4 +1,4 @@
-import { CharacterRenderer } from "../../renderers/Renderers.barrel";
+import { CharacterRenderer } from "../../renderers/renderers.barrel";
 
 
 export function JapaneseCharacterRenderer(props) {

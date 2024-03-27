@@ -19,7 +19,7 @@ export class BaseTrainingAlgorithm {
     constructor(question_count: number) {
 
         if (question_count < 1 || question_count % 1) {
-        throw ("Question count must be an integer greater than 0.")
+            throw ("Question count must be an integer greater than 0.")
         }
 
         this.question_count = question_count
@@ -32,13 +32,13 @@ export class BaseTrainingAlgorithm {
         return this.#current_question
     }
 
-    get is_complete(): boolean {return this.#is_complete}
+    get is_complete(): boolean { return this.#is_complete }
 
     next_question(): number | undefined {
         if ((this.current_question + 1) === this.question_count) {
-        this.#is_complete = true
+            this.#is_complete = true
 
-        return undefined
+            return undefined
         }
 
         this.#current_question += 1
@@ -46,5 +46,5 @@ export class BaseTrainingAlgorithm {
         return this.#current_question
     }
 
-    register(score: any): boolean { return true }
+    register(score: Number): boolean { return true }
 }

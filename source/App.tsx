@@ -14,7 +14,7 @@ import {
 import { IQuiz } from './quiz'
 import { empty_quiz } from './quizzes/quizzes'
 import { Router, Routes, Route } from '@solidjs/router'
-import { style, styleGroup } from './Style'
+import { style } from './Style'
 
 
 export namespace routes {
@@ -33,35 +33,57 @@ export type AppNavigator = (route: AppRoute, params?: Record<string, string>) =>
 const [quizValue, setQuizValue] = createStore<IQuiz>(empty_quiz);
 const QuizContext = createContext<[IQuiz, Setter<IQuiz>]>([quizValue, setQuizValue]);
 
-export function useQuiz() { return useContext(QuizContext)!; }
+export function useQuiz() { return useContext(QuizContext)! }
+
+const backgroundImage = () => quizValue.background_image ??
+  `https://source.unsplash.com/1600x900/?${quizValue.title.replace(' ', '-').toLowerCase()}`
 
 /**
  * Memory Trainer application root component.
  */
 function App() {
   return (
-    <Router>
-      <QuizContext.Provider value={[quizValue, setQuizValue]}>
-        <h1 style={{
-          ...styleGroup.title,
-          margin: ".5em",
-        }}>Memory Trainer</h1>
+    <>
+      <div style={{
+        'background-attachment': 'fixed',
+        'background-image': `url(${backgroundImage()})`,
+        'background-repeat': 'no-repeat',
+        'background-size': 'cover',
+        'display': 'flex',
+        'filter': 'opacity(.5)',
+        'flex-direction': 'column',
+        'height': '100vh',
+        'position': 'fixed',
+        'width': '100%',
+        'z-index': '-1',
+      }} />
 
-        <section id='memory_trainer' style={styleGroup.contentBox}>
-          <Routes>
-            <Route path={[routes.start, '*']} element={<StartScreen />} />
+      <Router>
+        <QuizContext.Provider value={[quizValue, setQuizValue]}>
+          <h1 style={{
+            ...style.group.title,
+            margin: ".5em",
+          }}>Memory Trainer</h1>
 
-            <Route path={routes.edit} element={<EditScreen />} />
+          <section
+            id='memory_trainer'
+            style={style.group.contentBox}
+          >
+            <Routes>
+              <Route path={[routes.start, '*']} element={<StartScreen />} />
 
-            <Route path={routes.create} element={<CreateScreen />} />
+              <Route path={routes.edit} element={<EditScreen />} />
 
-            <Route path={routes.train} element={<TrainScreen />} />
+              <Route path={routes.create} element={<CreateScreen />} />
 
-            <Route path={routes.score} element={<ScoreScreen />} />
-          </Routes>
-        </section>
-      </QuizContext.Provider>
-    </Router >
+              <Route path={routes.train} element={<TrainScreen />} />
+
+              <Route path={routes.score} element={<ScoreScreen />} />
+            </Routes>
+          </section>
+        </QuizContext.Provider>
+      </Router >
+    </>
   )
 }
 

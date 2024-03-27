@@ -2,7 +2,7 @@
 
 import { JSX, createEffect, onCleanup } from 'solid-js'
 import { ResponseFetcherProps } from '../quiz'
-import { styleGroup } from '../Style'
+import { style } from '../Style'
 import { arcTanTurns } from '../library/library.barrel'
 import { AbstractPath, Path, Point, Trail, } from '../library/path'
 
@@ -221,14 +221,14 @@ export const PathCanvas = (props: ResponseFetcherProps<Path[], string, Path[]>) 
 					}}
 				>
 					<button
-						style={styleGroup.button as JSX.CSSProperties}
+						style={style.group.button as JSX.CSSProperties}
 						onClick={clear}
 					>
 						Clear
 					</button>
 
 					<button
-						style={styleGroup.button as JSX.CSSProperties}
+						style={style.group.button as JSX.CSSProperties}
 						onClick={() => {
 							const response = trails.map(analyzePath)
 

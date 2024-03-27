@@ -1,5 +1,5 @@
 /**
- * Input evaluator.
+ * Response evaluator.
  *
  * Determines whether an answer was correct or incorrect.
  *
@@ -7,29 +7,35 @@
  * range 0–1.
  */
 
+import { Evaluator } from "../quiz"
+
+
 /**
  * Compares two normalized strings.
  */
-export function compare_strings(response: string, answer: string): boolean {
-    const normalize = (text: string) => text.toLowerCase().replaceAll(' ', '')
+export const compare_strings: Evaluator = function (
+  response: string, answer: string
+) {
+  const normalize = (text: string) => text.toLowerCase().replaceAll(' ', '')
 
-    return normalize(response) === normalize(answer)
-  }
+  return normalize(response) === normalize(answer) ? 1 : 0
+}
 
 /**
  * Compares a musical pitch string.
  */
-export function compare_music_notation(
+export const compare_music_notation: Evaluator = function (
   response: string, answer: string
-): boolean {
-    return compare_strings(response, answer)
-  }
+) {
+  return compare_strings(response, answer)
+}
 
 /**
  * Compares two objects for strict equality.
  **/
-export function compare_strictly_equal<T=any>(
+export function compare_strictly_equal<T = unknown>(
   response: T, answer: T
-): boolean {
-    return response === answer
+) {
+  return response === answer ? 1 : 0
 }
+compare_strictly_equal satisfies Evaluator

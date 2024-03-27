@@ -1,7 +1,7 @@
 import { For, JSX, Setter, createEffect, createSignal, onCleanup, onMount } from "solid-js"
-import { mora as moras } from "../answer keys/answer_keys.barrel"
+import { mora as moras } from "../answer keys/answer keys.barrel"
 import { ResponseFetcherProps, TrainingHistory } from "../quiz";
-import { Mora } from "../answer keys/_mora";
+import { Mora } from "../quizzes/japanese/_mora";
 
 function convert_to_grid(
   moras: Mora[],

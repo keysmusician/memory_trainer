@@ -1,7 +1,7 @@
 import { compare_strings } from "../../evaluators/evaluators"
 import { Quiz, defaultOnResponse } from "../../quiz"
 import { image_renderer } from "../../renderers/ImageRenderer"
-import { AutofillEnumFetcher } from "../../response fetchers/auto-fill enum fetcher"
+import { AutofillEnumFetcher } from "../../response fetchers/autofill enum fetcher"
 import { country_flags as answer_key } from "./country_flags"
 
 

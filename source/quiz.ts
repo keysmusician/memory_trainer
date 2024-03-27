@@ -1,6 +1,6 @@
 import { Component, JSXElement, Setter } from 'solid-js'
 import { Renderer } from './renderers/Renderer'
-import { DefaultQuizLayout } from './defaultQuizLayout'
+import { DefaultQuizLayout } from './DefaultQuizLayout'
 import { BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
 import { SmartTrainer } from './training algorithms/SmartTrainer'
 import { compare_strictly_equal } from './evaluators/evaluators'
@@ -21,6 +21,22 @@ import { compare_strictly_equal } from './evaluators/evaluators'
 // 		this.unselected_answer_key = new Map()
 // 	}
 // }
+
+/**
+ * A number between 0 and 1 (inclusive).
+ */
+export class ClosedUnitIntervalElement extends Number {
+	constructor(value: number) {
+		if (value < 0 || value > 1) {
+			throw new RangeError('The value must be between 0 and 1 (inclusive).')
+		}
+
+		super(value)
+	}
+}
+
+export type Evaluator<ResponseType = any, AnswerType = any> =
+	(response: ResponseType, answer: AnswerType) => ClosedUnitIntervalElement
 
 export interface QuizLayoutProps<
 	QuestionType = unknown,
@@ -65,7 +81,7 @@ export class TrainingHistory<
 		for (let index = this.length - 1; index >= 0; index--) {
 			if (
 				this[index].question === this.last.question &&
-				this[index].grade === false
+				this[index].grade < (.5 as ClosedUnitIntervalElement)
 			) {
 				retries++
 			} else {
@@ -78,8 +94,9 @@ export class TrainingHistory<
 }
 
 export type TrainingState<QuestionType, AnswerType, ResponseType> = {
-	grade: boolean
+	grade: ClosedUnitIntervalElement
 	question: QuestionType
+	questionIndex: number
 	questionsAskedCount: number
 	answer: AnswerType
 	response: ResponseType
@@ -87,7 +104,10 @@ export type TrainingState<QuestionType, AnswerType, ResponseType> = {
 }
 
 export function defaultOnResponse(trainingHistory: TrainingHistory): boolean {
-	return trainingHistory.last.grade || trainingHistory.retries > 1
+	return (
+		trainingHistory.last.grade >= (.5 as ClosedUnitIntervalElement) ||
+		trainingHistory.retries > 1
+	)
 }
 
 export interface ResponseFetcherProps<
@@ -100,19 +120,22 @@ export interface ResponseFetcherProps<
 export type ResponseFetcher<QuestionType, AnswerType, ResponseType> =
 	Component<ResponseFetcherProps<ResponseType, QuestionType, AnswerType>>
 
+type HTTPSURL = `https://${string}`;
+
 export interface IQuiz<
-	QuestionType = unknown,
-	AnswerType = unknown,
-	ResponseType = unknown
+	QuestionType = any,
+	AnswerType = any,
+	ResponseType = any
 > {
 	answer_key: Map<QuestionType, AnswerType>
-	evaluator: (response: ResponseType, answer: AnswerType) => any
+	evaluator: Evaluator<ResponseType, AnswerType>
 	response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	title: string
 	renderer: Renderer<QuestionType>
 	onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 	training_algorithm: typeof BaseTrainingAlgorithm
 	layout: (props: QuizLayoutProps) => JSXElement
+	background_image?: HTTPSURL
 }
 
 type Modify<T, R> = Omit<T, keyof R> & R;
@@ -124,9 +147,10 @@ type QuizParameters<QuestionType, AnswerType, ResponseType> =
 		layout?: (props: QuizLayoutProps) => JSXElement
 	}>
 
-export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<QuestionType, AnswerType, ResponseType> {
+export class Quiz<QuestionType = unknown, AnswerType = unknown, ResponseType = unknown>
+	implements IQuiz<QuestionType, AnswerType, ResponseType> {
 	readonly answer_key: Map<QuestionType, AnswerType>
-	readonly evaluator: (response: ResponseType, answer: AnswerType) => any // TODO: This should be a number between 0 and 1.
+	readonly evaluator: Evaluator<ResponseType, AnswerType>
 	readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	readonly title: string
 	readonly renderer: Renderer<QuestionType>
@@ -136,7 +160,7 @@ export class Quiz<QuestionType, AnswerType, ResponseType> implements IQuiz<Quest
 
 	constructor({
 		answer_key,
-		evaluator = compare_strictly_equal<ResponseType>,
+		evaluator = compare_strictly_equal<ResponseType | AnswerType>,
 		response_fetcher,
 		title,
 		renderer,

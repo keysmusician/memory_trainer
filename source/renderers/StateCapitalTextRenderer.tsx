@@ -1,5 +1,5 @@
 import { Renderer } from "./Renderer"
-import { styleGroup } from "../Style"
+import { style } from "../Style"
 
 
 /**
@@ -8,8 +8,8 @@ import { styleGroup } from "../Style"
 export const state_capital_text_renderer: Renderer<string> = (props) => {
   return (
     <div>
-      <p style={styleGroup.baseText}>What's the capital of:</p>
-      <h2 style={styleGroup.largeText}>{props.question + "?"}</h2>
+      <p style={style.group.baseText}>What's the capital of:</p>
+      <h2 style={style.group.largeText}>{props.question + "?"}</h2>
     </div>
   )
 }

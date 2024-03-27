@@ -2,7 +2,7 @@ import { JSX, createReaction, createSignal, getOwner, runWithOwner } from "solid
 import { useNavigate } from "@solidjs/router"
 import { AppNavigator, routes, useQuiz } from "../App"
 import { TrainingHistory } from "../quiz"
-import { style, styleGroup } from "../Style"
+import { style } from "../Style"
 
 
 // type GetQuestionType<C extends Quiz> = C extends Quiz<infer Q> ? Q : unknown;
@@ -31,6 +31,7 @@ export function TrainScreen() {
   /* This is the new main training loop */
   async function train(): Promise<void> {
     const owner = getOwner();
+
     var questionsAskedCount = 1
 
     while (!trainer.is_complete) {
@@ -47,6 +48,7 @@ export function TrainScreen() {
               new TrainingHistory(...trainingHistory, {
                 grade: quiz.evaluator(response(), answer()),
                 question: question(),
+                questionIndex: questionIndex()!,
                 questionsAskedCount: questionsAskedCount++,
                 answer: answer(),
                 response: response(),
@@ -81,7 +83,7 @@ export function TrainScreen() {
 
   return (
     <section
-      style={styleGroup.contentBox}
+      style={style.group.contentBox}
     >
       <quiz.layout
         quiz={quiz}
@@ -96,7 +98,7 @@ export function TrainScreen() {
         margin: style.layout.primaryMargin,
       }}>
         <button
-          style={styleGroup.button as JSX.CSSProperties}
+          style={style.group.button as JSX.CSSProperties}
           onClick={() => navigate(routes.start)}
           type="button"
         >

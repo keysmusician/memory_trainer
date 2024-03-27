@@ -4,7 +4,7 @@ import { Quiz } from '../quiz'
 import { quizzes as serialized_quizzes } from '../quizzes/quizzes'
 // import { column_layout, quiz_list_item, start_button, nested_button } from '../Styles.module.css'
 import { useNavigate } from '@solidjs/router'
-import { styleGroup, style } from '../Style'
+import { style } from '../Style'
 
 
 export const quizzes = serialized_quizzes.map(quiz => new Quiz(quiz))
@@ -23,18 +23,28 @@ function Quizzes() {
 
   const navigate = useNavigate() as AppNavigator
 
-  const selectQuiz = ([quiz, index]: [Quiz, number]) => {
+  const selectQuiz = ([quiz, index]: [Quiz<unknown, unknown, unknown>, number]) => {
     setQuiz(quiz)
     setQuizIndex(index)
   }
 
-  const quizzesStyle: JSX.CSSProperties = {
-    ...styleGroup.column,
-    'overflow-y': 'scroll',
+  const nested_button: JSX.CSSProperties = {
+    'box-sizing': 'border-box',
+    'border': 'none',
+    'height': '100%',
+    'padding': '.5rem',
+    'cursor': 'pointer',
+    'margin-left': '3px',
   }
 
   return (
-    <ul style={quizzesStyle}>
+    <ul style={{
+      ...style.group.column,
+      'gap': '0.75rem',
+      // 'overflow-y': 'scroll',
+      'height': 'auto',
+    }}
+    >
       <For each={quizzes}>
         {(quiz, index) => {
           const input_id = String(index())
@@ -42,23 +52,41 @@ function Quizzes() {
           return (
             <li
               style={{
-                width: '100%',
-                'padding': '0.5rem 0',
+                ...style.group.row,
+                ...style.group.border,
+                'justify-content': 'space-between',
+                'padding': '0',
+                'width': '100%',
+                'height': '100%',
+                'background-color': 'white',
+                'transition': 'box-shadow 0.1s',
               }}
               onClick={[selectQuiz, [quiz, index]]}
               tabIndex={-1}
+              // Set box shadow on hover
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 0 1rem 0 white'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
               <label
                 for={input_id}
                 style={{
                   'margin': '0 0.5rem 0 0',
+                  'padding': '.5rem',
                 }}
               >
                 {quiz.title}
               </label>
 
               <div
-                style={{ 'float': 'right' }}
+                style={{
+                  // 'float': 'right',
+                  'height': '100%',
+                  'display': 'flex',
+                }}
               >
                 {/* <input
                   style={{
@@ -71,7 +99,7 @@ function Quizzes() {
                 /> */}
                 <button
                   onClick={() => navigate(routes.edit)}
-                // style={nested_button}
+                  style={nested_button}
                 >
                   Configure
                 </button>
@@ -81,7 +109,11 @@ function Quizzes() {
                     setQuiz(quiz)
                     navigate(routes.train)
                   }}
-                // style={nested_button}
+                  style={{
+                    ...nested_button,
+                    'border-radius': '0 50px 50px 0',
+                    'font-weight': 'bold',
+                  }}
                 >
                   Start
                 </button>
@@ -113,7 +145,7 @@ export function StartButton(props: StartButtonProps) {
   return (
     <button
       onClick={beginTraining}
-      style={styleGroup.startButton}
+      style={style.group.button}
     >
       Start
     </button>
@@ -129,8 +161,7 @@ function NewQuizButton() {
       onClick={() => navigate(routes.create)}
       tabIndex={0}
       style={{
-        ...styleGroup.button,
-        'margin-right': '0.5rem',
+        ...style.group.button,
       }}
       type='button'
     >

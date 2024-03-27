@@ -1,6 +1,6 @@
-import { For, createEffect, createSignal } from "solid-js"
+import { For, createSignal } from "solid-js"
 import { QuizLayoutProps, TrainingHistory } from "./quiz"
-import { styleGroup } from "./Style"
+import { style } from "./Style"
 
 
 export function DefaultQuizLayout(props: QuizLayoutProps) {
@@ -86,7 +86,7 @@ export function DefaultFeedbackRenderer<
 
 	return (
 		<div>
-			<div style={styleGroup.baseText}>
+			<div style={style.group.baseText}>
 				<span>{feedback(props)}</span>
 			</div>
 		</div>
@@ -96,34 +96,16 @@ export function DefaultFeedbackRenderer<
 export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }) {
 	const [visible, setVisible] = createSignal(false)
 
-	var panelRef: HTMLDivElement | undefined
+	const backgroundColor = "rgba(255, 255, 255, .8)"
 
-	createEffect(() => {
-		if (visible()) {
-			panelRef?.animate([
-				{ transform: "translateX(-100%)" },
-				{ transform: "translateX(0)" },
-			], {
-				duration: 200,
-				easing: "ease-in-out",
-				fill: "both",
-			})
-		} else {
-			panelRef?.animate([
-				{ transform: "translateX(0)" },
-				{ transform: "translateX(-100%)" },
-			], {
-				duration: 200,
-				easing: "ease-in-out",
-				fill: "both",
-			})
-		}
-	})
-
-	const backgroundColor = "rgba(0, 0, 0, .2)"
+	const blurFilter = "blur(2px)"
 
 	const trStyle = {
 		'border-bottom': '1px solid black',
+	}
+
+	const column1 = {
+		'background-color': 'rgba(0, 0, 0, .1)',
 	}
 
 	// const localStyle = document.createElement('style')
@@ -134,13 +116,15 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 
 	return (
 		<section
-			ref={panelRef}
 			style={{
 				'position': 'fixed',
 				'left': '0',
 				'top': '0',
-				"width": "20%",
+				"width": "20rem",
 				'height': '100vh',
+				'transform': `translateX(${visible() ? 0 : -100}%)`,
+				'transition': 'transform 200ms ease-in-out',
+				'backdrop-filter': blurFilter,
 			}}
 		>
 			<span
@@ -174,23 +158,27 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 							</thead>
 							<tbody>
 								<tr style={trStyle}>
-									<td>Question</td>
+									<td style={column1}>Question</td>
 									<td>{JSON.stringify(trainingState.question)}</td>
 								</tr>
 								<tr style={trStyle}>
-									<td>Answer</td>
+									<td style={column1}>Question Index</td>
+									<td>{trainingState.questionIndex}</td>
+								</tr>
+								<tr style={trStyle}>
+									<td style={column1}>Answer</td>
 									<td>{JSON.stringify(trainingState.answer)}</td>
 								</tr>
 								<tr style={trStyle}>
-									<td>Response</td>
+									<td style={column1}>Response</td>
 									<td>{JSON.stringify(trainingState.response)}</td>
 								</tr>
 								<tr style={trStyle}>
-									<td>Response Time</td>
+									<td style={column1}>Response Time</td>
 									<td>{trainingState.responseTime / 1000} s</td>
 								</tr>
 								<tr style={trStyle}>
-									<td>Grade</td>
+									<td style={column1}>Grade</td>
 									<td>{trainingState.grade ? "pass" : "fail"}</td>
 								</tr>
 							</tbody>
@@ -207,17 +195,18 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 					'left': '100%',
 					'top': '0',
 					'background-color': backgroundColor,
-					'border-radius': '0 1em 1em 0',
+					'backdrop-filter': blurFilter,
+					'border-radius': '0 2em 2em 0',
 					'border': 'none',
 					'box-sizing': 'border-box',
-					'height': '2em',
-					'width': "2em",
-					'--test': 'test'
+					'height': '4em',
+					'width': "4em",
+					'cursor': 'pointer',
 				}}
 				title="Show/hide training history."
 				onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, .4)"}
 				onMouseLeave={(e) => e.currentTarget.style.backgroundColor = backgroundColor}
-			>{'?'}</button>
+			>{style.iconography.debug}</button>
 		</section>
 	)
 }

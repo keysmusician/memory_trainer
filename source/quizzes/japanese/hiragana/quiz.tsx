@@ -1,4 +1,4 @@
-import { Mora } from "../../../answer keys/answer_keys.barrel"
+import { Mora } from "../../../answer keys/answer keys.barrel"
 import { compare_strictly_equal } from "../../../evaluators/evaluators"
 import { Quiz } from "../../../quiz"
 import { SmartTrainer } from "../../../training algorithms/SmartTrainer"

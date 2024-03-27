@@ -84,18 +84,18 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
   // }
 
   #print_stats(): void {
-    this.stats.forEach((score, index) => {
-      console.log(index, score)
-      if (score['count'] > 0) {
+    console.log(this.stats)
+    // this.stats.forEach((score, index) => {
+    //   console.log(index, score)
+    //   if (score['count'] > 0) {
 
-        const accuracy = score['count'] > 0 ?
-          score['correct'] / score['count'] : 0
+    //     const accuracy = score['count'] > 0 ?
+    //       score['correct'] / score['count'] : 0
 
-        console.log(
-          `${index}: ${accuracy * 100}%: ${JSON.stringify(score)}`)
-      }
-    })
-
+    //     console.log(
+    //       `${index}: ${accuracy * 100}%: ${JSON.stringify(score)}`)
+    //   }
+    // })
   }
 
   next_question(): number {
@@ -132,6 +132,10 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
       this.#return_collection = this.unasked_questions
     }
     else { // If a comfortable question is randomly chosen or there are no focus or unasked questions
+      // console.log('comfortable_questions', this.comfortable_questions)
+
+      this.comfortable_questions.sort((a, b) => a - b)
+
       const weights = this.comfortable_questions.map((question_number) =>
         this.stats[question_number]['weight'])
 
@@ -140,6 +144,8 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
       //   Math.random() * this.comfortable_questions.length)
 
       next_question = this.comfortable_questions.splice(weighted_random_index, 1)[0]
+
+      // console.log('next_question', next_question)
 
       // Return current item to a collection
       this.#return_collection.push(this.#current_question)
@@ -155,12 +161,12 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
     return next_question
   }
 
-  register(is_correct: boolean): boolean {
+  register(score: number): boolean {
     const current_item_stats = this.stats[this.current_question]
 
     this.#return_collection = this.focus_questions
 
-    if (is_correct) {
+    if (score) {
       current_item_stats['correct'] += 1
 
       current_item_stats['streak'] += 1
@@ -176,7 +182,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
       current_item_stats['correct']
     )
 
-    return is_correct
+    return score === 1
   }
 
   random_inversely_weighted_index(weights: number[]): number {
@@ -199,6 +205,14 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
     var randomFraction = Math.random() * cdf[cdf.length - 1] // Random number between 0 and the sum of all weights, which should be 1 but might not be due to floating point error
 
     const index = cdf.findIndex(bin => randomFraction <= bin)
+
+    // console.log('inverse_weights', inverse_weights)
+
+    // console.log('cdf', cdf)
+
+    // console.log('randomFraction', randomFraction)
+
+    // console.log('index', index)
 
     return index === -1 ? cdf.length - 1 : index
   }

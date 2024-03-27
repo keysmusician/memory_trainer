@@ -4,7 +4,7 @@ import {
   state_capital_text_renderer,
   music_notation_renderer,
   empty_renderer,
-} from "../renderers/Renderers.barrel"
+} from "../renderers/renderers.barrel"
 import {
   compare_music_notation,
   compare_strings
@@ -13,7 +13,7 @@ import {
   music_notation,
   US_state_capitals,
   empty
-} from "../answer keys/answer_keys.barrel"
+} from "../answer keys/answer keys.barrel"
 import {
   MusicalKeyboard,
   EnumFetcher,

@@ -1,7 +1,7 @@
-import { For, Setter } from "solid-js"
+import { For, Setter, createEffect, createSignal } from "solid-js"
 import { StartButton } from "./Start"
 import { AppNavigator, routes, useQuiz } from "../App"
-import { styleGroup } from "../Style"
+import { style } from "../Style"
 import { Quiz } from "../quiz";
 import { useNavigate } from "@solidjs/router";
 
@@ -37,9 +37,12 @@ export function EditScreen() {
   )
 }
 
+type EditingQuiz = Quiz<string, string, string> &
+{ unselected_answer_key?: Map<string, string> }
+
 interface AnswerKeyEditorProps {
-  quiz: Quiz
-  setQuiz: Setter<Quiz>
+  quiz: EditingQuiz
+  setQuiz: Setter<EditingQuiz>
 }
 function AnswerKeyEditor(props: AnswerKeyEditorProps) {
   if (!props.quiz.unselected_answer_key) {
@@ -49,6 +52,12 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
       return quiz
     })
   }
+
+  const [unselectedAnswerKey, setUnselectedAnswerKey] = createSignal(new Map<string, string>())
+
+  createEffect(() => {
+    props.quiz.unselected_answer_key = unselectedAnswerKey()
+  })
 
   return (
     <div
@@ -100,11 +109,15 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
                       onclick={() => {
                         if (questionIsIncluded) {
                           props.quiz.answer_key.delete(question)
-                          props.quiz.unselected_answer_key?.set(question, answer)
+                          setUnselectedAnswerKey(() =>
+                            unselectedAnswerKey().set(question, answer))
                         }
                         else {
                           props.quiz.answer_key.set(question, answer)
-                          props.quiz.unselected_answer_key?.delete(question)
+                          setUnselectedAnswerKey((unselectedAnswerKey) => {
+                            unselectedAnswerKey.delete(question);
+                            return unselectedAnswerKey
+                          })
                         }
                       }}
                     />
@@ -129,7 +142,7 @@ export function HomeButton() {
     <button
       onClick={() => navigate(routes.start)}
       style={{
-        ...styleGroup.button,
+        ...style.group.button,
         'margin-left': '0.5rem'
       }}
     >

@@ -1,4 +1,4 @@
-import { styleGroup } from "../Style"
+import { style } from "../Style"
 import { Renderer } from "./Renderer"
 
 
@@ -14,8 +14,8 @@ interface CharacterRendererProps extends Renderer<string> {
 export function CharacterRenderer(props: CharacterRendererProps) {
 	return (
 		<div>
-			<p style={styleGroup.largeText}>{props.prompt}</p>
-			<h2 style={{ ...styleGroup.largeText, 'font-size': '5em' }}>{props.question}</h2>
+			<p style={style.group.largeText}>{props.prompt}</p>
+			<h2 style={{ ...style.group.largeText, 'font-size': '5em' }}>{props.question}</h2>
 		</div>
 	)
 }

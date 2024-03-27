@@ -1,13 +1,13 @@
-import { For, JSX, createSignal, onMount } from "solid-js"
+import { For, createSignal, onMount } from "solid-js"
 import { ResponseFetcherProps } from "../quiz"
-import { designSystem, style, styleGroup } from "../Style"
+import { designSystem, style } from "../Style"
 
 interface AutofillEnumFetcherProps<
 	QuestionType = unknown,
 	AnswerType = unknown
 > extends ResponseFetcherProps<string, QuestionType, AnswerType> {
 	placeholder?: string
-	responses?: string[]
+	responses?: Set<string>
 }
 
 /**
@@ -15,11 +15,13 @@ interface AutofillEnumFetcherProps<
  **/
 export function AutofillEnumFetcher<
 	QuestionType = unknown,
-	AnswerType = unknown
+// AnswerType = string
 >(
-	props: AutofillEnumFetcherProps<QuestionType, AnswerType>
+	props: AutofillEnumFetcherProps<QuestionType, string>
 ) {
-	const answers = props.responses ?? Array.from(props.quiz.answer_key.values())
+	const answers = Array.from(
+		props.responses ?? new Set(props.quiz.answer_key.values())
+	)
 
 	const [text, setText] = createSignal<string>("")
 
@@ -94,17 +96,17 @@ export function AutofillEnumFetcher<
 
 	return (
 		<div style={{
-			...styleGroup.column,
+			...style.group.column,
 			"justify-content": "start",
 			"height": "20rem",
 		}}
 		>
-			<div style={styleGroup.column}
+			<div style={style.group.column}
 			>
 				<div
 					style={{
-						...styleGroup.baseText,
-						...styleGroup.row,
+						...style.group.baseText,
+						...style.group.row,
 						'border': style.layout.primaryBorder,
 						'border-radius': designSystem.layout.border.radiusWide,
 						'box-sizing': 'border-box',
@@ -172,7 +174,7 @@ function OptionList(props: OptionListProps) {
 			<div
 				style={{
 					'background': 'white',
-					'border': styleGroup.button.border,
+					'border': style.group.button.border,
 					'border-radius': "5px",
 					'padding': "5px",
 					'margin': ".5em 0",
@@ -211,7 +213,7 @@ function OptionList(props: OptionListProps) {
 									style.color.accent :
 									hoveredOption() === option ? style.color.focused :
 										"white",
-								'border': styleGroup.button.border,
+								'border': style.group.button.border,
 								'font-weight': props.selectedOption === option ? "bold" : "normal"
 							}
 						}
@@ -265,8 +267,8 @@ function textInputComboButton() {
 	return (
 		<div
 			style={{
-				...styleGroup.baseText,
-				...styleGroup.row,
+				...style.group.baseText,
+				...style.group.row,
 				'border': style.layout.primaryBorder,
 				'border-radius': designSystem.layout.border.radiusWide,
 				'box-sizing': 'border-box',
