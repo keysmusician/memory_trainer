@@ -40,7 +40,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
     training_algorithm: SmartTrainer,
   }),
   new Quiz({
-    title: "U.S. State capitals",
+    title: "U.S. state capitals",
     answer_key: US_state_capitals,
     evaluator: compare_strings,
     response_fetcher: (props) => <EnumFetcher<string> {...props} sort />,
@@ -51,7 +51,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
   hiragana,
   katakana,
   kanji_recognition,
-  kanji_writing,
+  // kanji_writing,
   hebrew,
   periodic_table
   // {
@@ -67,7 +67,7 @@ export const quizzes: IQuiz<any, any, any>[] = [
 export const empty_quiz = new Quiz({
   title: 'Empty',
   answer_key: empty,
-  evaluator: () => true,
+  evaluator: () => 1,
   response_fetcher: () => '',
   renderer: empty_renderer,
   onResponse: defaultOnResponse,

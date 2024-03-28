@@ -2,7 +2,7 @@ import { compare_strings } from "../../evaluators/evaluators";
 import { Quiz } from "../../quiz";
 import { CharacterRenderer } from "../../renderers/CharacterRenderer";
 import { EnumFetcher } from "../../response fetchers/enum fetcher";
-import { hebrew as answer_key } from "./answer key";
+import { hebrew as answer_key, HebrewCharacter } from "./answer key";
 
 
 export const hebrew = new Quiz({
@@ -11,7 +11,14 @@ export const hebrew = new Quiz({
 	renderer: (props) =>
 		<CharacterRenderer {...props}
 			prompt={"Which Hebrew character is this?"}
+			style={{
+				'font-family': '"Noto Serif Hebrew", serif',
+				'font-optical-sizing': 'auto',
+				'font-weight': '<weight>',
+				'font-style': 'normal',
+				'font-variation-settings': '"wdth" 100',
+			}}
 		/>,
 	evaluator: compare_strings,
-	response_fetcher: EnumFetcher<string>,
+	response_fetcher: EnumFetcher<string, HebrewCharacter, string>,
 });

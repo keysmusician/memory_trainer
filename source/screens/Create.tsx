@@ -2,6 +2,7 @@ import { For, createSignal } from "solid-js";
 import { HomeButton } from "./Edit";
 import { StartButton } from "./Start";
 import { useQuiz } from "../App";
+import { style } from "../style";
 
 
 export function CreateScreen() {
@@ -15,6 +16,9 @@ export function CreateScreen() {
 	return (
 		<>
 			<h2>Create</h2>
+			<p>
+				Here you can create a new quiz.
+			</p>
 
 			<ul
 				style={{
@@ -25,24 +29,27 @@ export function CreateScreen() {
 					'gap': '1em',
 				}}
 			>
-				<li>
-					Here you can create a new quiz.
-				</li>
 
 				<li>
-					<button>
+					<button
+						style={style.group.button}
+					>
 						New Quiz
 					</button>
 				</li>
 
 				<li>
-					<button>
+					<button
+						style={style.group.button}
+					>
 						Import Quiz
 					</button>
 				</li>
 
 				<li>
-					<button>
+					<button
+						style={style.group.button}
+					>
 						Export Quiz
 					</button>
 				</li>
@@ -57,9 +64,16 @@ export function CreateScreen() {
 				)}
 			</For>
 
-			<HomeButton />
+			<div
+				style={{
+					...style.group.row,
+					'gap': '1em',
+				}}
+			>
+				<HomeButton />
 
-			<StartButton />
+				<StartButton />
+			</div>
 		</>
 	)
 }

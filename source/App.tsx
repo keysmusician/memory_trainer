@@ -3,6 +3,8 @@ import {
   createContext,
   useContext,
   Setter,
+  createEffect,
+  createSignal,
 } from 'solid-js'
 import {
   CreateScreen,
@@ -31,59 +33,103 @@ export type AppNavigator = (route: AppRoute, params?: Record<string, string>) =>
 
 
 const [quizValue, setQuizValue] = createStore<IQuiz>(empty_quiz);
+
 const QuizContext = createContext<[IQuiz, Setter<IQuiz>]>([quizValue, setQuizValue]);
 
 export function useQuiz() { return useContext(QuizContext)! }
 
-const backgroundImage = () => quizValue.background_image ??
-  `https://source.unsplash.com/1600x900/?${quizValue.title.replace(' ', '-').toLowerCase()}`
 
 /**
  * Memory Trainer application root component.
  */
 function App() {
   return (
-    <>
-      <div style={{
-        'background-attachment': 'fixed',
-        'background-image': `url(${backgroundImage()})`,
-        'background-repeat': 'no-repeat',
-        'background-size': 'cover',
+    <Router>
+      <QuizContext.Provider value={[quizValue, setQuizValue]}>
+        <BackgroundImage />
+
+        <h1 style={{
+          ...style.group.title,
+          margin: ".5em",
+        }}>Memory Trainer</h1>
+
+        <section
+          id='memory_trainer'
+          style={style.group.contentBox}
+        >
+          <Routes>
+            <Route path={[routes.start, '*']} element={<StartScreen />} />
+
+            <Route path={routes.edit} element={<EditScreen />} />
+
+            <Route path={routes.create} element={<CreateScreen />} />
+
+            <Route path={routes.train} element={<TrainScreen />} />
+
+            <Route path={routes.score} element={<ScoreScreen />} />
+          </Routes>
+        </section>
+      </QuizContext.Provider>
+    </Router >
+  )
+}
+
+function BackgroundImage() {
+  const cleanString = (dirtyString: string) => dirtyString
+    .replace(' ', '-')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '')
+
+  const backgroundImage = () => quizValue.background_image ??
+    `https://source.unsplash.com/1600x900/?${cleanString(quizValue.title)}`
+
+  const [transitioning, setTransitioning] = createSignal(false)
+
+  const [loading, setLoading] = createSignal(false)
+
+  let backgroundImageRef;
+
+  const fadeDuration = 500
+
+  createEffect(() => {
+    backgroundImage()
+    setLoading(true)
+    setTransitioning(true)
+    backgroundImageRef!.animate(
+      [{ opacity: '0' }],
+      { duration: fadeDuration, fill: 'forwards' }
+    ).onfinish = () => {
+      backgroundImageRef!.src = backgroundImage()
+      setTransitioning(false)
+    }
+  })
+
+  createEffect(() => {
+    if (!loading() && !transitioning()) {
+      backgroundImageRef!.animate(
+        [{ opacity: '.5' }],
+        { duration: fadeDuration, fill: 'forwards' }
+      )
+    }
+  })
+
+  return (
+    <img
+      ref={backgroundImageRef}
+      style={{
         'display': 'flex',
-        'filter': 'opacity(.5)',
+        'opacity': '0',
         'flex-direction': 'column',
         'height': '100vh',
         'position': 'fixed',
         'width': '100%',
         'z-index': '-1',
-      }} />
-
-      <Router>
-        <QuizContext.Provider value={[quizValue, setQuizValue]}>
-          <h1 style={{
-            ...style.group.title,
-            margin: ".5em",
-          }}>Memory Trainer</h1>
-
-          <section
-            id='memory_trainer'
-            style={style.group.contentBox}
-          >
-            <Routes>
-              <Route path={[routes.start, '*']} element={<StartScreen />} />
-
-              <Route path={routes.edit} element={<EditScreen />} />
-
-              <Route path={routes.create} element={<CreateScreen />} />
-
-              <Route path={routes.train} element={<TrainScreen />} />
-
-              <Route path={routes.score} element={<ScoreScreen />} />
-            </Routes>
-          </section>
-        </QuizContext.Provider>
-      </Router >
-    </>
+      }}
+      alt='background'
+      onLoad={() => setLoading(false)}
+      elementtiming={''}
+      fetchpriority={'auto'}
+    />
   )
 }
 

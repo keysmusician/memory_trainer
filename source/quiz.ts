@@ -130,12 +130,12 @@ export interface IQuiz<
 	answer_key: Map<QuestionType, AnswerType>
 	evaluator: Evaluator<ResponseType, AnswerType>
 	response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
-	title: string
+	readonly title: string
 	renderer: Renderer<QuestionType>
 	onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 	training_algorithm: typeof BaseTrainingAlgorithm
 	layout: (props: QuizLayoutProps) => JSXElement
-	background_image?: HTTPSURL
+	readonly background_image?: HTTPSURL
 }
 
 type Modify<T, R> = Omit<T, keyof R> & R;
@@ -157,6 +157,7 @@ export class Quiz<QuestionType = unknown, AnswerType = unknown, ResponseType = u
 	readonly onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
 	readonly training_algorithm: typeof BaseTrainingAlgorithm
 	readonly layout: any
+	readonly background_image?: HTTPSURL
 
 	constructor({
 		answer_key,
@@ -167,6 +168,7 @@ export class Quiz<QuestionType = unknown, AnswerType = unknown, ResponseType = u
 		onResponse = defaultOnResponse,
 		training_algorithm = SmartTrainer,
 		layout = DefaultQuizLayout,
+		background_image
 	}: QuizParameters<QuestionType, AnswerType, ResponseType>) {
 		this.answer_key = answer_key
 		this.evaluator = evaluator
@@ -176,5 +178,6 @@ export class Quiz<QuestionType = unknown, AnswerType = unknown, ResponseType = u
 		this.onResponse = onResponse
 		this.training_algorithm = training_algorithm
 		this.layout = layout
+		this.background_image = background_image
 	}
 }

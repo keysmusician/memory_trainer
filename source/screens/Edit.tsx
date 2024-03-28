@@ -37,42 +37,84 @@ export function EditScreen() {
   )
 }
 
+const unselectedAnswerKeys: Map<string, Map<string, string>> = new Map()
+
 type EditingQuiz = Quiz<string, string, string> &
 { unselected_answer_key?: Map<string, string> }
 
 interface AnswerKeyEditorProps {
-  quiz: EditingQuiz
+  quiz: EditingQuiz,
   setQuiz: Setter<EditingQuiz>
 }
 function AnswerKeyEditor(props: AnswerKeyEditorProps) {
-  if (!props.quiz.unselected_answer_key) {
-    props.setQuiz((quiz) => {
-      console.log(quiz)
-      quiz.unselected_answer_key = new Map()
-      return quiz
+  const [selectedAnswerKey, setSelectedAnswerKey] = createSignal(
+    props.quiz.answer_key, { "equals": _ => false }
+  )
+
+  const [unselectedAnswerKey, setUnselectedAnswerKey] = createSignal(
+    unselectedAnswerKeys.get(props.quiz.title) ?? new Map<string, string>(),
+    { "equals": _ => false }
+  )
+
+  function answerKey() {
+    const answerKey: { question: string, answer: string, selected: boolean }[] =
+      []
+
+    selectedAnswerKey().forEach((answer, question) => {
+      answerKey.push({ question, answer, selected: true })
     })
+
+    unselectedAnswerKey().forEach((answer, question) => {
+      answerKey.push({ question, answer, selected: false })
+    })
+
+    return answerKey
   }
 
-  const [unselectedAnswerKey, setUnselectedAnswerKey] = createSignal(new Map<string, string>())
-
   createEffect(() => {
-    props.quiz.unselected_answer_key = unselectedAnswerKey()
+    props.setQuiz({
+      ...props.quiz,
+      answer_key: selectedAnswerKey()
+    })
+    unselectedAnswerKeys.set(props.quiz.title, unselectedAnswerKey())
   })
+
+  const tableCellStyle = {
+    'padding': '0.5rem',
+  }
+
+  const TableData = (props: any) =>
+    <td
+      style={{
+        ...tableCellStyle,
+        'border-bottom': '1px solid black',
+
+      }}
+    >
+      {props.children}
+    </td>
 
   return (
     <div
       style={{
         'overflow-y': 'auto',
         'max-height': '50vh',
+        'backdrop-filter': 'blur(5px)',
+        'background-color': 'rgba(255, 255, 255, 0.5)',
+        'border-radius': '1rem',
       }}
     >
       <table
         style={{
           'border-collapse': 'separate',
-          'border-spacing': '0.5rem',
+          'border-spacing': '0rem',
         }}
       >
-        <caption>Answer Key</caption>
+        <caption>
+          <h3>
+            Answer Key
+          </h3>
+        </caption>
         <thead
           style={{
             position: 'sticky',
@@ -83,37 +125,40 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
             style={{
               'border-bottom': '1px solid black',
               'background-color': 'white',
+              'box-shadow': '0 .5rem .5rem 0 rgba(255, 255, 255, 1)'
             }}
           >
-            <th>#</th>
-            <th>Include</th>
-            <th>Question</th>
-            <th>Answer</th>
+            <th style={tableCellStyle}>#</th>
+            <th style={tableCellStyle}>Include</th>
+            <th style={tableCellStyle}>Question</th>
+            <th style={tableCellStyle}>Answer</th>
           </tr>
         </thead>
         <tbody>
-          <For each={Array.from(props.quiz.answer_key).concat(
-            Array.from(props.quiz.unselected_answer_key ?? [])
-          )
-          }>
-            {([question, answer], index) => {
-              const questionIsIncluded = props.quiz.answer_key.has(question)
+          <For each={answerKey()}>
+            {({ question, answer, selected }, index) => {
 
               return (
                 <tr>
-                  <td>{index() + 1}</td>
-                  <td>
+                  <TableData>{index() + 1}</TableData>
+                  <TableData>
                     <input
                       type="checkbox"
-                      checked={questionIsIncluded}
+                      checked={selected}
                       onclick={() => {
-                        if (questionIsIncluded) {
-                          props.quiz.answer_key.delete(question)
+                        if (selected) {
                           setUnselectedAnswerKey(() =>
-                            unselectedAnswerKey().set(question, answer))
+                            unselectedAnswerKey().set(question, answer)
+                          )
+                          setSelectedAnswerKey(() => {
+                            selectedAnswerKey().delete(question)
+                            return selectedAnswerKey()
+                          })
                         }
                         else {
-                          props.quiz.answer_key.set(question, answer)
+                          setSelectedAnswerKey(() =>
+                            selectedAnswerKey().set(question, answer)
+                          )
                           setUnselectedAnswerKey((unselectedAnswerKey) => {
                             unselectedAnswerKey.delete(question);
                             return unselectedAnswerKey
@@ -121,9 +166,9 @@ function AnswerKeyEditor(props: AnswerKeyEditorProps) {
                         }
                       }}
                     />
-                  </td>
-                  <td>{JSON.stringify(question)}</td>
-                  <td>{JSON.stringify(answer)}</td>
+                  </TableData>
+                  <TableData>{JSON.stringify(question)}</TableData>
+                  <TableData>{JSON.stringify(answer)}</TableData>
                 </tr>
               )
             }}

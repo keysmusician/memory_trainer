@@ -12,6 +12,9 @@ interface EnumFetcherProps<
 
 /**
  * Fetches a selection from an enumeration.
+ *
+ * Props:
+ * - `sort`: Whether to sort the answers.
  **/
 export function EnumFetcher<
     ResponseType,

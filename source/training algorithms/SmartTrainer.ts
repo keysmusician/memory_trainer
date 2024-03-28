@@ -202,7 +202,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
 
     var cdf = inverse_weights.map((sum => value => sum += value)(0))
 
-    var randomFraction = Math.random() * cdf[cdf.length - 1] // Random number between 0 and the sum of all weights, which should be 1 but might not be due to floating point error
+    var randomFraction = Math.random() * cdf[cdf.length - 1] // Random number between 0 and the sum of all weights, which should be 1 but might not be exact due to floating point error
 
     const index = cdf.findIndex(bin => randomFraction <= bin)
 

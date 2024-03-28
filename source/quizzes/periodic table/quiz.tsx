@@ -13,13 +13,14 @@ export const periodic_table = new Quiz<number, PeriodicTable.Element, string>({
 			question={props.question.toString()}
 			prompt="Which element has atomic number:"
 		/>,
-	evaluator: (response, element) => response === element.name,
+	evaluator: (response, element) => response === element.name ? 1 : 0,
 	response_fetcher: (props) =>
-		<AutofillEnumFetcher<number, PeriodicTable.Element>
+		<AutofillEnumFetcher<number>
 			{...props}
 			responses={
-				Array.from(PeriodicTable.answerKey.values()).map(element => element.name)
+				new Set(Array.from(PeriodicTable.answerKey.values()).map(element => element.name))
 			}
 		/>,
-	layout: PeriodicTableQuizLayout
+	layout: PeriodicTableQuizLayout,
+	background_image: `https://source.unsplash.com/1600x900/?chemistry`
 });
