@@ -14,6 +14,10 @@ export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>
 		>
 			<TrainingHistoryPanel trainingHistory={props.trainingHistory} />
 
+			<div>
+				<props.quiz.renderer question={props.question} />
+			</div>
+
 			<DefaultFeedbackRenderer<string, Mora, Mora>
 				question={props.question}
 				answer={props.answer}
@@ -24,10 +28,6 @@ export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>
 					(_) => `The answer was ${props.trainingHistory.last.answer.romanization}`
 				)}
 			/>
-
-			<div>
-				<props.quiz.renderer question={props.question} />
-			</div>
 
 			<div style={{ margin: "1em" }}>
 				<props.quiz.response_fetcher

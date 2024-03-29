@@ -25,7 +25,6 @@ import { hebrew } from "./hebrew/quiz"
 import { periodic_table } from "./periodic table/quiz"
 import { country_flags } from "./country flags/quiz"
 import { kanji as kanji_recognition } from "./japanese/kanji/recognition/quiz"
-import { kanji as kanji_writing } from "./japanese/kanji/writing/quiz"
 
 
 export const quizzes: IQuiz<any, any, any>[] = [

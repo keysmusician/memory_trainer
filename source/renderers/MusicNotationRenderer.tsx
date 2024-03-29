@@ -48,7 +48,9 @@ class MusicNotationRenderer {
       left: 1,
       top: 25,
       width: 101
-    }));
+    }),
+      { fill_style: 'black' }
+    );
 
     stave.addClef(clef);
 

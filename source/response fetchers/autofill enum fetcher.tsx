@@ -33,6 +33,8 @@ export function AutofillEnumFetcher<
 
 	const [selection, setSelection] = createSignal<string>(options()[0])
 
+	const [hoveredOption, set_hoveredOption] = createSignal<string | null>(null)
+
 	// Get a reference to the text input and focus it when the component mounts.
 	let input_ref: HTMLInputElement | undefined
 
@@ -95,146 +97,148 @@ export function AutofillEnumFetcher<
 	}
 
 	return (
-		<div style={{
-			...style.group.column,
-			"justify-content": "start",
-			"height": "20rem",
-		}}
+		<div
+			style={{
+				...style.group.column,
+				"justify-content": "start",
+				"height": "20rem",
+			}}
 		>
 			<div style={style.group.column}
 			>
 				<div
 					style={{
-						...style.group.baseText,
-						...style.group.row,
-						'border': style.layout.primaryBorder,
-						'border-radius': designSystem.layout.border.radiusWide,
-						'box-sizing': 'border-box',
-						'margin': 'auto',
-						'background': 'white',
-						'padding': '0',
+						...style.group.column,
 						'width': '100%',
+						'margin': '0.5em',
+						'gap': '0.5em'
 					}}
 				>
-					<input
+					<div
 						style={{
-							'border': 'none',
-							'border-radius': '1em 0 0 1em',
+							...style.group.baseText,
+							...style.group.row,
+							'background': 'white',
+							'border-radius': "5px",
+							'border': style.group.button.border,
 							'box-sizing': 'border-box',
-							'flex': '1',
-							'font-size': 'inherit',
-							'height': '100%',
-							'padding': '0 0.5em',
-						}}
-						type="text"
-						ref={input_ref}
-						onInput={e => setText(e.currentTarget.value)}
-						placeholder={props.placeholder}
-						onKeyDown={handleKeyPress}
-					/>
-
-					<button
-						onClick={submit}
-						title="Click here to submit your answer."
-						style={{
-							'border-radius': '0 1em 1em 0',
-							'border': 'none',
-							'box-sizing': 'border-box',
-							'height': '100%',
-							'margin-left': '2px',
-							'width': "2em",
+							'margin': 'auto',
+							'padding': '0',
+							'width': '100%',
 						}}
 					>
-						→
-					</button>
+						<div
+							style={{
+								'flex': '1',
+								'font-weight': 'bold',
+								'text-align': 'center',
+							}}
+						>
+							{selection()}
+						</div>
+
+						<button
+							onClick={submit}
+							title="Click here to submit your answer."
+							style={{
+								// 'border-radius': '0 1em 1em 0',
+								'border': 'none',
+								'box-sizing': 'border-box',
+								'height': 'auto',
+								'margin-left': '2px',
+								'width': "2em",
+							}}
+						>
+							→
+						</button>
+					</div>
+
+					<div // Text search box
+						style={{
+							...style.group.baseText,
+							...style.group.row,
+							'border': style.layout.primaryBorder,
+							'border-radius': designSystem.layout.border.radiusWide,
+							'box-sizing': 'border-box',
+							'margin': 'auto',
+							'background': 'white',
+							'padding': '0',
+							'width': '100%',
+						}}
+					>
+						<input
+							style={{
+								'border': 'none',
+								'border-radius': 'inherit',
+								'box-sizing': 'border-box',
+								'flex': '1',
+								'font-size': 'inherit',
+								'height': '100%',
+								'padding': '0 0.5em',
+							}}
+							type="text"
+							ref={input_ref}
+							onInput={e => setText(e.currentTarget.value)}
+							placeholder={props.placeholder}
+							onKeyDown={handleKeyPress}
+						/>
+					</div>
+
+					<ul
+						style={{
+							'display': 'flex',
+							'flex-direction': 'column',
+							'gap': '2px',
+							'list-style': "none",
+							'margin': "0",
+							'max-height': "200px",
+							'overflow-y': "scroll",
+							'padding': "0",
+							'width': '100%',
+						}}
+						tabIndex={-1}
+					>
+						<For each={options()}>
+							{option => <li
+								style={
+									{
+										// ...(option === props.selectedOption &&
+										// {
+										// 	'position': 'absolute',
+										// 	'top': '0',
+										// }
+										// ),
+										'cursor': 'pointer',
+										'padding': "5px",
+										'border-radius': "5px",
+										'background-color': selection() === option ?
+											style.color.accent :
+											hoveredOption() === option ? style.color.focused :
+												"white",
+										'border': style.group.button.border,
+										'font-weight': selection() === option ? "bold" : "normal"
+									}
+								}
+								onClick={() => selectOption(option)}
+								onMouseEnter={
+									() => set_hoveredOption(option)
+								}
+								onMouseLeave={
+									() => set_hoveredOption(null)
+								}
+								tabIndex={0}
+								onKeyPress={e => {
+									if (e.key === "Enter") {
+										selectOption(option)
+									}
+								}}
+							>
+								{option}
+							</li>}
+						</For>
+					</ul>
 				</div>
-
-				<OptionList
-					options={options()}
-					selectedOption={selection()}
-					selectOption={selectOption}
-				/>
 			</div>
-		</div>
-	)
-}
-
-interface OptionListProps {
-	options: string[]
-	selectedOption: string
-	selectOption: (option: string) => void
-}
-function OptionList(props: OptionListProps) {
-	const [hoveredOption, set_hoveredOption] = createSignal<string | null>(null)
-
-	return (
-		<div
-			style={{ 'width': '100%', 'margin': '0.5em' }}
-		>
-			<div
-				style={{
-					'background': 'white',
-					'border': style.group.button.border,
-					'border-radius': "5px",
-					'padding': "5px",
-					'margin': ".5em 0",
-				}}
-			>
-				{`Selected: ${props.selectedOption}`}
-			</div>
-
-			<ul
-				style={{
-					'display': 'flex',
-					'flex-direction': 'column',
-					'overflow-y': "scroll",
-					'max-height': "200px",
-					'list-style': "none",
-					'padding': "0",
-					'margin': "0",
-					'gap': '2px',
-				}}
-				tabIndex={-1}
-			>
-				<For each={props.options}>
-					{option => <li
-						style={
-							{
-								// ...(option === props.selectedOption &&
-								// {
-								// 	'position': 'absolute',
-								// 	'top': '0',
-								// }
-								// ),
-								'cursor': 'pointer',
-								'padding': "5px",
-								'border-radius': "5px",
-								'background-color': props.selectedOption === option ?
-									style.color.accent :
-									hoveredOption() === option ? style.color.focused :
-										"white",
-								'border': style.group.button.border,
-								'font-weight': props.selectedOption === option ? "bold" : "normal"
-							}
-						}
-						onClick={() => props.selectOption(option)}
-						onMouseEnter={
-							() => set_hoveredOption(option)
-						}
-						onMouseLeave={
-							() => set_hoveredOption(null)
-						}
-						tabIndex={0}
-						onKeyPress={e => {
-							if (e.key === "Enter") {
-								props.selectOption(option)
-							}
-						}}
-					>
-						{option}
-					</li>}
-				</For>
-			</ul>
 		</div>
 	)
 }
@@ -263,7 +267,8 @@ function modulo(n: number, m: number) {
 }
 
 // Saved for reference, might use somewhere else.
-function textInputComboButton() {
+/*
+function textInputComboButton(props) {
 	return (
 		<div
 			style={{
@@ -312,3 +317,52 @@ function textInputComboButton() {
 		</div >
 	)
 }
+*/
+
+/* Another old version of the input field, with a different style.
+	<div
+		style={{
+			...style.group.baseText,
+			...style.group.row,
+			'border': style.layout.primaryBorder,
+			'border-radius': designSystem.layout.border.radiusWide,
+			'box-sizing': 'border-box',
+			'margin': 'auto',
+			'background': 'white',
+			'padding': '0',
+			'width': '100%',
+		}}
+	>
+		<input
+			style={{
+				'border': 'none',
+				'border-radius': '1em 0 0 1em',
+				'box-sizing': 'border-box',
+				'flex': '1',
+				'font-size': 'inherit',
+				'height': '100%',
+				'padding': '0 0.5em',
+			}}
+			type="text"
+			ref={input_ref}
+			onInput={e => setText(e.currentTarget.value)}
+			placeholder={props.placeholder}
+			onKeyDown={handleKeyPress}
+		/>
+
+		<button
+			onClick={submit}
+			title="Click here to submit your answer."
+			style={{
+				'border-radius': '0 1em 1em 0',
+				'border': 'none',
+				'box-sizing': 'border-box',
+				'height': '100%',
+				'margin-left': '2px',
+				'width': "2em",
+			}}
+		>
+			→
+		</button>
+	</div>
+*/

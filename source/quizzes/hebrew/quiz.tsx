@@ -6,19 +6,17 @@ import { hebrew as answer_key, HebrewCharacter } from "./answer key";
 
 
 export const hebrew = new Quiz({
-	title: "Hebrew",
+	title: "Hebrew alphabet",
 	answer_key: answer_key,
 	renderer: (props) =>
 		<CharacterRenderer {...props}
 			prompt={"Which Hebrew character is this?"}
 			style={{
 				'font-family': '"Noto Serif Hebrew", serif',
-				'font-optical-sizing': 'auto',
-				'font-weight': '<weight>',
-				'font-style': 'normal',
-				'font-variation-settings': '"wdth" 100',
+				'font-weight': 'bold',
 			}}
 		/>,
 	evaluator: compare_strings,
 	response_fetcher: EnumFetcher<string, HebrewCharacter, string>,
+	background_image: "https://source.unsplash.com/1600x900/?hebrew",
 });

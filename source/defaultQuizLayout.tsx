@@ -14,15 +14,15 @@ export function DefaultQuizLayout(props: QuizLayoutProps) {
 					'align-items': "center",
 				}}
 			>
+				<div>
+					<props.quiz.renderer question={props.question} />
+				</div>
+
 				<DefaultFeedbackRenderer
 					answer={props.answer}
 					question={props.question}
 					trainingHistory={props.trainingHistory}
 				/>
-
-				<div>
-					<props.quiz.renderer question={props.question} />
-				</div>
 
 				<div style={{ margin: "1em" }}>
 					<props.quiz.response_fetcher

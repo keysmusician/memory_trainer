@@ -81,6 +81,11 @@ function FormatComboButton(props: FormatComboButtonProps) {
     'flex': '1',
     'text-align': 'center',
   }
+
+  const selected_background_color = 'white'
+
+  const unselected_background_color = 'whitesmoke'
+
   return (
     <div
       style={{
@@ -94,7 +99,7 @@ function FormatComboButton(props: FormatComboButtonProps) {
       }
       onMouseEnter={
         (e) => {
-          e.currentTarget.style.backgroundColor = 'lightgray'
+          e.currentTarget.style.backgroundColor = selected_background_color
           e.currentTarget.style.cursor = 'pointer'
         }
       }
@@ -109,11 +114,11 @@ function FormatComboButton(props: FormatComboButtonProps) {
         style={{
           ...button_style,
           'color': props.format() == "romanization" ? 'black' : 'gray',
-          'background-color': props.format() == "romanization" ? 'lightgray' : '',
+          'background-color': props.format() == "romanization" ? selected_background_color : unselected_background_color,
           'border-radius': '1em 0 0 1em',
         }}
       // disabled={props.format() == "romanization"}
-      >Romanization</span>
+      >Romanized</span>
       <span
         style={{
           'flex': '0 0 0px',
@@ -126,7 +131,7 @@ function FormatComboButton(props: FormatComboButtonProps) {
         style={{
           ...button_style,
           'color': props.format() == "ipa" ? 'black' : 'gray',
-          'background-color': props.format() == "ipa" ? 'lightgray' : '',
+          'background-color': props.format() == "ipa" ? selected_background_color : unselected_background_color,
           'border-radius': '0 1em 1em 0',
         }}
       >IPA</span>
