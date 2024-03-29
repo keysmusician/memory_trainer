@@ -62,7 +62,7 @@ function App() {
 
             <Route path={routes.edit} element={<EditScreen />} />
 
-            <Route path={routes.create} element={<CreateScreen />} />
+            {/* <Route path={routes.create} element={<CreateScreen />} /> */}
 
             <Route path={routes.train} element={<TrainScreen />} />
 

@@ -123,9 +123,9 @@ function Quizzes() {
         }}
       </For>
 
-      <li>
+      {/* <li>
         <NewQuizButton />
-      </li>
+      </li> */}
     </ul>
   )
 }
