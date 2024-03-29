@@ -1,0 +1,11 @@
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore dev tools files
+.vscode/
+node_modules/
+.vite
+
+# Ignore the build directory
+/distributable
