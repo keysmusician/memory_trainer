@@ -22,7 +22,7 @@ export function PeriodicTableQuizLayout(props: QuizLayoutProps<number, PeriodicT
 					giveFeedback={feedbackBuilder<number, PeriodicTable.Element, number>(
 						(_) => "Correct!",
 						(props) => `Hint: ${props.answer.symbol}`,
-						(props) => `The answer was ${props.answer.name}`
+						(props) => `The answer was ${props.trainingHistory.last.answer.name}`
 					)}
 				/>
 
