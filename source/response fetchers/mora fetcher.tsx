@@ -1,51 +1,72 @@
-import { For, JSX, Setter, createEffect, createSignal, onCleanup, onMount } from "solid-js"
+import { For, JSX, Setter, createSignal, onCleanup, onMount } from "solid-js"
 import { mora as moras } from "../answer keys/answer keys.barrel"
 import { ResponseFetcherProps, TrainingHistory } from "../quiz";
 import { Mora } from "../quizzes/japanese/_mora";
 
+function lookupMora(consonant: string, vowel: string): Mora | undefined {
+  consonant = ["c", "ch", "ts"].includes(consonant) ? "t" : consonant
+  consonant = ["j"].includes(consonant) ? "z" : consonant
+  consonant = ["sh"].includes(consonant) ? "s" : consonant
+  consonant = ["f"].includes(consonant) ? "h" : consonant
+
+  return Object.values(moras).find(mora =>
+    mora.consonant === consonant &&
+    mora.vowel === vowel
+  )
+}
+
 function convert_to_grid(
   moras: Mora[],
-  format: "romanization" | "ipa" = "romanization"
 ) {
-  const vowels = ["a", "i", "u", "e", "o"]
+  const vowels = ['a', 'i', 'u', 'e', 'o']
+
   const consonants = [
-    ["k"],
-    ['g'],
-    ["s"],
-    ['z', 'j'],
-    ["t", "c"],
-    ['d'],
-    ["n"],
-    ["h", "f"],
-    ['b'],
-    ['p'],
-    ["m"],
-    ["y"],
-    ["r"],
-    ["w"],
+    'k',
+    'g',
+    's',
+    'z',
+    't',
+    'd',
+    'n',
+    'h',
+    'b',
+    'p',
+    'm',
+    'y',
+    'r',
+    'w',
   ]
+
   const blank = null;
+
   const column_headers = [blank, ...vowels]
+
   const vowel_row = Array.from([blank, ...vowels],
     vowel => moras.find(mora => mora.romanization == vowel) ?? null
   )
+
   const grid_data: (string | Mora | null)[][] = [column_headers, vowel_row]
-  for (const consonant_options of consonants) {
-    const main_consonant = consonant_options[0]
-    const row: (string | Mora | null)[] = [main_consonant]
+
+  for (const consonant of consonants) {
+    const row: (string | Mora | null)[] = [consonant]
+
     let include_row = false
+
     for (const vowel of vowels) {
-      const mora = moras.find(mora =>
-        consonant_options.includes(mora[format][0]) && // First character is in consonant list
-        mora[format].slice(-1) == vowel // Last character is vowel
-      ) ?? null
+      const mora = lookupMora(consonant, vowel) ?? null
+
       if (mora) include_row = true
+
       row.push(mora)
     }
+
     if (include_row) grid_data.push(row)
   }
-  const n = moras.find(mora => mora.romanization == "n")
+
+  const n = moras.find(mora => mora.consonant == "n")
+
   if (n) grid_data.push([blank, n])
+
   return grid_data
 }
 
@@ -147,7 +168,7 @@ interface SelectedCell {
 interface MoraGridProps {
   answerKey: Map<string, Mora>
   format: () => "romanization" | "ipa"
-  set_response: (response: Mora) => void
+  set_response: Setter<Mora>
   trainingHistory: TrainingHistory<string, Mora, Mora>
   answer: Mora
 }
@@ -174,70 +195,120 @@ function MoraGrid(props: MoraGridProps) {
     }
     if ('kgszjtdcnhfbpmyrw'.includes(keyboardEvent.key)) {
       setSelectedCell(selected => ({
-        consonant: keyboardEvent.key,
+        consonant: keyboardEvent.key === "c" ? "ch" : keyboardEvent.key,
         vowel: selected.vowel
       }))
     }
   }
 
+  const keysDown = new Set<string>()
+
+  const selectedCellKey = () => `${selectedCell().consonant ?? ''}${selectedCell().vowel ?? ''}`
+
+  function keyupHandler(keyboardEvent: KeyboardEvent) {
+    keysDown.delete(keyboardEvent.key)
+
+    const response: Mora | undefined = lookupMora(
+      selectedCell().consonant ?? '',
+      selectedCell().vowel ?? ''
+    )
+
+    if (keysDown.size === 0) {
+      setSelectedCell({
+        consonant: undefined,
+        vowel: undefined,
+      })
+
+      if (response !== undefined) {
+        props.set_response(response)
+      }
+    }
+  }
+
+  function keyDownHandler(keyboardEvent: KeyboardEvent) {
+    keysDown.add(keyboardEvent.key)
+  }
+
   onMount(() => {
+    document.addEventListener('keydown', keyDownHandler)
     document.addEventListener('keypress', keypressHandler)
+    document.addEventListener('keyup', keyupHandler)
   })
 
   onCleanup(() => {
+    document.removeEventListener('keydown', keyDownHandler)
     document.removeEventListener('keypress', keypressHandler)
+    document.addEventListener('keyup', keyupHandler)
   })
 
   return (
-    <div style={grid_style}>
-      <For each={grid_data}>
-        {(row, row_index) =>
-          <For each={row}>
-            {(cell_data, column_index) => {
-              const common_style: JSX.CSSProperties = {
-                'grid-row': row_index() + 1,
-                'grid-column': column_index() + 1,
-                'text-align': 'center',
-              }
-              if (cell_data) {
-                if (typeof cell_data == 'string') {
-                  return (
-                    <span
-                      style={{
-                        ...common_style,
-                        'color': selectedCell().consonant == cell_data || selectedCell().vowel == cell_data ? 'red' : 'black'
-                      }}
-                    >{cell_data as string}</span>
-                  )
-                } else {
-                  return (
-                    <button
-                      style={{
-                        ...common_style,
-                        ...cell_data.romanization == 'n' ?
-                          { 'grid-column': 'span 5' } : {},
-                      }}
-                      onClick={() => {
-                        setSelectedCell({
-                          consonant: undefined,
-                          vowel: undefined,
-                        })
+    <>
+      <div
+        style={{
+          'text-align': 'center',
+          'display': 'flex',
+          'color': lookupMora(
+            selectedCell().consonant ?? '',
+            selectedCell().vowel ?? ''
+          ) !== undefined ? 'green' : 'white',
+        }}
+      >
+        <h2 style={{ 'user-select': 'none', 'flex': 0 }}>&nbsp{" "}</h2>
+        <h2 style={{ 'flex': 1 }}>
+          {selectedCellKey()}
+        </h2>
+      </div>
 
-                        props.set_response(cell_data)
-                      }}
-                    >{
-                        typeof cell_data == 'string' ? cell_data :
-                          `/${cell_data[props.format()]}/`
-                      }</button>
-                  )
+      <div style={grid_style}>
+        <For each={grid_data}>
+          {(row, row_index) =>
+            <For each={row}>
+              {(cell_data, column_index) => {
+                const common_style: JSX.CSSProperties = {
+                  'grid-row': row_index() + 1,
+                  'grid-column': column_index() + 1,
+                  'text-align': 'center',
                 }
-              } else {
-                return <span style={common_style}></span>
-              }
-            }}
-          </For>
-        }
-      </For>
-    </div>
+                if (cell_data) {
+                  if (typeof cell_data == 'string') {
+                    return (
+                      <span
+                        style={{
+                          ...common_style,
+                          'color': selectedCell().consonant == cell_data || selectedCell().vowel == cell_data ? 'red' : 'black'
+                        }}
+                      >{cell_data as string}</span>
+                    )
+                  } else {
+                    return (
+                      <button
+                        style={{
+                          ...common_style,
+                          ...cell_data.romanization == 'n' ?
+                            { 'grid-column': 'span 5' } : {},
+                        }}
+                        onClick={() => {
+                          setSelectedCell({
+                            consonant: undefined,
+                            vowel: undefined,
+                          })
+
+                          props.set_response(cell_data)
+                        }}
+                      >{
+                          typeof cell_data == 'string' ? cell_data :
+                            `/${cell_data[props.format()]}/`
+                        }</button>
+                    )
+                  }
+                } else {
+                  return <span style={common_style}></span>
+                }
+              }}
+            </For>
+          }
+        </For>
+      </div>
+    </>
   )
 }
