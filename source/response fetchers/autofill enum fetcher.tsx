@@ -1,11 +1,12 @@
-import { For, createSignal, onMount } from "solid-js"
-import { ResponseFetcherProps } from "../quiz"
+import { For, createEffect, createSignal, onMount, untrack } from "solid-js"
+import { NonNegativeNumber, ResponseFetcherProps } from "../quiz"
 import { designSystem, style } from "../Style"
+import { TimedAnswer, TimedResponse } from "../evaluators/evaluators"
 
 interface AutofillEnumFetcherProps<
 	QuestionType = unknown,
 	AnswerType = unknown
-> extends ResponseFetcherProps<string, QuestionType, AnswerType> {
+> extends ResponseFetcherProps<string | TimedResponse<string>, QuestionType, AnswerType> {
 	placeholder?: string
 	responses?: Set<string>
 }
@@ -15,12 +16,20 @@ interface AutofillEnumFetcherProps<
  **/
 export function AutofillEnumFetcher<
 	QuestionType = unknown,
-// AnswerType = string
+// AnswerType = string || TimedAnswer<string>,
 >(
-	props: AutofillEnumFetcherProps<QuestionType, string>
+	props: AutofillEnumFetcherProps<QuestionType, string | TimedAnswer<string>>
 ) {
 	const answers = Array.from(
-		props.responses ?? new Set(props.quiz.answer_key.values())
+		props.responses ??
+		new Set(
+			props.quiz.answerKey.values().map<string>(
+				(answer) => // We don't know if the answer type will be a string, but we want to force it to be.
+					'answer' in (answer as any) ?
+						(answer as TimedAnswer<string>).answer : // answer.answer is a workaround for making this work for TimedAnswer types.
+						answer as string
+			)
+		)
 	)
 
 	const [text, setText] = createSignal<string>("")
@@ -31,19 +40,34 @@ export function AutofillEnumFetcher<
 		answer => normalize(answer).includes(normalizedText())
 	).sort((a, b) => firstMatch(normalize(a), normalize(b), normalizedText()))
 
+	createEffect(() => {
+		// If there's only one option, select it.
+		if (options().length === 1) {
+			setSelection(options()[0])
+		}
+	})
+
 	const [selection, setSelection] = createSignal<string>(options()[0])
 
-	const [hoveredOption, set_hoveredOption] = createSignal<string | null>(null)
+	const [hoveredOption, setHoveredOption] = createSignal<string | null>(null)
 
 	// Get a reference to the text input and focus it when the component mounts.
 	let input_ref: HTMLInputElement | undefined
 
 	onMount(() => input_ref!.focus())
 
+	const [startTime, setStartTime] = createSignal(Date.now())
+
+	const responseTimeSeconds = () => new NonNegativeNumber((Date.now() - startTime()) / 1000)
+
 	function submit() {
 		input_ref!.value = ""
 		setText("")
-		props.setResponse(() => selection(),)
+		props.setResponse(() => 'timeLimitSeconds' in (props.answer as TimedAnswer<string>) ? // WARNING: COUPLING
+			{ response: selection(), responseTimeSeconds: untrack(() => responseTimeSeconds()) } :
+			selection()
+		)
+		setStartTime(Date.now())
 		setSelection(options()[0])
 	}
 
@@ -221,10 +245,10 @@ export function AutofillEnumFetcher<
 								}
 								onClick={() => selectOption(option)}
 								onMouseEnter={
-									() => set_hoveredOption(option)
+									() => setHoveredOption(option)
 								}
 								onMouseLeave={
-									() => set_hoveredOption(null)
+									() => setHoveredOption(null)
 								}
 								tabIndex={0}
 								onKeyPress={e => {
@@ -243,8 +267,10 @@ export function AutofillEnumFetcher<
 	)
 }
 
-// Sorts the given strings based on how well they match the given text.
-function firstMatch(a: string, b: string, match_text: string) {
+/**
+ * Sorts the given strings, `a` and `b` based on how well they match the given text.
+ */
+function firstMatch(a: string, b: string, match_text: string): number {
 	const a_index = a.indexOf(match_text)
 	const b_index = b.indexOf(match_text)
 	if (a_index === b_index) {

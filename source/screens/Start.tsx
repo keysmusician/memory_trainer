@@ -1,13 +1,13 @@
 import { For, JSX, createSignal } from 'solid-js'
 import { useQuiz, routes, AppNavigator } from '../App'
-import { Quiz } from '../quiz'
+import { QuizBuilder } from '../quiz'
 import { quizzes as serialized_quizzes } from '../quizzes/quizzes'
 // import { column_layout, quiz_list_item, start_button, nested_button } from '../Styles.module.css'
 import { useNavigate } from '@solidjs/router'
 import { style } from '../Style'
 
 
-export const quizzes = serialized_quizzes.map(quiz => new Quiz(quiz))
+export const quizzes = serialized_quizzes.map(quiz => new QuizBuilder(quiz))
 
 const [quizIndex, setQuizIndex] = createSignal(0)
 
@@ -23,7 +23,7 @@ function Quizzes() {
 
   const navigate = useNavigate() as AppNavigator
 
-  const selectQuiz = ([quiz, index]: [Quiz<unknown, unknown, unknown>, number]) => {
+  const selectQuiz = ([quiz, index]: [QuizBuilder<unknown, unknown, unknown>, number]) => {
     setQuiz(quiz)
     setQuizIndex(index)
   }

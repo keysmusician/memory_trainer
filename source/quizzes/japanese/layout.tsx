@@ -1,7 +1,12 @@
 import { Mora } from "./_mora"
-import { DefaultFeedbackRenderer, TrainingHistoryPanel, feedbackBuilder } from "../../DefaultQuizLayout"
+import { DefaultFeedbackRenderer, TrainingHistoryPanel } from "../../defaultQuizLayout"
 import { QuizLayoutProps } from "../../quiz"
 
+// feedbackBuilder(
+// 	(_) => "Correct!",
+// 	(_) => 'Hint: ' + (props.answer.romanization)[props.trainingHistory.retries - 1],
+// 	(_) => `The answer was ${props.trainingHistory.last.answer.romanization}`
+// )
 
 export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>) {
 	return (
@@ -18,16 +23,7 @@ export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>
 				<props.quiz.renderer question={props.question} />
 			</div>
 
-			<DefaultFeedbackRenderer<string, Mora, Mora>
-				question={props.question}
-				answer={props.answer}
-				trainingHistory={props.trainingHistory}
-				giveFeedback={feedbackBuilder(
-					(_) => "Correct!",
-					(_) => 'Hint: ' + (props.answer.romanization)[props.trainingHistory.retries - 1],
-					(_) => `The answer was ${props.trainingHistory.last.answer.romanization}`
-				)}
-			/>
+			<DefaultFeedbackRenderer<string> feedback={props.feedbackRenderer} />
 
 			<div style={{ margin: "1em" }}>
 				<props.quiz.response_fetcher
@@ -35,6 +31,7 @@ export function JapaneseQuizzesLayout(props: QuizLayoutProps<string, Mora, Mora>
 					question={props.question}
 					answer={props.answer}
 					trainingHistory={props.trainingHistory}
+					feedback={props.feedbackRenderer}
 					quiz={props.quiz}
 				/>
 			</div>

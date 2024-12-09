@@ -67,15 +67,15 @@ export class MemoryTrainerApp {
   }
 
   get answer(): any {
-    return this.answers[this.trainer.current_question]
+    return this.answers[this.trainer.currentQuestion]
   }
 
   get question(): any {
-    return this.questions[this.trainer.current_question]
+    return this.questions[this.trainer.currentQuestion]
   }
 
   async train(): Promise<void> {
-    while (!this.trainer.is_complete) {
+    while (!this.trainer.isComplete) {
       this.set_question(this.question)
 
       let grade

@@ -13,10 +13,13 @@ import {
   StartScreen,
   TrainScreen,
 } from './screens/Screens.barrel'
-import { IQuiz } from './quiz'
+import { IQuizBuilder } from './quiz'
 import { empty_quiz } from './quizzes/quizzes'
 import { Router, Routes, Route } from '@solidjs/router'
 import { style } from './Style'
+import { Flexbox } from './Flexbox'
+import { Button } from './Button'
+import { null_student, Student } from './Student'
 
 
 export namespace routes {
@@ -31,12 +34,13 @@ export type AppRoute = typeof routes[keyof typeof routes]
 
 export type AppNavigator = (route: AppRoute, params?: Record<string, string>) => void
 
+const [student, setStudent] = createStore<Student>(null_student);
 
-const [quizValue, setQuizValue] = createStore<IQuiz>(empty_quiz);
+const [quizValue, setQuizValue] = createStore<IQuizBuilder>(empty_quiz)
 
-const QuizContext = createContext<[IQuiz, Setter<IQuiz>]>([quizValue, setQuizValue]);
+const QuizContext = createContext<[IQuizBuilder, Setter<IQuizBuilder>]>([quizValue, setQuizValue])
 
-export function useQuiz() { return useContext(QuizContext)! }
+export const useQuiz = () => useContext(QuizContext)!
 
 
 /**
@@ -48,10 +52,7 @@ function App() {
       <QuizContext.Provider value={[quizValue, setQuizValue]}>
         <BackgroundImage />
 
-        <h1 style={{
-          ...style.group.title,
-          margin: ".5em",
-        }}>Memory Trainer</h1>
+        <Header />
 
         <section
           id='memory_trainer'
@@ -80,7 +81,7 @@ function BackgroundImage() {
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, '')
 
-  const backgroundImage = () => quizValue.background_image ??
+  const backgroundImage = () => quizValue.backgroundImage ??
     `https://source.unsplash.com/1600x900/?${cleanString(quizValue.title)}`
 
   const [transitioning, setTransitioning] = createSignal(false)
@@ -130,6 +131,44 @@ function BackgroundImage() {
       elementtiming={''}
       fetchpriority={'auto'}
     />
+  )
+}
+
+function Header() {
+  return (
+    <Flexbox
+      flex={'unset'}
+      style={{
+        'padding': '0rem 1rem',
+      }}
+    >
+      <Flexbox style={{ 'flex': 1 }} />
+
+      <Flexbox flex={2}>
+        <h1 style={{
+          ...style.group.title,
+          'margin': '0.5 rem',
+        }}>Memory Trainer</h1>
+      </Flexbox>
+
+      <Flexbox
+        style={{
+          'align-items': 'center',
+          'justify-content': 'center'
+        }}
+      >
+        <StudentButton />
+      </Flexbox>
+    </Flexbox>
+  )
+}
+
+function StudentButton() {
+  return (
+    // TODO: User icon
+    <Button>
+      ,O,
+    </Button>
   )
 }
 

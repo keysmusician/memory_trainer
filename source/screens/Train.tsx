@@ -1,96 +1,156 @@
 import { JSX, createReaction, createSignal, getOwner, runWithOwner } from "solid-js"
 import { useNavigate } from "@solidjs/router"
-import { AppNavigator, routes, useQuiz } from "../App"
-import { TrainingHistory } from "../quiz"
+import { AppNavigator, routes, useQuiz as useQuizBuilder } from "../App"
+import { ClosedUnitIntervalMember, TrainingHistory } from "../quiz"
 import { style } from "../Style"
 
 
-// type GetQuestionType<C extends Quiz> = C extends Quiz<infer Q> ? Q : unknown;
-
 export function TrainScreen() {
-  const [quiz, _] = useQuiz()
+  const [quizBuilder, _] = useQuizBuilder()
 
-  const questions = [...quiz.answer_key.keys()]
+  const [answerKeyIndex, setAnswerKeyIndex] = createSignal<number | undefined>()
 
-  const answers = [...quiz.answer_key.values()]
+  const question = () => quizBuilder.quiz.questions[answerKeyIndex()!] // TODO: Handle undefined case
 
-  const trainer = new quiz.training_algorithm(questions.length)
+  // const [questionsAskedCount, setQuestionsAskedCount] = createSignal(0)
 
-  const [questionIndex, setQuestionIndex] = createSignal(trainer.next_question())
+  // createEffect(() => {
+  //   questionIndex()
+  //   setQuestionsAskedCount((questionsAskedCount) => questionsAskedCount + 1)
+  // })
 
-  const question = () => questions[questionIndex()!]
+  const answer = () => quizBuilder.quiz.answers[answerKeyIndex()!]
 
-  const answer = () => answers[questionIndex()!]
-
-  const [response, setResponse] = createSignal(undefined,
+  const [response, setResponse] = createSignal<any>(undefined,
     { equals: () => false }) // Force a reaction to every update, even if the value is the same.
 
-  const [trainingHistory, setTrainingHistory] = createSignal<TrainingHistory>(new TrainingHistory())
+  const [feedback, setFeedback] = createSignal<any>()
 
+  // const [trainingHistory, setTrainingHistory] = createSignal<TrainingHistory>(new TrainingHistory())
+  // const _trainingHistory = setTrainingHistory((trainingHistory) => {
+  //   return new TrainingHistory(...trainingHistory, {
+  //     grade: quiz.evaluator(response(), answer()),
+  //     // feedback: quiz.feedback(response(), answer()),
+  //     question: question(),
+  //     questionIndex: questionIndex()!,
+  //     questionsAskedCount: questionsAskedCount++,
+  //     answer: answer(),
+  //     response: response(),
+  //     timeStamp: Date.now(),
+  //   })
+  // })
 
-  /* This is the new main training loop */
-  async function train(): Promise<void> {
-    const owner = getOwner();
+  // createEffect(() => {
+  //   setTrainingHistory((trainingHistory) => {
+  //     return new TrainingHistory(...trainingHistory, {
+  //       grade: response() ? quizBuilder.evaluator(response(), answer()) : null,
+  //       question: question(),
+  //       questionIndex: questionIndex()!,
+  //       questionsAskedCount: questionsAskedCount(),
+  //       answer: answer(),
+  //       response: response(),
+  //       timeStamp: Date.now(),
+  //     })
+  //   })
+  // })
 
-    var questionsAskedCount = 1
+  /**
+   * This is the new main training loop.
+   *
+   * The training loop, or what I think should now be called the "control loop,"
+   * should also be a replaceable component. Different quizzes may be best
+   * served by different control loops.
+   **/
+  // async function train(): Promise<void> {
+  //   const retryCount = 2
 
-    while (!trainer.is_complete) {
-      setQuestionIndex(trainer.current_question)
+  //   const owner = getOwner();
 
-      // Wait for the user to respond to the question
-      const trainingHistory = await new Promise<TrainingHistory>((resolve) =>
-        runWithOwner(owner, () => {
-          const askedAt = Date.now()
+  //   var questionsAskedCount = 0
 
-          const createTrainingHistoryWhen = createReaction(() => {
+  //   while (!trainer.is_complete) {
+  //     setQuestionIndex(trainer.current_question)
 
-            const _trainingHistory = setTrainingHistory((trainingHistory) =>
-              new TrainingHistory(...trainingHistory, {
-                grade: quiz.evaluator(response(), answer()),
-                question: question(),
-                questionIndex: questionIndex()!,
-                questionsAskedCount: questionsAskedCount++,
-                answer: answer(),
-                response: response(),
-                responseTime: Date.now() - askedAt,
-              })
-            )
+  //     questionsAskedCount++
 
-            resolve(_trainingHistory)
-          })
+  //     var responseCount = 0
+  //     var grade: ClosedUnitIntervalMember | undefined = undefined
+  //     while (responseCount < retryCount) {
 
-          // Will execute the reaction one time when the response changes:
-          createTrainingHistoryWhen(() => response())
-        })
-      )
+  //       // Wait for the user to respond to the question
+  //       const _response = await new Promise<any>((resolve) =>
+  //         runWithOwner(owner, () => {
+  //           const resolveResponseWhen = createReaction(() => {
+  //             resolve(response())
+  //           })
 
-      if (!quiz.onResponse(trainingHistory)) { // Allows each quiz to determine if the user has passed the question and the grade should be registered with the Trainer. This is useful for quizzes that allow retries.
-        // TODO: Allow quizzes to adjust grades before registering them, for example, to penalize regrades.
-        continue
-      }
+  //           // Will execute the reaction one time when the response changes:
+  //           resolveResponseWhen(() => response())
+  //         })
+  //       )
 
-      trainer.register(trainingHistory.last.grade)
+  //       responseCount++
 
-      trainer.next_question()
+  //       // Determine the next action to take (e.g., grade the response, skip the question, etc.)
 
-      questionsAskedCount++
-    }
-  }
+  //       grade = quizBuilder.evaluator(_response, answer())
+
+  //       if (grade === 1) {
+  //         setFeedback('Correct!')
+  //         break
+  //       } else if (responseCount < retryCount) {
+  //         setFeedback('Try again.')
+  //       } else {
+  //         setFeedback('The correct answer was: ' + JSON.stringify(answer()))
+  //       }
+  //     }
+
+  //     if (grade !== undefined) {
+  //       trainer.register(grade)
+  //     } else {
+  //       console.warn(`A grade was not determined for question ${questionsAskedCount}.`)
+  //     }
+
+  //     trainer.next_question()
+  //   }
+  // }
+
+  const owner = getOwner();
+
+  const awaitResponse = () => new Promise((resolve) =>
+    runWithOwner(owner, () => {
+      const resolveResponseWhen = createReaction(() => {
+        resolve(response())
+      })
+
+      // Will execute the reaction one time when the response changes:
+      resolveResponseWhen(() => response())
+    })
+  )
 
   const navigate = useNavigate() as AppNavigator
 
-  train().then(() => navigate(routes.score))
+  quizBuilder.coordinator.train({
+    quiz: quizBuilder.quiz,
+    trainingAlgorithm: quizBuilder.trainingAlgorithm,
+    userInterface: {
+      setAnswerKeyIndex: setAnswerKeyIndex,
+      setFeedback: setFeedback,
+      awaitResponse: awaitResponse,
+    },
+  }).then(() => navigate(routes.score))
 
   return (
     <section
       style={style.group.contentBox}
     >
-      <quiz.layout
-        quiz={quiz}
+      <quizBuilder.layout
+        quiz={quizBuilder.quiz}
         answer={answer()}
         question={question()}
-        trainingHistory={trainingHistory()}
+        feedback={feedback()}
         setResponse={setResponse}
+      // trainingHistory={trainingHistory()}
       />
 
       <div style={{

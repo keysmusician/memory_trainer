@@ -27,15 +27,15 @@ export class BaseTrainingAlgorithm {
         this.#current_question = 0
     }
 
-    get current_question(): number {
+    get currentQuestion(): number {
         if (this.#current_question === null) { this.next_question() }
         return this.#current_question
     }
 
-    get is_complete(): boolean { return this.#is_complete }
+    get isComplete(): boolean { return this.#is_complete }
 
     next_question(): number | undefined {
-        if ((this.current_question + 1) === this.question_count) {
+        if ((this.currentQuestion + 1) === this.question_count) {
             this.#is_complete = true
 
             return undefined

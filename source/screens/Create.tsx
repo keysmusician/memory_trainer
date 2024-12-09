@@ -2,7 +2,7 @@ import { For, createSignal } from "solid-js";
 import { HomeButton } from "./Edit";
 import { StartButton } from "./Start";
 import { useQuiz } from "../App";
-import { style } from "../style";
+import { style } from "../Style";
 
 
 export function CreateScreen() {

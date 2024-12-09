@@ -1,13 +1,13 @@
-import { Quiz } from "../../quiz";
+import { QuizBuilder } from "../../quiz";
 import { TextRenderer } from "../../renderers/TextRenderer";
 import { AutofillEnumFetcher } from "../../response fetchers/autofill enum fetcher";
 import { PeriodicTable } from "./answer key";
 import { PeriodicTableQuizLayout } from "./layout";
 
 
-export const periodic_table = new Quiz<number, PeriodicTable.Element, string>({
+export const periodic_table = new QuizBuilder<number, PeriodicTable.Element, string>({
 	title: "Periodic table",
-	answer_key: PeriodicTable.answerKey,
+	quiz: PeriodicTable.answerKey,
 	renderer: (props) =>
 		<TextRenderer
 			question={props.question.toString()}
@@ -22,5 +22,5 @@ export const periodic_table = new Quiz<number, PeriodicTable.Element, string>({
 			}
 		/>,
 	layout: PeriodicTableQuizLayout,
-	background_image: `https://source.unsplash.com/1600x900/?chemistry`
+	backgroundImage: `https://source.unsplash.com/1600x900/?chemistry`
 });

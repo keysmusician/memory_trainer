@@ -1,4 +1,4 @@
-import { DefaultFeedbackRenderer, feedbackBuilder, TrainingHistoryPanel } from "../../DefaultQuizLayout"
+import { DefaultFeedbackRenderer, TrainingHistoryPanel } from "../../defaultQuizLayout"
 import { QuizLayoutProps } from "../../quiz"
 import { PeriodicTable } from "./answer key"
 
@@ -15,16 +15,7 @@ export function PeriodicTableQuizLayout(props: QuizLayoutProps<number, PeriodicT
 					'align-items': "center",
 				}}
 			>
-				<DefaultFeedbackRenderer<number, PeriodicTable.Element, number>
-					answer={props.answer}
-					question={props.question}
-					trainingHistory={props.trainingHistory}
-					giveFeedback={feedbackBuilder<number, PeriodicTable.Element, number>(
-						(_) => "Correct!",
-						(props) => `Hint: ${props.answer.symbol}`,
-						(props) => `The answer was ${props.trainingHistory.last.answer.name}`
-					)}
-				/>
+				<DefaultFeedbackRenderer<number> feedback={props.feedbackRenderer} />
 
 				<div>
 					<props.quiz.renderer question={props.question} />
@@ -36,6 +27,7 @@ export function PeriodicTableQuizLayout(props: QuizLayoutProps<number, PeriodicT
 						question={props.question}
 						quiz={props.quiz}
 						trainingHistory={props.trainingHistory}
+						feedback={props.feedbackRenderer}
 						setResponse={props.setResponse}
 					/>
 				</div>

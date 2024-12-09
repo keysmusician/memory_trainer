@@ -1,9 +1,8 @@
-import { Component, JSXElement, Setter } from 'solid-js'
-import { Renderer } from './renderers/Renderer'
-import { DefaultQuizLayout } from './DefaultQuizLayout'
-import { BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
+import { Component, Setter } from 'solid-js'
+// import { Renderer } from './renderers/Renderer'
+import { type BaseTrainingAlgorithm } from './training algorithms/BaseTrainingAlgorithm'
 import { SmartTrainer } from './training algorithms/SmartTrainer'
-import { compare_strictly_equal } from './evaluators/evaluators'
+import { ICoordinator } from './TrainingCoordinator'
 
 
 // export interface Quiz extends SerializedQuiz {
@@ -25,8 +24,11 @@ import { compare_strictly_equal } from './evaluators/evaluators'
 /**
  * A number between 0 and 1 (inclusive).
  */
-export class ClosedUnitIntervalElement extends Number {
-	constructor(value: number) {
+export class ClosedUnitIntervalMember extends Number {
+	constructor(
+		value: number,
+		overflowBehavior: 'wrap' | 'clamp' | 'reflect' | 'throw' = 'throw' // TODO: Implement wrap, clamp, and reflect. Document their behavior.
+	) {
 		if (value < 0 || value > 1) {
 			throw new RangeError('The value must be between 0 and 1 (inclusive).')
 		}
@@ -35,21 +37,94 @@ export class ClosedUnitIntervalElement extends Number {
 	}
 }
 
-export type Evaluator<ResponseType = any, AnswerType = any> =
-	(response: ResponseType, answer: AnswerType) => ClosedUnitIntervalElement
+/**
+ * A non-negative number. Any number >= 0.
+ */
+export class NonNegativeNumber extends Number {
+	static ONE = new NonNegativeNumber(1)
+	static ZERO = new NonNegativeNumber(0)
+
+	constructor(value: number) {
+		if (value < 0) {
+			throw new RangeError('The value must be greater than or equal to 0.')
+		}
+
+		super(value)
+	}
+
+	toString(radix?: number): string {
+		return super.toString(radix)
+	}
+
+	add(value: number): number {
+		return (this.valueOf() + value)
+	}
+
+	addNonNegative(value: NonNegativeNumber): NonNegativeNumber {
+		return new NonNegativeNumber(this.valueOf() + value.valueOf())
+	}
+
+	subtract(value: number | NonNegativeNumber): number {
+		if (value instanceof NonNegativeNumber) {
+			return this.valueOf() - value.valueOf()
+		}
+		return this.valueOf() - value
+	}
+}
+
+/**
+ * A function which returns a grade for a user's response.
+ * The grade is a number between 0 and 1 (inclusive).
+ */
+export type Evaluator<ResponseType = any, AnswerType = any> = (
+	/**
+	 * The user's response.
+	 */
+	response: ResponseType,
+	/**
+	 * The correct answer.
+	 */
+	answer: AnswerType
+) => ClosedUnitIntervalMember
+
+export interface QuizComponentBaseProps<
+	QuestionType = unknown,
+	AnswerType = unknown
+> {
+	quiz: IQuiz<QuestionType, AnswerType>
+	answer: AnswerType,
+	question: QuestionType,
+}
 
 export interface QuizLayoutProps<
 	QuestionType = unknown,
 	AnswerType = unknown,
-	ResponseType = unknown
-> {
-	quiz: IQuiz<QuestionType, AnswerType, ResponseType>
-	answer: AnswerType,
-	question: QuestionType,
-	/* This changes throughout the lifecycle of the quiz: */
-	trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>,
+	ResponseType = unknown,
+	FeedbackType = unknown
+> extends QuizComponentBaseProps<QuestionType, AnswerType> {
+	question: QuestionType
 	setResponse: Setter<ResponseType>
+	feedback: FeedbackType
+
+	// questionRenderer: Renderer<QuestionType>,
+	// feedbackRenderer: Renderer<FeedbackType>,
+	// responseFetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>,
+
+	/* This mutates throughout the lifecycle of the quiz: */
+	// trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>,
 }
+
+export type QuizLayout<
+	QuestionType,
+	AnswerType,
+	ResponseType,
+	FeedbackType
+> = Component<QuizLayoutProps<
+	QuestionType,
+	AnswerType,
+	ResponseType,
+	FeedbackType
+>>
 
 export class TrainingHistory<
 	QuestionType = any,
@@ -81,7 +156,7 @@ export class TrainingHistory<
 		for (let index = this.length - 1; index >= 0; index--) {
 			if (
 				this[index].question === this.last.question &&
-				this[index].grade < (.5 as ClosedUnitIntervalElement)
+				this[index].grade < (.5 as ClosedUnitIntervalMember)
 			) {
 				retries++
 			} else {
@@ -94,90 +169,133 @@ export class TrainingHistory<
 }
 
 export type TrainingState<QuestionType, AnswerType, ResponseType> = {
-	grade: ClosedUnitIntervalElement
+	grade: ClosedUnitIntervalMember
 	question: QuestionType
 	questionIndex: number
-	questionsAskedCount: number
+	questionsAskedCount: NonNegativeNumber
 	answer: AnswerType
 	response: ResponseType
-	responseTime: number
-}
-
-export function defaultOnResponse(trainingHistory: TrainingHistory): boolean {
-	return (
-		trainingHistory.last.grade >= (.5 as ClosedUnitIntervalElement) ||
-		trainingHistory.retries > 1
-	)
+	timeStamp: number
 }
 
 export interface ResponseFetcherProps<
-	ResponseType,
 	QuestionType = unknown,
-	AnswerType = unknown
-> extends QuizLayoutProps<QuestionType, AnswerType, ResponseType> {
+	AnswerType = unknown,
+	ResponseType = unknown,
+> extends QuizComponentBaseProps<QuestionType, AnswerType> {
+	setResponse: Setter<ResponseType>
 }
 
 export type ResponseFetcher<QuestionType, AnswerType, ResponseType> =
-	Component<ResponseFetcherProps<ResponseType, QuestionType, AnswerType>>
+	Component<ResponseFetcherProps<QuestionType, AnswerType, ResponseType>>
 
 type HTTPSURL = `https://${string}`;
 
-export interface IQuiz<
+export interface IQuizParameters<QuestionType, AnswerType> {
+	title?: string
+	answerKey: Map<QuestionType, AnswerType>
+}
+
+export interface IQuiz<QuestionType, AnswerType>
+	extends IQuizParameters<QuestionType, AnswerType> {
+	readonly questions: QuestionType[]
+	readonly answers: AnswerType[]
+}
+
+export class Quiz<QuestionType, AnswerType> implements IQuiz<QuestionType, AnswerType> {
+	readonly title?: string
+	readonly answerKey: Map<QuestionType, AnswerType>
+
+	get questions(): QuestionType[] {
+		return [...this.answerKey.keys()]
+	}
+
+	get answers(): AnswerType[] {
+		return [...this.answerKey.values()]
+	}
+
+	constructor({
+		title,
+		answerKey: answer_key,
+	}: IQuizParameters<QuestionType, AnswerType>) {
+		this.title = title
+		this.answerKey = answer_key
+	}
+}
+
+/**
+ * A Quiz builder. Use this class to create new quizzes.
+ *
+ * @readonly title: The display name of the quiz.
+ */
+export interface IQuizBuilder<
 	QuestionType = any,
 	AnswerType = any,
-	ResponseType = any
+	ResponseType = any,
+	FeedbackType = any
 > {
-	answer_key: Map<QuestionType, AnswerType>
-	evaluator: Evaluator<ResponseType, AnswerType>
-	response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	readonly title: string
-	renderer: Renderer<QuestionType>
-	onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
-	training_algorithm: typeof BaseTrainingAlgorithm
-	layout: (props: QuizLayoutProps) => JSXElement
-	readonly background_image?: HTTPSURL
-}
+	readonly quiz: IQuiz<QuestionType, AnswerType>
+	readonly coordinator: ICoordinator<QuestionType, AnswerType, ResponseType, FeedbackType>
+	// readonly evaluator: Evaluator<ResponseType, AnswerType>
+	// readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
+	// readonly renderer: Renderer<QuestionType>
+	readonly trainingAlgorithm: BaseTrainingAlgorithm
+	readonly layout: QuizLayout<QuestionType, AnswerType, ResponseType, FeedbackType>
+	readonly backgroundImage?: HTTPSURL
+}1
 
 type Modify<T, R> = Omit<T, keyof R> & R;
 
-type QuizParameters<QuestionType, AnswerType, ResponseType> =
-	Modify<IQuiz<QuestionType, AnswerType, ResponseType>, {
-		onResponse?: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
-		training_algorithm?: typeof BaseTrainingAlgorithm
-		layout?: (props: QuizLayoutProps) => JSXElement
+type QuizBuilderParameters<QuestionType, AnswerType, ResponseType, FeedbackType> =
+	Modify<IQuizBuilder<QuestionType, AnswerType, ResponseType>, {
+		trainingAlgorithm?: BaseTrainingAlgorithm
+		layout: QuizLayout<QuestionType, AnswerType, ResponseType, FeedbackType>
 	}>
 
-export class Quiz<QuestionType = unknown, AnswerType = unknown, ResponseType = unknown>
-	implements IQuiz<QuestionType, AnswerType, ResponseType> {
-	readonly answer_key: Map<QuestionType, AnswerType>
-	readonly evaluator: Evaluator<ResponseType, AnswerType>
-	readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
+export class QuizBuilder< // TODO: Rename. QuizBuilder isn't exactly correct.
+	QuestionType = unknown,
+	AnswerType = unknown,
+	ResponseType = unknown,
+	FeedbackType = unknown
+> implements IQuizBuilder<
+	QuestionType,
+	AnswerType,
+	ResponseType,
+	FeedbackType
+> {
+	readonly quiz: IQuiz<QuestionType, AnswerType>
+	readonly coordinator: ICoordinator<QuestionType, AnswerType, ResponseType, FeedbackType>
+	// readonly evaluator: Evaluator<ResponseType, AnswerType>
+	// readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 	readonly title: string
-	readonly renderer: Renderer<QuestionType>
-	readonly onResponse: (trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>) => boolean
-	readonly training_algorithm: typeof BaseTrainingAlgorithm
-	readonly layout: any
-	readonly background_image?: HTTPSURL
+	// readonly renderer: Renderer<QuestionType>
+	readonly trainingAlgorithm: BaseTrainingAlgorithm
+	readonly layout: QuizLayout<QuestionType, AnswerType, ResponseType, FeedbackType>
+	readonly backgroundImage?: HTTPSURL
+	// readonly getTimeLimitSeconds: (question: QuestionType) => NonNegativeNumber
 
 	constructor({
-		answer_key,
-		evaluator = compare_strictly_equal<ResponseType | AnswerType>,
-		response_fetcher,
+		quiz,
+		coordinator,
+		// evaluator = compare_strictly_equal<ResponseType | AnswerType>,
+		// response_fetcher,
 		title,
-		renderer,
-		onResponse = defaultOnResponse,
-		training_algorithm = SmartTrainer,
-		layout = DefaultQuizLayout,
-		background_image
-	}: QuizParameters<QuestionType, AnswerType, ResponseType>) {
-		this.answer_key = answer_key
-		this.evaluator = evaluator
-		this.response_fetcher = response_fetcher
+		// renderer,
+		trainingAlgorithm = new SmartTrainer(quiz.answerKey.size),
+		layout,
+		backgroundImage,
+		// getTimeLimitSeconds: getTimeLimit = () => Infinity
+	}: QuizBuilderParameters<QuestionType, AnswerType, ResponseType, FeedbackType>) {
+		this.quiz = quiz
+		this.coordinator = coordinator
+		// this.evaluator = evaluator
+		// this.response_fetcher = response_fetcher
 		this.title = title
-		this.renderer = renderer
-		this.onResponse = onResponse
-		this.training_algorithm = training_algorithm
+		// this.renderer = renderer
+		this.trainingAlgorithm = trainingAlgorithm
 		this.layout = layout
-		this.background_image = background_image
+		this.backgroundImage = backgroundImage
+		// this.getTimeLimitSeconds = getTimeLimit
 	}
 }

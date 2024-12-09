@@ -2,7 +2,7 @@ import { For, Setter, createEffect, createSignal } from "solid-js"
 import { StartButton } from "./Start"
 import { AppNavigator, routes, useQuiz } from "../App"
 import { style } from "../Style"
-import { Quiz } from "../quiz";
+import { IQuizBuilder, QuizBuilder } from "../quiz";
 import { useNavigate } from "@solidjs/router";
 
 
@@ -39,7 +39,7 @@ export function EditScreen() {
 
 const unselectedAnswerKeys: Map<string, Map<string, string>> = new Map()
 
-type EditingQuiz = Quiz<string, string, string> &
+type EditingQuiz = IQuizBuilder<string, string, string> &
 { unselected_answer_key?: Map<string, string> }
 
 interface AnswerKeyEditorProps {
@@ -48,7 +48,7 @@ interface AnswerKeyEditorProps {
 }
 function AnswerKeyEditor(props: AnswerKeyEditorProps) {
   const [selectedAnswerKey, setSelectedAnswerKey] = createSignal(
-    props.quiz.answer_key, { "equals": _ => false }
+    props.quiz.quiz, { "equals": _ => false }
   )
 
   const [unselectedAnswerKey, setUnselectedAnswerKey] = createSignal(

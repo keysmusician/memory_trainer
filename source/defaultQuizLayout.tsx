@@ -1,93 +1,80 @@
-import { For, createSignal } from "solid-js"
-import { QuizLayoutProps, TrainingHistory } from "./quiz"
+import { Component, For, JSX, createEffect, createSignal } from "solid-js"
+import { QuizLayoutProps, ResponseFetcher, TrainingHistory } from "./quiz"
 import { style } from "./Style"
+import { Renderer } from "./renderers/Renderer"
 
-
-export function DefaultQuizLayout(props: QuizLayoutProps) {
-	return (
-		<>
-			<TrainingHistoryPanel trainingHistory={props.trainingHistory} />
-			<article
-				style={{
-					'display': "flex",
-					'flex-direction': "column",
-					'align-items': "center",
-				}}
-			>
-				<div>
-					<props.quiz.renderer question={props.question} />
-				</div>
-
-				<DefaultFeedbackRenderer
-					answer={props.answer}
-					question={props.question}
-					trainingHistory={props.trainingHistory}
-				/>
-
-				<div style={{ margin: "1em" }}>
-					<props.quiz.response_fetcher
-						answer={props.answer}
-						question={props.question}
-						quiz={props.quiz}
-						trainingHistory={props.trainingHistory}
-						setResponse={props.setResponse}
-					/>
-				</div>
-			</article>
-		</>
-
-	)
-}
-
-type FeedbackFunction<QuestionType, AnswerType, ResponseType> =
-	(props: FeedbackRendererProps<QuestionType, AnswerType, ResponseType>) => string
-
-export function feedbackBuilder<QuestionType, AnswerType, ResponseType>(
-	correct: FeedbackFunction<QuestionType, AnswerType, ResponseType> =
-		(_) => "Correct!",
-	hint: FeedbackFunction<QuestionType, AnswerType, ResponseType> =
-		(props) => 'Hint: ' + (props.answer as string)[0],
-	answer: FeedbackFunction<QuestionType, AnswerType, ResponseType> =
-		(props) => `The answer was ${props.trainingHistory.last.answer}`,
-) {
-	return (props: FeedbackRendererProps<QuestionType, AnswerType, ResponseType>) => {
-		if (props.trainingHistory.last === undefined) {
-			return " "
-		} else if (props.trainingHistory.last.grade) {
-			return correct(props)
-		} else if (
-			props.trainingHistory.last.question == props.question
-		) {
-			return hint(props)
-		} else {
-			return answer(props)
-		}
-	}
-}
-
-
-interface FeedbackRendererProps<
-	QuestionType = unknown,
-	AnswerType = unknown,
-	ResponseType = unknown
+interface DefaultQuizLayoutBuilderProps<
+	QuestionType, AnswerType, ResponseType, FeedbackType
 > {
-	answer: AnswerType,
-	question: QuestionType,
-	trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>
-	giveFeedback?: (props: FeedbackRendererProps<QuestionType, AnswerType, ResponseType>) => string
+	questionRenderer: Renderer<QuestionType>
+	feedbackRenderer: Component<{ feedback: FeedbackType }>
+	responseFetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
 }
-export function DefaultFeedbackRenderer<
+export function DefaultQuizLayoutBuilder<
 	QuestionType = unknown,
 	AnswerType = unknown,
-	ResponseType = unknown
->(props: FeedbackRendererProps<QuestionType, AnswerType, ResponseType>) {
+	ResponseType = unknown,
+	FeedbackType = unknown
+>(
+	builderProps: DefaultQuizLayoutBuilderProps<
+		QuestionType,
+		AnswerType,
+		ResponseType,
+		FeedbackType
+	>
+) {
+	function DefaultQuizLayout(
+		props: QuizLayoutProps<
+			QuestionType,
+			AnswerType,
+			ResponseType,
+			FeedbackType
+		>
+	) {
+		return (
+			<>
+				{/* <TrainingHistoryPanel trainingHistory={props.trainingHistory} /> */}
+				<article
+					style={{
+						'display': "flex",
+						'flex-direction': "column",
+						'align-items': "center",
+					}}
+				>
+					<div>
+						<builderProps.questionRenderer question={props.question} />
+					</div>
 
-	const feedback = props.giveFeedback ?? feedbackBuilder()
+					<builderProps.feedbackRenderer feedback={props.feedback} />
 
+					<div style={{ margin: "1em" }}>
+						<builderProps.responseFetcher
+							question={props.question}
+							answer={props.answer}
+							setResponse={props.setResponse}
+							quiz={props.quiz}
+						// trainingHistory={props.trainingHistory}
+						/>
+					</div>
+				</article>
+			</>
+
+		)
+	}
+
+	return DefaultQuizLayout
+}
+
+interface FeedbackRendererProps<FeedbackType extends JSX.Element> {
+	feedback: FeedbackType
+}
+export function DefaultFeedbackRenderer<FeedbackType extends JSX.Element>(
+	props: FeedbackRendererProps<FeedbackType>
+) {
 	return (
 		<div>
 			<div style={style.group.baseText}>
-				<span>{feedback(props)}</span>
+				<span>{props.feedback}</span>
 			</div>
 		</div>
 	)
@@ -95,6 +82,13 @@ export function DefaultFeedbackRenderer<
 
 export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }) {
 	const [visible, setVisible] = createSignal(false)
+
+	var previousTimestamp = Date.now()
+
+	createEffect(() => {
+		props.trainingHistory.last
+		previousTimestamp = Date.now()
+	})
 
 	const backgroundColor = "rgba(255, 255, 255, .8)"
 
@@ -113,6 +107,15 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 	// 	`button:hover{ background-color: #00ff00 }`
 	// ))
 	// document.getElementsByTagName('head')[0].appendChild(localStyle);
+
+	/**
+	 * The time in seconds since the last history entry.
+	 */
+	const getDeltaTimeSeconds = () => {
+		const now = Date.now()
+		const delta = now - previousTimestamp
+		return delta / 1000
+	}
 
 	return (
 		<section
@@ -174,8 +177,8 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 									<td>{JSON.stringify(trainingState.response)}</td>
 								</tr>
 								<tr style={trStyle}>
-									<td style={column1}>Response Time</td>
-									<td>{trainingState.responseTime / 1000} s</td>
+									<td style={column1}>Time since last history entry</td>
+									<td>{getDeltaTimeSeconds()} seconds</td>
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Grade</td>

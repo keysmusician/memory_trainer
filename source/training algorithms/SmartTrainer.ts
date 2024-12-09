@@ -58,7 +58,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
     this.#current_question = null
   }
 
-  get is_complete(): boolean {
+  get isComplete(): boolean {
     for (const stat of this.stats) {
       if (stat['streak'] < this.#winning_streak) { return false }
     }
@@ -66,7 +66,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
     return true
   }
 
-  get current_question(): number {
+  get currentQuestion(): number {
     if (this.#current_question === null) { return this.next_question() }
     return this.#current_question
   }
@@ -162,7 +162,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
   }
 
   register(score: number): boolean {
-    const current_item_stats = this.stats[this.current_question]
+    const current_item_stats = this.stats[this.currentQuestion]
 
     this.#return_collection = this.focus_questions
 
@@ -182,7 +182,7 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
       current_item_stats['correct']
     )
 
-    return score === 1
+    return score > 0
   }
 
   random_inversely_weighted_index(weights: number[]): number {
