@@ -45,6 +45,8 @@ export function DefaultQuizLayoutBuilder<
 						<builderProps.questionRenderer question={props.question} />
 					</div>
 
+					<div style={{ margin: ".5em" }} />
+
 					<builderProps.feedbackRenderer feedback={props.feedback} />
 
 					<div style={{ margin: "1em" }}>
