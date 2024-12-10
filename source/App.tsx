@@ -142,7 +142,7 @@ function Header() {
         'padding': '0rem 1rem',
       }}
     >
-      <Flexbox style={{ 'flex': 1 }} />
+      {/* <Flexbox style={{ 'flex': 1 }} /> */}
 
       <Flexbox flex={2}>
         <h1 style={{
@@ -151,14 +151,14 @@ function Header() {
         }}>Memory Trainer</h1>
       </Flexbox>
 
-      <Flexbox
+      {/* <Flexbox
         style={{
           'align-items': 'center',
           'justify-content': 'center'
         }}
       >
         <StudentButton />
-      </Flexbox>
+      </Flexbox> */}
     </Flexbox>
   )
 }
