@@ -63,9 +63,13 @@ export function AutofillEnumFetcher<
 	function submit() {
 		input_ref!.value = ""
 		setText("")
-		props.setResponse(() => 'timeLimitSeconds' in (props.answer as TimedAnswer<string>) ? // WARNING: COUPLING
-			{ response: selection(), responseTimeSeconds: untrack(() => responseTimeSeconds()) } :
-			selection()
+		props.setResponse(() =>
+		// 'timeLimitSeconds' in (props.answer as TimedAnswer<string>) ? // WARNING: COUPLING
+		// { response: selection(), responseTimeSeconds: untrack(() => responseTimeSeconds()) } :
+		({
+			answer: selection(),
+			timeLimitSeconds: untrack(() => responseTimeSeconds())
+		})
 		)
 		setStartTime(Date.now())
 		setSelection(options()[0])

@@ -57,8 +57,25 @@ export function boolTimedCompareStrictlyEqual<T>(
 }
 compare_strictly_equal satisfies Evaluator<unknown, unknown>
 
+// export function floatTimedCompareStrictlyEqual<T>(
+//   { response, responseTimeSeconds }: TimedResponse<T>,
+//   { answer, timeLimitSeconds }: TimedAnswer<T>
+// ) {
+//   if (response !== answer) {
+//     return 0
+//   } else {
+//     const secondsPastLimit = responseTimeSeconds.subtract(timeLimitSeconds)
+//     return (
+//       secondsPastLimit < 0 ?
+//         1 :
+//         1 / (1 + Math.exp(secondsPastLimit - 5)) // Sigmoid function
+//     )
+//   }
+// }
+// compare_strictly_equal satisfies Evaluator<unknown, unknown>
+
 export function floatTimedCompareStrictlyEqual<T>(
-  { response, responseTimeSeconds }: TimedResponse<T>,
+  { answer: response, timeLimitSeconds: responseTimeSeconds }: TimedAnswer<T>,
   { answer, timeLimitSeconds }: TimedAnswer<T>
 ) {
   if (response !== answer) {

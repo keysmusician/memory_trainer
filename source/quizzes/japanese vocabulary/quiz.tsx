@@ -3,6 +3,7 @@ import { floatTimedCompareStrictlyEqual, TimedAnswer, TimedResponse } from "../.
 import { NonNegativeNumber, Quiz, QuizBuilder } from "../../quiz"
 import { TextRenderer } from "../../renderers/TextRenderer"
 import { AutofillEnumFetcher } from "../../response fetchers/autofill enum fetcher"
+import { MultipleChoiceFetcher } from "../../response fetchers/multiple choice fetcher"
 import { DefaultCoordinator } from "../../TrainingCoordinator"
 
 const timeLimitSeconds = new NonNegativeNumber(5)
@@ -18,6 +19,7 @@ const answer_key = new Map<string, TimedAnswer<string>>([
 	// ['はな', 'Flower'],
 	// ['いす', 'Chair'],
 	['かみ', 'Paper'],
+	["うた", "Song"],
 	// ['くち', 'Mouth; Opening'],
 	['くろ', 'Black'],
 	['あか', 'Red'],
@@ -34,29 +36,45 @@ const answer_key = new Map<string, TimedAnswer<string>>([
 	['うま', 'Horse'],
 	['くま', 'Bear'],
 	['やま', 'Mountain'],
+	["いけ", "Pond"],
+	["うみ", "Sea; Ocean"],
 	// ['そら', 'Sky'],
 	['くも', 'Cloud | Spider'],
-	['あき', 'Autumn; Fall'],
-	['くつ', 'Shoes; Footwear'],
+	// ['あき', 'Autumn; Fall'],
+	// ['くつ', 'Shoes; Footwear'],
 	// ['ちゃ', 'Tea'],
-	['むし', 'Insect; Bug;'],
+	// ['むし', 'Insect; Bug;'],
 	['あさ', 'Morning'],
-	['いえ', 'House'],
-	['あし', 'Foot; Leg'],
+	// ['いえ', 'House'],
+	// ['あし', 'Foot; Leg'],
 	['あに', 'Older brother'],
 	['あね', 'Older sister'],
-	['あれ/あの', 'That (over there | mutually familiar thing)'],
-	['これ/この', 'This (near me)'],
-	['それ/その', 'That (near you)'],
+	// ['あれ/あの', 'That (over there | mutually familiar thing)'],
+	// ['これ/この', 'This (near me)'],
+	// ['それ/その', 'That (near you)'],
 	['どの', 'Which (one, of at least three)'],
 	// Three characters
+	["あたま", "Head"],
 	['あまい', 'Sweet'],
-	// ['あなた', 'You'],
+	['あなた', 'You'],
+	["あつい", "Thick; Hot"],
+	["いしゃ", "Doctor"],
+	["いたい", "Painful, Hurt"],
+	["いつも", "Always"],
+	["うしろ", "Back; Behind"],
+	["うすい", "Thin; Weak"],
+	["うわぎ", "Jacket"],
+	["えいが", "Movie"],
+	// ["おかね", "Money"],
 	// ['いいえ', 'No'],
-	// ['あした', 'Tomorrow'],
+	['あした', 'Tomorrow'],
 	// Four characters
-	// ['あたらしい', 'Bright'],
+	["おいしい", "Delicious"],
+	// ['あかるい', 'Bright'],
+	// Five characters
+	// ['あたらしい', 'New'],
 	// ['おてあらい', 'Bathroom; Restroom'],
+	["いそがしい", "Busy"],
 ].map(([question, answer]) => [question, { answer, timeLimitSeconds }]))
 
 
@@ -69,33 +87,31 @@ const coordinator = new DefaultCoordinator({
 	}
 })
 
-const layout = (prompt: string) => DefaultQuizLayoutBuilder<
-	string,
-	TimedAnswer<string>,
-	TimedResponse<string>,
-	string
->({
-	responseFetcher: (props) => <AutofillEnumFetcher {...props} />,
-	questionRenderer: (props) => <TextRenderer prompt={prompt} {...props} />,
-	feedbackRenderer: (props) => <div>{props.feedback}</div>,
-})
-
 export const japanese_vocabulary = new QuizBuilder<
 	string, // QuestionType
 	TimedAnswer<string>, // AnswerType
-	TimedResponse<string>, // ResponseType
+	TimedAnswer<string>, // ResponseType
 	string // FeedbackType
 >({
 	title: "Japanese Vocabulary",
 	quiz: new Quiz({ answerKey: answer_key }),
 	coordinator: coordinator,
-	layout: layout("What does this word mean:"),
+	layout: DefaultQuizLayoutBuilder<
+		string,
+		TimedAnswer<string>,
+		TimedAnswer<string>,
+		string
+	>({
+		responseFetcher: (props) => <AutofillEnumFetcher {...props} />,
+		questionRenderer: (props) => <TextRenderer prompt={"What does this word mean:"} {...props} />,
+		feedbackRenderer: (props) => <div>{props.feedback}</div>,
+	}),
 })
 
 export const english_to_japanese_vocabulary = new QuizBuilder<
 	string, // QuestionType
 	TimedAnswer<string>, // AnswerType
-	TimedResponse<string>, // ResponseType
+	TimedAnswer<string>, // ResponseType
 	string // FeedbackType
 >({
 	title: "English to Japanese Vocabulary",
@@ -106,5 +122,18 @@ export const english_to_japanese_vocabulary = new QuizBuilder<
 		)
 	}),
 	coordinator: coordinator,
-	layout: layout("What is the Japanese word for:"),
+	layout: DefaultQuizLayoutBuilder<
+		string,
+		TimedAnswer<string>,
+		TimedAnswer<string>,
+		string
+	>({
+		responseFetcher: (props) => <MultipleChoiceFetcher
+			choicesCount={new NonNegativeNumber(6)}
+			getLabel={(option) => option.answer}
+			{...props}
+		/>,
+		questionRenderer: (props) => <TextRenderer prompt={"What is the Japanese word for:"} {...props} />,
+		feedbackRenderer: (props) => <div>{props.feedback}</div>,
+	})
 })
