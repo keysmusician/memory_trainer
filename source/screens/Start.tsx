@@ -9,7 +9,7 @@ import { style } from '../Style'
 
 export const quizzes = serialized_quizzes.map(quiz => new QuizBuilder(quiz))
 
-const [quizIndex, setQuizIndex] = createSignal(0)
+// const [quizIndex, setQuizIndex] = createSignal(0)
 
 export function StartScreen() {
 
@@ -25,7 +25,7 @@ function Quizzes() {
 
   const selectQuiz = ([quiz, index]: [QuizBuilder<unknown, unknown, unknown>, number]) => {
     setQuiz(quiz)
-    setQuizIndex(index)
+    // setQuizIndex(index)
   }
 
   const nested_button: JSX.CSSProperties = {
@@ -35,6 +35,11 @@ function Quizzes() {
     'padding': '.5rem',
     'cursor': 'pointer',
     'margin-left': '3px',
+  }
+
+  const final_nested_button: JSX.CSSProperties = {
+    ...nested_button,
+    'border-radius': '0 50px 50px 0',
   }
 
   return (
@@ -60,13 +65,22 @@ function Quizzes() {
                 'height': '100%',
                 'background-color': 'white',
                 'transition': 'box-shadow 0.1s',
+                'cursor': 'pointer',
               }}
-              onClick={[selectQuiz, [quiz, index]]}
+
+              onClick={() => {
+                // selectQuiz([quiz, index()])
+                setQuiz(quiz)
+                navigate(routes.train)
+              }}
+
               tabIndex={-1}
+
               // Set box shadow on hover
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = '0 0 1rem 0 white'
               }}
+
               onMouseLeave={(e) => {
                 e.currentTarget.style.boxShadow = 'none'
               }}
@@ -76,17 +90,19 @@ function Quizzes() {
                 style={{
                   'margin': '0 0.5rem 0 0',
                   'padding': '.5rem',
+                  'cursor': 'inherit',
                 }}
               >
                 {quiz.title}
               </label>
 
-              <div
+              <div // Nested button container
                 style={{
                   // 'float': 'right',
                   'height': '100%',
                   'display': 'flex',
                 }}
+                onClick={(clickEvent) => clickEvent.stopPropagation()}
               >
                 {/* <input
                   style={{
@@ -98,13 +114,16 @@ function Quizzes() {
                   name='quiz'
                 /> */}
                 <button
-                  onClick={() => navigate(routes.edit)}
-                  style={nested_button}
+                  onClick={() => {
+                    setQuiz(quiz)
+                    navigate(routes.edit)
+                  }}
+                  style={final_nested_button}
                 >
                   Configure
                 </button>
 
-                <button
+                {/* <button
                   onClick={() => {
                     setQuiz(quiz)
                     navigate(routes.train)
@@ -116,7 +135,7 @@ function Quizzes() {
                   }}
                 >
                   Start
-                </button>
+                </button> */}
               </div>
             </li>
           )

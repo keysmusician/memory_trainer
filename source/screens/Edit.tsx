@@ -48,7 +48,7 @@ interface AnswerKeyEditorProps {
 }
 function AnswerKeyEditor(props: AnswerKeyEditorProps) {
   const [selectedAnswerKey, setSelectedAnswerKey] = createSignal(
-    props.quiz.quiz, { "equals": _ => false }
+    props.quiz.quiz.answerKey, { "equals": _ => false }
   )
 
   const [unselectedAnswerKey, setUnselectedAnswerKey] = createSignal(

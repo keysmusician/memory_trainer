@@ -105,30 +105,36 @@ function createMultipleChoiceOptions<AnswerType>(
 	correctAnswer: AnswerType,
 	optionCount: NonNegativeNumber
 ) {
-	switch (optionCount.valueOf()) {
+	var _optionCount = optionCount.valueOf()
+	switch (_optionCount) {
 		case 0:
 			return []
 		case 1:
 			return [correctAnswer]
 		default:
-			return Array.from( // TODO: Make this more efficient.
-				takeRandom(
-					answers,
-					new NonNegativeNumber(optionCount.subtract(1))
-				).add(correctAnswer)
-			).sort(() => .5 - Math.random())
+			// Initialize options with the correct answer
+			const options = [correctAnswer]
+
+			const incorrectOptions = answers
+				.filter((answer) => answer !== correctAnswer)
+				.sort(() => Math.random() - 0.5) // Not sure if this shuffles properly
+
+			// Select random unique incorrect options
+			for (let i = 1; i < _optionCount - 1; i++) {
+				options.push(incorrectOptions.pop()!)
+			}
+
+			// Shuffle the options
+			options.sort(() => Math.random() - 0.5)
+
+			return options
 	}
 }
 
-/**
- * Returns a Set of `elementCount` random elements from an array.
- **/
-// TODO: Write a more efficient implementation.
-function takeRandom<ArrayType>(array: ArrayType[], elementCount: NonNegativeNumber) {
-	return new Set(
-		Array
-			.from(array)
-			.sort(() => .5 - Math.random())
-			.slice(0, elementCount.valueOf())
-	)
+function createRange({ start = 0, end }: { start?: number, end: number }) {
+	const range = []
+	for (let i = start; i <= end; i++) {
+		range.push(i)
+	}
+	return range
 }

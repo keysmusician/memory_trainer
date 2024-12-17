@@ -21,17 +21,82 @@ import { ICoordinator } from './TrainingCoordinator'
 // 	}
 // }
 
+const WideningOverflowBehavior = {
+	/**
+	 * The data type is widened to accommodate the value.
+	 **/
+	Widen: 'Widen'
+} as const
+
+type WideningOverflowBehavior = typeof WideningOverflowBehavior[keyof typeof WideningOverflowBehavior]
+
+const FailingOverflowBehavior = {
+	/**
+	 * Throws a RangeError.
+	 * @throws RangeError
+	 **/
+	Throw: 'Throw'
+} as const
+
+type FailingOverflowBehavior = typeof FailingOverflowBehavior[keyof typeof FailingOverflowBehavior]
+
+const TypeMaintainingOverflowBehavior = {
+	/**
+	 * The value is clamped to the bounds of the data type.
+	 **/
+	Clamp: 'Clamp',
+
+	/**
+	 * The value reflects off the bounds of the data type.
+	 **/
+	Reflect: 'Reflect',
+
+	/**
+	 * The value wraps around the bounds of the data type.
+	 **/
+	Wrap: 'Wrap'
+} as const
+
+type TypeMaintainingOverflowBehavior = typeof TypeMaintainingOverflowBehavior[keyof typeof TypeMaintainingOverflowBehavior]
+
+// type OverflowBehavior = WideningOverflowBehavior | FailingOverflowBehavior | TypeMaintainingOverflowBehavior
+
+export const OverflowBehavior = {
+	...WideningOverflowBehavior,
+	...FailingOverflowBehavior,
+	...TypeMaintainingOverflowBehavior
+} as const
+
+type OverflowBehavior = typeof OverflowBehavior[keyof typeof OverflowBehavior]
+
 /**
  * A number between 0 and 1 (inclusive).
  */
 export class ClosedUnitIntervalMember extends Number {
+	/**
+	 * A number between 0 and 1 (inclusive).
+	 * @param value A number between 0 and 1 (inclusive).
+	 * @param overflowBehavior The behavior when `value` is outside the range [0, 1]. Defaults to 'throw'.
+	 */
 	constructor(
 		value: number,
-		overflowBehavior: 'wrap' | 'clamp' | 'reflect' | 'throw' = 'throw' // TODO: Implement wrap, clamp, and reflect. Document their behavior.
+		overflowBehavior: TypeMaintainingOverflowBehavior | FailingOverflowBehavior = OverflowBehavior.Throw
+		// TODO: Implement wrap, clamp and reflect. Document their behavior.
 	) {
 		if (value < 0 || value > 1) {
 			throw new RangeError('The value must be between 0 and 1 (inclusive).')
 		}
+		// Clamp:
+		// * e.g. 1.1 => 1, 1.5 => 1, -0.1 => 0
+		// Widen:
+		// * e.g. 1.1 => 1.1, 1.5 => 1.5, -0.1 => -0.1
+		// Reflect:
+		// * e.g. 1.1 => 0.9, 1.5 => 0.5, -0.1 => 0.1
+		// Wrap:
+		// * e.g. 1.1 => 0.1, 1.5 => 0.5, -0.1 => 0.9
+
+
+		// (1 + result % 1) % 1
 
 		super(value)
 	}
@@ -44,19 +109,23 @@ export class NonNegativeNumber extends Number {
 	static ONE = new NonNegativeNumber(1)
 	static ZERO = new NonNegativeNumber(0)
 
-	constructor(value: number) {
-		if (value < 0) {
+	constructor(value: number | NonNegativeNumber) {
+		const _value = value instanceof NonNegativeNumber ? value.valueOf() : value
+
+		if (_value < 0) {
 			throw new RangeError('The value must be greater than or equal to 0.')
 		}
 
-		super(value)
+		super(_value)
 	}
 
 	toString(radix?: number): string {
 		return super.toString(radix)
 	}
 
-	add(value: number): number {
+	// add(value: NonNegativeNumber): NonNegativeNumber
+	// add(value: number, overflowBehavior: OverflowBehavior): number | NonNegativeNumber
+	add(value: number, overflowBehavior: TypeMaintainingOverflowBehavior): number {
 		return (this.valueOf() + value)
 	}
 
@@ -64,13 +133,31 @@ export class NonNegativeNumber extends Number {
 		return new NonNegativeNumber(this.valueOf() + value.valueOf())
 	}
 
-	subtract(value: number | NonNegativeNumber): number {
-		if (value instanceof NonNegativeNumber) {
-			return this.valueOf() - value.valueOf()
+	subtract(value: number | NonNegativeNumber, overflowBehavior: typeof OverflowBehavior.Throw): NonNegativeNumber
+
+	subtract(value: number | NonNegativeNumber, overflowBehavior: OverflowBehavior = OverflowBehavior.Throw): number | NonNegativeNumber {
+		const result = this.valueOf() - (value instanceof NonNegativeNumber ? value.valueOf() : value)
+
+		if (result < 0) {
+			switch (overflowBehavior) {
+				case OverflowBehavior.Clamp:
+					return NonNegativeNumber.ZERO
+				case OverflowBehavior.Reflect:
+					return new NonNegativeNumber(Math.abs(result))
+				case OverflowBehavior.Wrap:
+					return new NonNegativeNumber(Infinity)
+				case OverflowBehavior.Throw:
+					throw new RangeError('The result must be greater than or equal to 0.')
+				case OverflowBehavior.Widen:
+					return result
+			}
 		}
-		return this.valueOf() - value
+		else {
+			return new NonNegativeNumber(result)
+		}
 	}
 }
+
 
 /**
  * A function which returns a grade for a user's response.

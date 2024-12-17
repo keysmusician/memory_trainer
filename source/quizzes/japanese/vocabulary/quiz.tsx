@@ -1,80 +1,85 @@
-import { DefaultQuizLayoutBuilder } from "../../defaultQuizLayout"
-import { floatTimedCompareStrictlyEqual, TimedAnswer, TimedResponse } from "../../evaluators/evaluators"
-import { NonNegativeNumber, Quiz, QuizBuilder } from "../../quiz"
-import { TextRenderer } from "../../renderers/TextRenderer"
-import { AutofillEnumFetcher } from "../../response fetchers/autofill enum fetcher"
-import { MultipleChoiceFetcher } from "../../response fetchers/multiple choice fetcher"
-import { DefaultCoordinator } from "../../TrainingCoordinator"
+import { DefaultQuizLayoutBuilder } from "../../../defaultQuizLayout"
+import { floatTimedCompareStrictlyEqual, TimedAnswer, TimedResponse } from "../../../evaluators/evaluators"
+import { NonNegativeNumber, Quiz, QuizBuilder } from "../../../quiz"
+import { TextRenderer } from "../../../renderers/TextRenderer"
+import { AutofillEnumFetcher } from "../../../response fetchers/autofill enum fetcher"
+import { MultipleChoiceFetcher } from "../../../response fetchers/multiple choice fetcher"
+import { DefaultCoordinator } from "../../../TrainingCoordinator"
 
 const timeLimitSeconds = new NonNegativeNumber(5)
 
 // Vocab lists:
 // https://en.wiktionary.org/wiki/Appendix:1000_Japanese_basic_words
 // https://thejapanesepage.com/jlpt-n5-vocabulary/
-const answer_key = new Map<string, TimedAnswer<string>>([
+// https://jlptsensei.com/jlpt-n5-vocabulary-list/
+const answer_key = new Map<string, TimedAnswer<string>>([ // TODO: Consistent English formatting
 	['あめ', 'Rain | Candy'],
-	['あと', 'Later'],
+	['あと', 'Behind; after; remainder; left; also'],
 	// ['はい', 'Yes'],
 	// ['あい', 'Love'],
 	// ['はな', 'Flower'],
 	// ['いす', 'Chair'],
-	['かみ', 'Paper'],
-	["うた", "Song"],
+	// ['かみ', 'Paper'],
+	// ["うた", "Song"],
 	// ['くち', 'Mouth; Opening'],
-	['くろ', 'Black'],
-	['あか', 'Red'],
-	['あお', 'Blue'],
-	['しろ', 'White'],
+	// ['くろ', 'Black'],
+	// ['あか', 'Red'],
+	// ['あお', 'Blue'],
+	// ['しろ', 'White'],
 	// ['みず', 'Water'],
-	['ちず', 'Map'],
-	['つき', 'Moon'],
-	['みみ', 'Ear'],
+	// ['ちず', 'Map'],
+	// ['つき', 'Moon'],
+	// ['みみ', 'Ear'],
 	// ['ほん', 'Book'],
 	// ['ねこ', 'Cat'],
 	// ['いぬ', 'Dog'],
 	// ['へび', 'Snake'],
 	['うま', 'Horse'],
 	['くま', 'Bear'],
-	['やま', 'Mountain'],
-	["いけ", "Pond"],
+	// ['やま', 'Mountain'],
+	// ["いけ", "Pond"],
 	["うみ", "Sea; Ocean"],
 	// ['そら', 'Sky'],
 	['くも', 'Cloud | Spider'],
 	// ['あき', 'Autumn; Fall'],
 	// ['くつ', 'Shoes; Footwear'],
 	// ['ちゃ', 'Tea'],
-	// ['むし', 'Insect; Bug;'],
-	['あさ', 'Morning'],
+	['むし', 'Insect; Bug;'],
+	// ['あさ', 'Morning'],
 	// ['いえ', 'House'],
 	// ['あし', 'Foot; Leg'],
-	['あに', 'Older brother'],
-	['あね', 'Older sister'],
-	// ['あれ/あの', 'That (over there | mutually familiar thing)'],
-	// ['これ/この', 'This (near me)'],
-	// ['それ/その', 'That (near you)'],
+	// ['あに', 'Older brother'],
+	// ['あね', 'Older sister'],
+	['あれ/あの', 'That (over there | mutually familiar thing)'],
+	['これ/この', 'This (near me)'],
+	['それ/その', 'That (near you)'],
 	['どの', 'Which (one, of at least three)'],
 	// Three characters
-	["あたま", "Head"],
-	['あまい', 'Sweet'],
-	['あなた', 'You'],
-	["あつい", "Thick; Hot"],
-	["いしゃ", "Doctor"],
+	// ["あたま", "Head"],
+	// ['あまい', 'Sweet'],
+	// ['あなた', 'You'],
+	// ["あつい", "Thick; Hot"],
+	// ["いしゃ", "Doctor"],
 	["いたい", "Painful, Hurt"],
 	["いつも", "Always"],
 	["うしろ", "Back; Behind"],
 	["うすい", "Thin; Weak"],
 	["うわぎ", "Jacket"],
-	["えいが", "Movie"],
+	// ["えいが", "Movie"],
 	// ["おかね", "Money"],
 	// ['いいえ', 'No'],
 	['あした', 'Tomorrow'],
 	// Four characters
 	["おいしい", "Delicious"],
-	// ['あかるい', 'Bright'],
+	['あかるい', 'Bright'],
+	['アパート', 'Apartment'],
+	["あさって", "Day after tomorrow"],
 	// Five characters
 	// ['あたらしい', 'New'],
 	// ['おてあらい', 'Bathroom; Restroom'],
-	["いそがしい", "Busy"],
+	// ["いそがしい", "Busy"],
+	// ["あさごはん", "Breakfast"],
+	// ["ばんごはん", "Dinner"],
 ].map(([question, answer]) => [question, { answer, timeLimitSeconds }]))
 
 
@@ -129,7 +134,7 @@ export const english_to_japanese_vocabulary = new QuizBuilder<
 		string
 	>({
 		responseFetcher: (props) => <MultipleChoiceFetcher
-			choicesCount={new NonNegativeNumber(6)}
+			choicesCount={new NonNegativeNumber(9)}
 			getLabel={(option) => option.answer}
 			{...props}
 		/>,

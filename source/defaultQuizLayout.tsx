@@ -7,8 +7,8 @@ interface DefaultQuizLayoutBuilderProps<
 	QuestionType, AnswerType, ResponseType, FeedbackType
 > {
 	questionRenderer: Renderer<QuestionType>
-	feedbackRenderer: Component<{ feedback: FeedbackType }>
 	responseFetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
+	feedbackRenderer?: Component<{ feedback: FeedbackType }>
 }
 export function DefaultQuizLayoutBuilder<
 	QuestionType = unknown,
@@ -23,6 +23,9 @@ export function DefaultQuizLayoutBuilder<
 		FeedbackType
 	>
 ) {
+	const FeedbackRenderer = builderProps.feedbackRenderer ??
+		((props) => <div>{props.feedback}</div>)
+
 	function DefaultQuizLayout(
 		props: QuizLayoutProps<
 			QuestionType,
@@ -47,7 +50,7 @@ export function DefaultQuizLayoutBuilder<
 
 					<div style={{ margin: ".5em" }} />
 
-					<builderProps.feedbackRenderer feedback={props.feedback} />
+					<FeedbackRenderer feedback={props.feedback} />
 
 					<div style={{ margin: "1em" }}>
 						<builderProps.responseFetcher

@@ -25,7 +25,7 @@ import { hebrew } from "./hebrew/quiz"
 import { periodic_table } from "./periodic table/quiz"
 import { country_flags } from "./country flags/quiz"
 import { kanji as kanji_recognition } from "./japanese/kanji/recognition/quiz"
-import { japanese_vocabulary, english_to_japanese_vocabulary } from "./japanese vocabulary/quiz"
+import { japanese_vocabulary, english_to_japanese_vocabulary } from "./japanese/vocabulary/quiz"
 import { DefaultCoordinator } from "../TrainingCoordinator"
 
 
@@ -49,14 +49,14 @@ export const quizzes: IQuizBuilder<any, any, any, any>[] = [
   //   renderer: state_capital_text_renderer,
   //   trainingAlgorithm: SmartTrainer,
   // }),
-  // hiragana,
+  hiragana,
   // katakana,
   // kanji_recognition,
   // // kanji_writing,
-  // hebrew,
-  // periodic_table,
   japanese_vocabulary,
   english_to_japanese_vocabulary,
+  // hebrew,
+  // periodic_table,
   // empty_quiz = new QuizBuilder({
   //   title: 'Empty',
   //   answer_key: empty,

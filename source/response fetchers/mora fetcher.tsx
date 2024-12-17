@@ -1,6 +1,6 @@
 import { For, JSX, Setter, createSignal, onCleanup, onMount } from "solid-js"
 import { mora as moras } from "../answer keys/answer keys.barrel"
-import { ResponseFetcherProps, TrainingHistory } from "../quiz";
+import { ResponseFetcherProps } from "../quiz";
 import { Mora } from "../quizzes/japanese/_mora";
 
 function lookupMora(consonant: string, vowel: string): Mora | undefined {
@@ -15,26 +15,26 @@ function lookupMora(consonant: string, vowel: string): Mora | undefined {
   )
 }
 
-function convert_to_grid(
+function convertToGrid(
   moras: Mora[],
 ) {
   const vowels = ['a', 'i', 'u', 'e', 'o']
 
   const consonants = [
-    'k',
-    'g',
-    's',
-    'z',
-    't',
-    'd',
-    'n',
-    'h',
-    'b',
-    'p',
-    'm',
-    'y',
-    'r',
-    'w',
+    // 'k',
+    // 'g',
+    // 's',
+    // 'z',
+    // 't',
+    // 'd',
+    // 'n',
+    // 'h',
+    // 'b',
+    // 'p',
+    // 'm',
+    // 'y',
+    // 'r',
+    // 'w',
   ]
 
   const blank = null;
@@ -70,27 +70,24 @@ function convert_to_grid(
   return grid_data
 }
 
-export function mora_fetcher_builder(answerKey: Map<string, Mora>) {
-  /**
-   * Hiragana/Katakana mora fetcher.
-   */
-  return function mora_fetcher(props: ResponseFetcherProps<Mora, string, Mora>) {
+/**
+ * Hiragana/Katakana mora fetcher.
+ */
+export function MoraFetcher(props: ResponseFetcherProps<string, Mora, Mora>) {
 
-    const [format, setFormat] = createSignal<"romanization" | "ipa">("romanization")
+  const [format, setFormat] = createSignal<"romanization" | "ipa">("romanization")
 
-    return (
-      <div>
-        <MoraGrid
-          answerKey={answerKey}
-          format={format}
-          set_response={props.setResponse}
-          trainingHistory={props.trainingHistory}
-          answer={props.answer}
-        />
-        <FormatComboButton format={format} setFormat={setFormat} />
-      </div>
-    )
-  }
+  return (
+    <div>
+      <MoraGrid
+        answerKey={props.quiz.answerKey}
+        format={format}
+        set_response={props.setResponse}
+        answer={props.answer}
+      />
+      <FormatComboButton format={format} setFormat={setFormat} />
+    </div>
+  )
 }
 
 interface FormatComboButtonProps {
@@ -169,7 +166,6 @@ interface MoraGridProps {
   answerKey: Map<string, Mora>
   format: () => "romanization" | "ipa"
   set_response: Setter<Mora>
-  trainingHistory: TrainingHistory<string, Mora, Mora>
   answer: Mora
 }
 function MoraGrid(props: MoraGridProps) {
@@ -179,7 +175,7 @@ function MoraGrid(props: MoraGridProps) {
     'grid-gap': "0.5em",
   }
 
-  const grid_data = convert_to_grid([...new Set(props.answerKey.values())])
+  const grid_data = convertToGrid([...new Set(props.answerKey.values())])
 
   const [selectedCell, setSelectedCell] = createSignal<SelectedCell>({
     consonant: undefined,
@@ -297,7 +293,7 @@ function MoraGrid(props: MoraGridProps) {
                         }}
                       >{
                           typeof cell_data == 'string' ? cell_data :
-                            `/${cell_data[props.format()]}/`
+                            `${cell_data[props.format()]}`
                         }</button>
                     )
                   }
