@@ -7,7 +7,7 @@
  * range 0–1.
  */
 
-import { Evaluator, NonNegativeNumber } from "../quiz"
+import { Evaluator, NonNegativeNumber, OverflowBehavior } from "../quiz"
 
 
 /**
@@ -41,17 +41,13 @@ compare_strictly_equal satisfies Evaluator<unknown, unknown>
  * Compares two objects for strict equality and compares response time with a
  * time limit.
  **/
-export interface TimedResponse<T> {
-  response: T
-  responseTimeSeconds: NonNegativeNumber
-}
-export interface TimedAnswer<T> {
-  answer: T
-  timeLimitSeconds: NonNegativeNumber
+export interface TimedValue<T> {
+  value: T
+  timeSeconds: NonNegativeNumber
 }
 export function boolTimedCompareStrictlyEqual<T>(
-  { response, responseTimeSeconds }: TimedResponse<T>,
-  { answer, timeLimitSeconds }: TimedAnswer<T>
+  { value: response, timeSeconds: responseTimeSeconds }: TimedValue<T>,
+  { value: answer, timeSeconds: timeLimitSeconds }: TimedValue<T>
 ) {
   return (response === answer) && (responseTimeSeconds < timeLimitSeconds) ? 1 : 0
 }
@@ -75,13 +71,13 @@ compare_strictly_equal satisfies Evaluator<unknown, unknown>
 // compare_strictly_equal satisfies Evaluator<unknown, unknown>
 
 export function floatTimedCompareStrictlyEqual<T>(
-  { answer: response, timeLimitSeconds: responseTimeSeconds }: TimedAnswer<T>,
-  { answer, timeLimitSeconds }: TimedAnswer<T>
+  { value: response, timeSeconds: responseTimeSeconds }: TimedValue<T>,
+  { value: answer, timeSeconds: timeLimitSeconds }: TimedValue<T>
 ) {
   if (response !== answer) {
     return 0
   } else {
-    const secondsPastLimit = responseTimeSeconds.subtract(timeLimitSeconds)
+    const secondsPastLimit = responseTimeSeconds.valueOf() - timeLimitSeconds.valueOf()
     return (
       secondsPastLimit < 0 ?
         1 :

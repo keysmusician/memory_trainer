@@ -64,6 +64,13 @@ export namespace style {
 		export const secondary = designSystem.color.white
 		export const accent = designSystem.color.paleGreen
 		export const focused = designSystem.color.gray
+
+		export const contentBackground = designSystem.color.white
+
+		export namespace button {
+			export const primary = designSystem.color.mediumBlue
+			export const primaryHovered = designSystem.color.paleBlue
+		}
 	}
 
 	export namespace typography {

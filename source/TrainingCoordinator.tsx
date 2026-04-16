@@ -1,4 +1,4 @@
-import { ClosedUnitIntervalMember, IQuiz, NonNegativeNumber } from "./quiz";
+import { ClosedUnitIntervalMember, IAnswerKey, NonNegativeNumber } from "./quiz";
 import { BaseTrainingAlgorithm } from "./training algorithms/BaseTrainingAlgorithm";
 import { SmartTrainer } from "./training algorithms/SmartTrainer";
 
@@ -33,7 +33,7 @@ interface TrainParameters<
 	QuestionType, AnswerType, ResponseType, FeedbackType
 > {
 	trainingAlgorithm: BaseTrainingAlgorithm
-	quiz: IQuiz<QuestionType, AnswerType>
+	answerKey: IAnswerKey<QuestionType, AnswerType>
 	userInterface: IApplicationUI<ResponseType, FeedbackType>
 }
 
@@ -92,12 +92,12 @@ export namespace Default {
 			this.TrainingAlgorithmType = TrainingAlgorithmType
 		}
 
-		public async train({ quiz, userInterface }:
+		public async train({ answerKey, userInterface }:
 			TrainParameters<QuestionType, AnswerType, ResponseType, FeedbackType>
 		): Promise<void> {
-			const trainingAlgorithm = new this.TrainingAlgorithmType(quiz.answerKey.size)
-			const getQuestion = () => quiz.questions[trainingAlgorithm.currentQuestion]
-			const getAnswer = () => quiz.answers[trainingAlgorithm.currentQuestion]
+			const trainingAlgorithm = new this.TrainingAlgorithmType(answerKey.size)
+			const getQuestion = () => answerKey.questions[trainingAlgorithm.currentQuestion]
+			const getAnswer = () => answerKey.answers[trainingAlgorithm.currentQuestion]
 
 			let questionsAskedCount = 0
 
@@ -169,7 +169,7 @@ export namespace Default {
 				if (grade !== undefined) {
 					trainingAlgorithm.register(grade)
 				} else {
-					const question = quiz.questions[trainingAlgorithm.currentQuestion]
+					const question = answerKey.questions[trainingAlgorithm.currentQuestion]
 					console.warn(`A grade was not determined for question ${questionsAskedCount}: ${JSON.stringify(question)}.`)
 				}
 

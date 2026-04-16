@@ -80,12 +80,12 @@ export function MoraFetcher(props: ResponseFetcherProps<string, Mora, Mora>) {
   return (
     <div>
       <MoraGrid
-        answerKey={props.quiz.answerKey}
+        answerKey={props.answerKey}
         format={format}
         set_response={props.setResponse}
         answer={props.answer}
       />
-      <FormatComboButton format={format} setFormat={setFormat} />
+      {/* <FormatComboButton format={format} setFormat={setFormat} /> */}
     </div>
   )
 }
@@ -96,6 +96,7 @@ interface FormatComboButtonProps {
 }
 function FormatComboButton(props: FormatComboButtonProps) {
   const button_style: JSX.CSSProperties = {
+    'padding': '0 0.5em',
     'flex': '1',
     'text-align': 'center',
   }

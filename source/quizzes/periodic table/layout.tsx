@@ -18,14 +18,14 @@ export function PeriodicTableQuizLayout(props: QuizLayoutProps<number, PeriodicT
 				<DefaultFeedbackRenderer<number> feedback={props.feedbackRenderer} />
 
 				<div>
-					<props.quiz.renderer question={props.question} />
+					<props.renderer question={props.question} />
 				</div>
 
 				<div style={{ margin: "1em" }}>
-					<props.quiz.response_fetcher
+					<props.response_fetcher
 						answer={props.answer}
 						question={props.question}
-						quiz={props.quiz}
+						quiz={props.answerKey}
 						trainingHistory={props.trainingHistory}
 						feedback={props.feedbackRenderer}
 						setResponse={props.setResponse}

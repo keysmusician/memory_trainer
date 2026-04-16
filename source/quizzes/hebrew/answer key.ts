@@ -1,3 +1,5 @@
+import { AnswerKey } from "../../quiz";
+
 export type HebrewCharacter =
 	'א' | 'ב' | 'ג' | 'ד' | 'ה' |
 	'ו' | 'ז' | 'ח' | 'ט' | 'י' |
@@ -8,7 +10,7 @@ export type HebrewCharacter =
 	'ך' | 'ם' | 'ן' | 'ף' | 'ץ' |
 	'׳' | '״' | '־'
 
-export const hebrew: Map<HebrewCharacter, string> = new Map([
+export const hebrew = new AnswerKey([
 	['א', 'aleph'],
 	['ב', 'bet'],
 	['ג', 'gimel'],

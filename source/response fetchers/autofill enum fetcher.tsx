@@ -1,14 +1,18 @@
 import { For, createEffect, createSignal, onMount, untrack } from "solid-js"
 import { NonNegativeNumber, ResponseFetcherProps } from "../quiz"
 import { designSystem, style } from "../Style"
-import { TimedAnswer, TimedResponse } from "../evaluators/evaluators"
+import { TimedValue } from "../evaluators/evaluators"
 
 interface AutofillEnumFetcherProps<
 	QuestionType = unknown,
 	AnswerType = unknown
-> extends ResponseFetcherProps<string | TimedResponse<string>, QuestionType, AnswerType> {
+> extends ResponseFetcherProps<QuestionType, AnswerType, string | TimedValue<string>> {
 	placeholder?: string
-	responses?: Set<string>
+	/**
+	 * A set of possible responses. If not provided, the fetcher will use the
+	 * answer key of the quiz.
+	 */
+	possibleResponses?: Set<string>
 }
 
 /**
@@ -18,15 +22,15 @@ export function AutofillEnumFetcher<
 	QuestionType = unknown,
 // AnswerType = string || TimedAnswer<string>,
 >(
-	props: AutofillEnumFetcherProps<QuestionType, string | TimedAnswer<string>>
+	props: AutofillEnumFetcherProps<QuestionType, string | TimedValue<string>>
 ) {
 	const answers = Array.from(
-		props.responses ??
+		props.possibleResponses ??
 		new Set(
-			props.quiz.answerKey.values().map<string>(
+			props.answerKey.values().map<string>( // TODO: Fix this coupling. This is a workaround for the fact that we don't know if the answer type will be a string.
 				(answer) => // We don't know if the answer type will be a string, but we want to force it to be.
-					'answer' in (answer as any) ?
-						(answer as TimedAnswer<string>).answer : // answer.answer is a workaround for making this work for TimedAnswer types.
+					'value' in (answer as any) ?
+						(answer as TimedValue<string>).value : // answer.value is a workaround for making this work for TimedAnswer types.
 						answer as string
 			)
 		)
@@ -54,7 +58,13 @@ export function AutofillEnumFetcher<
 	// Get a reference to the text input and focus it when the component mounts.
 	let input_ref: HTMLInputElement | undefined
 
-	onMount(() => input_ref!.focus())
+	onMount(() => {
+		input_ref!.focus()
+		document.addEventListener("keydown", (event) => {
+			console.log(`Key: ${event.key}, Default prevented: ${event.code}`);
+		});
+	}
+	)
 
 	const [startTime, setStartTime] = createSignal(Date.now())
 
@@ -62,13 +72,14 @@ export function AutofillEnumFetcher<
 
 	function submit() {
 		input_ref!.value = ""
+		input_ref!.focus()
 		setText("")
 		props.setResponse(() =>
 		// 'timeLimitSeconds' in (props.answer as TimedAnswer<string>) ? // WARNING: COUPLING
 		// { response: selection(), responseTimeSeconds: untrack(() => responseTimeSeconds()) } :
 		({
-			answer: selection(),
-			timeLimitSeconds: untrack(() => responseTimeSeconds())
+			value: [selection()],
+			timeSeconds: untrack(() => responseTimeSeconds())
 		})
 		)
 		setStartTime(Date.now())
@@ -82,7 +93,10 @@ export function AutofillEnumFetcher<
 	}
 
 	function handleKeyPress(keyboardEvent: KeyboardEvent) {
-		const index = options().indexOf(selection()) === -1 ? 0 :
+		console.log(keyboardEvent.key)
+
+		const index = options().indexOf(selection()) === -1 ?
+			0 :
 			options().indexOf(selection())
 
 		const first_option = options()[0]
@@ -141,6 +155,7 @@ export function AutofillEnumFetcher<
 						'margin': '0.5em',
 						'gap': '0.5em'
 					}}
+				// onKeyPress={handleKeyPress}
 				>
 					<div
 						style={{
@@ -225,6 +240,7 @@ export function AutofillEnumFetcher<
 							'width': '100%',
 						}}
 						tabIndex={-1}
+						onClick={() => input_ref!.focus()}
 					>
 						<For each={options()}>
 							{option => <li

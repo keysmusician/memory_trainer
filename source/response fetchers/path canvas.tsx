@@ -174,7 +174,7 @@ export const PathCanvas = (props: ResponseFetcherProps<Path[], string, Path[]>) 
 						canvasSize={canvasSize}
 						answer={props.answer}
 						lineStyle={lineStyle}
-						visible={props.regrades > 0}
+						visible={props.answerKey > 0}
 					/>
 
 					<canvas

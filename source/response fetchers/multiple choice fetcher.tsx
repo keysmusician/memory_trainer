@@ -29,7 +29,7 @@ export const MultipleChoiceFetcher = function <
 	>
 ) {
 	const options = () => createMultipleChoiceOptions(
-		props.quiz.answers,
+		props.answerKey.answers,
 		props.answer,
 		props.choicesCount
 	)
@@ -117,24 +117,20 @@ function createMultipleChoiceOptions<AnswerType>(
 
 			const incorrectOptions = answers
 				.filter((answer) => answer !== correctAnswer)
-				.sort(() => Math.random() - 0.5) // Not sure if this shuffles properly
+				// Shuffle array
+				.map(value => ({ value, sort: Math.random() }))
+				.sort((a, b) => a.sort - b.sort)
+				.map(({ value }) => value)
 
 			// Select random unique incorrect options
-			for (let i = 1; i < _optionCount - 1; i++) {
+			for (let _ = 1; _ < _optionCount; _++) {
 				options.push(incorrectOptions.pop()!)
 			}
 
 			// Shuffle the options
-			options.sort(() => Math.random() - 0.5)
-
 			return options
+				.map(value => ({ value, sort: Math.random() }))
+				.sort((a, b) => a.sort - b.sort)
+				.map(({ value }) => value)
 	}
-}
-
-function createRange({ start = 0, end }: { start?: number, end: number }) {
-	const range = []
-	for (let i = start; i <= end; i++) {
-		range.push(i)
-	}
-	return range
 }

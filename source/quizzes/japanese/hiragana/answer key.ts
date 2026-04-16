@@ -1,3 +1,4 @@
+import { AnswerKey } from '../../../quiz'
 import { Mora, mora } from '../_mora'
 
 export type HiraganaCharacter =
@@ -18,7 +19,7 @@ export type HiraganaCharacter =
   'わ' | 'ゐ' | 'ゑ' | 'を' |
   'ん'
 
-export const answerKey: Map<HiraganaCharacter, Mora> = new Map([
+export const answerKey: AnswerKey<HiraganaCharacter, Mora> = new AnswerKey([
   ['あ', mora.a],
   ['い', mora.i],
   ['う', mora.u],

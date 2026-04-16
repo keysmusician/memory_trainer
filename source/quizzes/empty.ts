@@ -1,4 +1,6 @@
+import { AnswerKey } from "../quiz";
+
 /**
  * An empty answer key for testing.
  */
-export const empty = new Map([['', '']])
+export const empty = new AnswerKey([['', '']])

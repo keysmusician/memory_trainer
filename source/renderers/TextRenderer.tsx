@@ -8,7 +8,7 @@ interface TextRendererProps extends RendererProps<string> {
 /**
  * Renders text questions.
  **/
-export const TextRenderer: Renderer<string> = (props: TextRendererProps) => {
+export const TextRenderer: Renderer<string> = (props) => {
 	return (
 		<div>
 			<p style={style.group.baseText}>{props.prompt}</p>

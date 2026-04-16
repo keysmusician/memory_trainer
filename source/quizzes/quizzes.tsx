@@ -20,12 +20,12 @@ import {
 } from "../response fetchers/user input fetchers.barrel"
 import { hiragana } from "./japanese/hiragana/quiz"
 import { katakana } from "./japanese/katakana/quiz"
-import { IQuizBuilder, Quiz, QuizBuilder } from "../quiz"
+import { IQuizBuilder, QuizBuilder } from "../quiz"
 import { hebrew } from "./hebrew/quiz"
 import { periodic_table } from "./periodic table/quiz"
 import { country_flags } from "./country flags/quiz"
 import { kanji as kanji_recognition } from "./japanese/kanji/recognition/quiz"
-import { japanese_vocabulary, english_to_japanese_vocabulary } from "./japanese/vocabulary/quiz"
+import { japaneseToEnglishVocabulary, englishToJapaneseVocabulary } from "./japanese/vocabulary/quiz"
 import { DefaultCoordinator } from "../TrainingCoordinator"
 
 
@@ -53,8 +53,8 @@ export const quizzes: IQuizBuilder<any, any, any, any>[] = [
   // katakana,
   // kanji_recognition,
   // // kanji_writing,
-  japanese_vocabulary,
-  english_to_japanese_vocabulary,
+  japaneseToEnglishVocabulary,
+  englishToJapaneseVocabulary,
   // hebrew,
   // periodic_table,
   // empty_quiz = new QuizBuilder({
@@ -69,7 +69,7 @@ export const quizzes: IQuizBuilder<any, any, any, any>[] = [
 
 export const empty_quiz = new QuizBuilder({
   title: 'Empty',
-  quiz: new Quiz({ answerKey: empty }),
+  answerKey: empty,
   coordinator: new DefaultCoordinator({
     evaluator: () => 1,
     feedback: {

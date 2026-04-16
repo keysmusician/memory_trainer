@@ -40,3 +40,33 @@ export function shuffleArray(array: any[]): void {
 		[array[i], array[j]] = [array[j], array[i]]
 	}
 }
+
+/**
+ * Converts an array buffer to a base 64 encoded string.
+ */
+export function arrayBufferToBase64(buffer: ArrayBuffer): string {
+	return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
+
+/**
+ * Converts a base 64 encoded string to an array buffer.
+ */
+export function base64ToArrayBuffer(base64: string) {
+	const binaryString = atob(base64);
+	const bytes = new Uint8Array(binaryString.length);
+	for (let i = 0; i < binaryString.length; i++) {
+		bytes[i] = binaryString.charCodeAt(i);
+	}
+	return bytes.buffer;
+}
+
+/**
+ * Creates a range of integers from `start` to `end` inclusive.
+ */
+export function createRange({ start = 0, end }: { start?: number, end: number }) {
+	const range = []
+	for (let i = start; i <= end; i++) {
+		range.push(i)
+	}
+	return range
+}

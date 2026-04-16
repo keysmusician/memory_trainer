@@ -1,3 +1,4 @@
+import { AnswerKey } from '../../../quiz'
 import { Mora, mora } from '../_mora'
 
 export type KatakanaCharacter =
@@ -18,7 +19,7 @@ export type KatakanaCharacter =
   'ワ' | 'ヰ' | 'ヱ' | 'ヲ' |
   'ン'
 
-export const katakana: Map<KatakanaCharacter, Mora> = new Map([
+export const katakana: AnswerKey<KatakanaCharacter, Mora> = new AnswerKey([
   ['ア', mora.a,],
   ['イ', mora.i,],
   ['ウ', mora.u,],

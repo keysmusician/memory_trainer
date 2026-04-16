@@ -10,7 +10,7 @@ export function TrainScreen() {
 
   const [answerKeyIndex, setAnswerKeyIndex] = createSignal<number | undefined>()
 
-  const question = () => quizBuilder.quiz.questions[answerKeyIndex()!] // TODO: Handle undefined case
+  const question = () => quizBuilder.answerKey.questions[answerKeyIndex()!] // TODO: Handle undefined case
 
   // const [questionsAskedCount, setQuestionsAskedCount] = createSignal(0)
 
@@ -19,7 +19,7 @@ export function TrainScreen() {
   //   setQuestionsAskedCount((questionsAskedCount) => questionsAskedCount + 1)
   // })
 
-  const answer = () => quizBuilder.quiz.answers[answerKeyIndex()!]
+  const answer = () => quizBuilder.answerKey.answers[answerKeyIndex()!]
 
   const [response, setResponse] = createSignal<any>(undefined,
     { equals: () => false }) // Force a reaction to every update, even if the value is the same.
@@ -54,67 +54,6 @@ export function TrainScreen() {
   //   })
   // })
 
-  /**
-   * This is the new main training loop.
-   *
-   * The training loop, or what I think should now be called the "control loop,"
-   * should also be a replaceable component. Different quizzes may be best
-   * served by different control loops.
-   **/
-  // async function train(): Promise<void> {
-  //   const retryCount = 2
-
-  //   const owner = getOwner();
-
-  //   var questionsAskedCount = 0
-
-  //   while (!trainer.is_complete) {
-  //     setQuestionIndex(trainer.current_question)
-
-  //     questionsAskedCount++
-
-  //     var responseCount = 0
-  //     var grade: ClosedUnitIntervalMember | undefined = undefined
-  //     while (responseCount < retryCount) {
-
-  //       // Wait for the user to respond to the question
-  //       const _response = await new Promise<any>((resolve) =>
-  //         runWithOwner(owner, () => {
-  //           const resolveResponseWhen = createReaction(() => {
-  //             resolve(response())
-  //           })
-
-  //           // Will execute the reaction one time when the response changes:
-  //           resolveResponseWhen(() => response())
-  //         })
-  //       )
-
-  //       responseCount++
-
-  //       // Determine the next action to take (e.g., grade the response, skip the question, etc.)
-
-  //       grade = quizBuilder.evaluator(_response, answer())
-
-  //       if (grade === 1) {
-  //         setFeedback('Correct!')
-  //         break
-  //       } else if (responseCount < retryCount) {
-  //         setFeedback('Try again.')
-  //       } else {
-  //         setFeedback('The correct answer was: ' + JSON.stringify(answer()))
-  //       }
-  //     }
-
-  //     if (grade !== undefined) {
-  //       trainer.register(grade)
-  //     } else {
-  //       console.warn(`A grade was not determined for question ${questionsAskedCount}.`)
-  //     }
-
-  //     trainer.next_question()
-  //   }
-  // }
-
   const owner = getOwner();
 
   const awaitResponse = () => new Promise((resolve) =>
@@ -131,7 +70,7 @@ export function TrainScreen() {
   const navigate = useNavigate() as AppNavigator
 
   quizBuilder.coordinator.train({
-    quiz: quizBuilder.quiz,
+    answerKey: quizBuilder.answerKey,
     trainingAlgorithm: quizBuilder.trainingAlgorithm,
     userInterface: {
       setAnswerKeyIndex: setAnswerKeyIndex,
@@ -145,7 +84,7 @@ export function TrainScreen() {
       style={style.group.contentBox}
     >
       <quizBuilder.layout
-        quiz={quizBuilder.quiz}
+        answerKey={quizBuilder.answerKey}
         answer={answer()}
         question={question()}
         feedback={feedback()}

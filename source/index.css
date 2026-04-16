@@ -38,3 +38,8 @@ ul {
 td {
     vertical-align: top;
 }
+
+.keepLineHeightWhenEmpty:empty::after {
+    content: "\200B";
+    visibility: hidden;
+}

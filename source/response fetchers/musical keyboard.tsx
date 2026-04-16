@@ -26,4 +26,4 @@ export function MusicalKeyboard(props: ResponseFetcherProps<string, VexNotation,
     )
 }
 
-MusicalKeyboard satisfies ResponseFetcher<VexNotation, PitchClass, string>
+MusicalKeyboard satisfies ResponseFetcher<VexNotation, PitchClass>

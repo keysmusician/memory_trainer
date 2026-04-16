@@ -1,4 +1,5 @@
 import { Path, Segment } from "../../../../library/path"
+import { AnswerKey } from "../../../../quiz"
 // import all the default imports in the "bitmaps" directory
 
 export type Kanji =
@@ -125,6 +126,6 @@ export const kanji = [ // Consider adding readings, stroke order, radicals, etc.
 ]
 
 
-export const answer_key: Map<string, Path[]> = new Map(
+export const answer_key: AnswerKey<string, Path[]> = new AnswerKey(
 	kanji.map((kanji) => [kanji.meaning, kanji.paths])
 )

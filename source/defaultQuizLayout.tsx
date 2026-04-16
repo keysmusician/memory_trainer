@@ -3,6 +3,16 @@ import { QuizLayoutProps, ResponseFetcher, TrainingHistory } from "./quiz"
 import { style } from "./Style"
 import { Renderer } from "./renderers/Renderer"
 
+interface DefaultQuizLayoutProps<
+	QuestionType,
+	AnswerType,
+	ResponseType,
+	FeedbackType
+>
+	extends QuizLayoutProps<QuestionType, AnswerType, ResponseType, FeedbackType> {
+	// trainingHistory: TrainingHistory
+}
+
 interface DefaultQuizLayoutBuilderProps<
 	QuestionType, AnswerType, ResponseType, FeedbackType
 > {
@@ -24,10 +34,10 @@ export function DefaultQuizLayoutBuilder<
 	>
 ) {
 	const FeedbackRenderer = builderProps.feedbackRenderer ??
-		((props) => <div>{props.feedback}</div>)
+		((props) => <div class="keepLineHeightWhenEmpty">{props.feedback}</div>)
 
 	function DefaultQuizLayout(
-		props: QuizLayoutProps<
+		props: DefaultQuizLayoutProps<
 			QuestionType,
 			AnswerType,
 			ResponseType,
@@ -44,20 +54,21 @@ export function DefaultQuizLayoutBuilder<
 						'align-items': "center",
 					}}
 				>
+					<FeedbackRenderer feedback={props.feedback} />
+
 					<div>
 						<builderProps.questionRenderer question={props.question} />
 					</div>
 
 					<div style={{ margin: ".5em" }} />
 
-					<FeedbackRenderer feedback={props.feedback} />
 
 					<div style={{ margin: "1em" }}>
 						<builderProps.responseFetcher
 							question={props.question}
 							answer={props.answer}
 							setResponse={props.setResponse}
-							quiz={props.quiz}
+							answerKey={props.answerKey}
 						// trainingHistory={props.trainingHistory}
 						/>
 					</div>

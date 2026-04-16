@@ -1,6 +1,8 @@
 /// https://kanjicards.org/kanji-list-by-jlpt-level.html
 /// https://www.youtube.com/watch?v=ERGfmpOVl4Q
 
+import { AnswerKey } from "../../../../quiz";
+
 // export type Kanji =
 // 	'一' |
 // 	'二' |
@@ -44,7 +46,7 @@
 // 	'昨' |
 // 	'明'
 
-export const answer_key: Map<string, string> = new Map([
+export const answer_key: AnswerKey<string, string> = new AnswerKey([
 	/* Numbers */
 	// ['一', 'one'],
 	// ['二', 'two'],

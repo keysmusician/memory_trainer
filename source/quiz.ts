@@ -133,8 +133,9 @@ export class NonNegativeNumber extends Number {
 		return new NonNegativeNumber(this.valueOf() + value.valueOf())
 	}
 
-	subtract(value: number | NonNegativeNumber, overflowBehavior: typeof OverflowBehavior.Throw): NonNegativeNumber
 
+	subtract(value: number | NonNegativeNumber, overflowBehavior: typeof OverflowBehavior.Throw): NonNegativeNumber
+	subtract(value: number | NonNegativeNumber, overflowBehavior: OverflowBehavior): number | NonNegativeNumber
 	subtract(value: number | NonNegativeNumber, overflowBehavior: OverflowBehavior = OverflowBehavior.Throw): number | NonNegativeNumber {
 		const result = this.valueOf() - (value instanceof NonNegativeNumber ? value.valueOf() : value)
 
@@ -178,7 +179,7 @@ export interface QuizComponentBaseProps<
 	QuestionType = unknown,
 	AnswerType = unknown
 > {
-	quiz: IQuiz<QuestionType, AnswerType>
+	answerKey: IAnswerKey<QuestionType, AnswerType>
 	answer: AnswerType,
 	question: QuestionType,
 }
@@ -276,37 +277,29 @@ export interface ResponseFetcherProps<
 export type ResponseFetcher<QuestionType, AnswerType, ResponseType> =
 	Component<ResponseFetcherProps<QuestionType, AnswerType, ResponseType>>
 
-type HTTPSURL = `https://${string}`;
+export type HTTPSURL = `https://${string}`;
 
-export interface IQuizParameters<QuestionType, AnswerType> {
-	title?: string
-	answerKey: Map<QuestionType, AnswerType>
-}
-
-export interface IQuiz<QuestionType, AnswerType>
-	extends IQuizParameters<QuestionType, AnswerType> {
+export interface IAnswerKey<QuestionType, AnswerType>
+	extends Map<QuestionType, AnswerType>
+// extends IQuizParameters<QuestionType, AnswerType>
+{
 	readonly questions: QuestionType[]
 	readonly answers: AnswerType[]
 }
 
-export class Quiz<QuestionType, AnswerType> implements IQuiz<QuestionType, AnswerType> {
-	readonly title?: string
-	readonly answerKey: Map<QuestionType, AnswerType>
+export class AnswerKey<QuestionType, AnswerType>
+	extends Map<QuestionType, AnswerType>
+	implements IAnswerKey<QuestionType, AnswerType> {
+	constructor(answerKey: [QuestionType, AnswerType][]) {
+		super(answerKey)
+	}
 
 	get questions(): QuestionType[] {
-		return [...this.answerKey.keys()]
+		return [...this.keys()]
 	}
 
 	get answers(): AnswerType[] {
-		return [...this.answerKey.values()]
-	}
-
-	constructor({
-		title,
-		answerKey: answer_key,
-	}: IQuizParameters<QuestionType, AnswerType>) {
-		this.title = title
-		this.answerKey = answer_key
+		return [...this.values()]
 	}
 }
 
@@ -322,7 +315,7 @@ export interface IQuizBuilder<
 	FeedbackType = any
 > {
 	readonly title: string
-	readonly quiz: IQuiz<QuestionType, AnswerType>
+	readonly answerKey: IAnswerKey<QuestionType, AnswerType>
 	readonly coordinator: ICoordinator<QuestionType, AnswerType, ResponseType, FeedbackType>
 	// readonly evaluator: Evaluator<ResponseType, AnswerType>
 	// readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
@@ -351,7 +344,7 @@ export class QuizBuilder< // TODO: Rename. QuizBuilder isn't exactly correct.
 	ResponseType,
 	FeedbackType
 > {
-	readonly quiz: IQuiz<QuestionType, AnswerType>
+	readonly answerKey: IAnswerKey<QuestionType, AnswerType>
 	readonly coordinator: ICoordinator<QuestionType, AnswerType, ResponseType, FeedbackType>
 	// readonly evaluator: Evaluator<ResponseType, AnswerType>
 	// readonly response_fetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>
@@ -363,18 +356,18 @@ export class QuizBuilder< // TODO: Rename. QuizBuilder isn't exactly correct.
 	// readonly getTimeLimitSeconds: (question: QuestionType) => NonNegativeNumber
 
 	constructor({
-		quiz,
+		answerKey,
 		coordinator,
 		// evaluator = compare_strictly_equal<ResponseType | AnswerType>,
 		// response_fetcher,
 		title,
 		// renderer,
-		trainingAlgorithm = new SmartTrainer(quiz.answerKey.size),
+		trainingAlgorithm = new SmartTrainer(answerKey.size),
 		layout,
 		backgroundImage,
 		// getTimeLimitSeconds: getTimeLimit = () => Infinity
 	}: QuizBuilderParameters<QuestionType, AnswerType, ResponseType, FeedbackType>) {
-		this.quiz = quiz
+		this.answerKey = answerKey
 		this.coordinator = coordinator
 		// this.evaluator = evaluator
 		// this.response_fetcher = response_fetcher

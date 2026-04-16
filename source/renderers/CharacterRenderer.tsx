@@ -6,7 +6,7 @@ import { Renderer, RendererProps } from "./Renderer"
 /**
  * Renders text character questions.
  */
-interface CharacterRendererProps extends RendererProps<string> {
+export interface CharacterRendererProps extends RendererProps<string> {
 	/** The prompt to display above the question. */
 	prompt: string
 	/** The question to display. */

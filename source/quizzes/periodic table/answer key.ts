@@ -1,3 +1,5 @@
+import { AnswerKey } from "../../quiz";
+
 export namespace PeriodicTable {
 	export interface Element {
 		number: number
@@ -126,7 +128,7 @@ export namespace PeriodicTable {
 		{ number: 118, symbol: "Og", name: "Oganesson" }
 	];
 
-	export const answerKey: Map<number, Element> = new Map(
+	export const answerKey = new AnswerKey(
 		periodicTable.map(element => [element.number, element])
 	);
 }

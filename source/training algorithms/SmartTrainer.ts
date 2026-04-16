@@ -118,12 +118,12 @@ export class SmartTrainer extends BaseTrainingAlgorithm {
 
       next_question = this.focus_questions.splice(random_index, 1)[0]
 
-      this.#return_collection.push(this.#current_question)
+      this.#return_collection.push(this.#current_question!)
 
       this.#return_collection = this.focus_questions
     }
     else if (this.unasked_questions.length > 0) {
-      next_question = this.unasked_questions.pop()
+      next_question = this.unasked_questions.pop()!
 
       if (this.#current_question !== null) {
         this.#return_collection.push(this.#current_question)

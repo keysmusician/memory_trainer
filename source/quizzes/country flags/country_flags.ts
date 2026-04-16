@@ -1,3 +1,5 @@
+import { AnswerKey } from "../../quiz"
+
 const country_code_name_map = {
   "ad": "Andorra",
   "ae": "United Arab Emirates (UAE)",
@@ -264,7 +266,7 @@ export const image_height: FlagCDN_JPG_Heights = 240
 /**
  * Country flags.
  */
-export const country_flags = new Map(Object.entries(country_code_name_map).map(
+export const country_flags = new AnswerKey(Object.entries(country_code_name_map).map(
   ([country_code, country_name]) => [
     `https://flagcdn.com/h${image_height}/${country_code}.jpg`, country_name
   ]

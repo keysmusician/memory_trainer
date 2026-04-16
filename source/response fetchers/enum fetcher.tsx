@@ -23,7 +23,7 @@ export function EnumFetcher<
 >(
     props: EnumFetcherProps<ResponseType, QuestionType, AnswerType>
 ) {
-    const answers = Array.from(props.quiz.quiz.values())
+    const answers = Array.from(props.answerKey.values())
 
     if (props.sort) { answers.sort() }
 
