@@ -6,7 +6,8 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "tsc": "tsc"
   },
   "license": "MIT",
   "devDependencies": {
@@ -17,6 +18,7 @@
   "dependencies": {
     "@solidjs/router": "^0.8.3",
     "solid-js": "^1.6.10",
-    "ts-key-enum": "^2.0.12"
+    "ts-key-enum": "^2.0.12",
+    "unsplash-js": "^7.0.19"
   }
 }
