@@ -1,2 +1,3 @@
 node_modules
 web/distributable
+.DS_Store

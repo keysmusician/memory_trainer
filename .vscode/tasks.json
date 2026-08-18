@@ -11,6 +11,9 @@
 			"type": "npm",
 			"script": "dev",
 			"detail": "Launches the Vite development server",
+			"dependsOn": [
+				"Open Browser"
+			],
 			"problemMatcher": [
 				{
 					"pattern": [
@@ -43,6 +46,22 @@
 			"runOptions": {
 				"runOn": "folderOpen"
 			}
+		},
+		{
+			"label": "Open Browser",
+			"type": "shell",
+			"command": "open",
+			"args": [
+				"http://localhost:5173"
+			],
+			"windows": {
+				"command": "start"
+			},
+			"linux": {
+				"command": "xdg-open"
+			},
+			"isBackground": true,
+			"problemMatcher": []
 		}
 	]
 }
