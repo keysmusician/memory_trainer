@@ -24,7 +24,7 @@ export namespace designSystem {
 			export const small = "1rem"
 			export const medium = "1.3rem"
 			export const large = "1.6rem"
-			export const extraLarge = "2rem"
+			export const extraLarge = "5rem"
 		}
 
 		export namespace weight {

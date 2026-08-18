@@ -199,7 +199,7 @@ export interface QuizLayoutProps<
 	// responseFetcher: ResponseFetcher<QuestionType, AnswerType, ResponseType>,
 
 	/* This mutates throughout the lifecycle of the quiz: */
-	// trainingHistory: TrainingHistory<QuestionType, AnswerType, ResponseType>,
+	trainingSessionHistory: TrainingSessionHistory<QuestionType, AnswerType, ResponseType>,
 }
 
 export type QuizLayout<
@@ -214,57 +214,71 @@ export type QuizLayout<
 	FeedbackType
 >>
 
-export class TrainingHistory<
+export class TrainingSessionHistory<
 	QuestionType = any,
 	AnswerType = any,
 	ResponseType = any
-> extends Array<TrainingState<QuestionType, AnswerType, ResponseType>> {
+> extends Array<TrainingEvent<QuestionType, AnswerType, ResponseType>> {
 
-	constructor(...args: TrainingState<QuestionType, AnswerType, ResponseType>[]) {
+	constructor(...args: TrainingEvent<QuestionType, AnswerType, ResponseType>[]) {
 		super(...args)
 	}
 
 	/**
-	 * The most recent training state (question, answer, response, and grade).
+	 * The most recent event in the session.
 	 */
-	get last(): TrainingState<QuestionType, AnswerType, ResponseType> {
-		return this[this.length - 1]
+	last(): TrainingEvent<QuestionType, AnswerType, ResponseType> | undefined
+	last<EventType extends TrainingEventType>(type: EventType): Extract<TrainingEvent<QuestionType, AnswerType, ResponseType>, { type: EventType }> | undefined
+	last<EventType extends TrainingEventType>(type?: EventType) {
+		if (type === undefined) {
+			return this[this.length - 1]
+		}
+
+		return [...this].reverse().find((event) => event.type === type) as Extract<TrainingEvent<QuestionType, AnswerType, ResponseType>, { type: EventType }> | undefined
 	}
 
 	/**
 	 * The number of times the user has attempted the most recent question.
 	 */
 	get retries() {
-		if (!this.last) {
+		const lastQuestion = this.last('question')
+		if (!lastQuestion) {
 			return 0
 		}
 
-		var retries = 0
-
-		for (let index = this.length - 1; index >= 0; index--) {
-			if (
-				this[index].question === this.last.question &&
-				this[index].grade < (.5 as ClosedUnitIntervalMember)
-			) {
-				retries++
-			} else {
-				break
-			}
-		}
-
-		return retries
+		return this.filter((event) =>
+			event.type === 'response' && event.timestamp >= lastQuestion.timestamp
+		).length
 	}
 }
 
-export type TrainingState<QuestionType, AnswerType, ResponseType> = {
-	grade: ClosedUnitIntervalMember
-	question: QuestionType
-	questionIndex: number
-	questionsAskedCount: NonNegativeNumber
-	answer: AnswerType
-	response: ResponseType
-	timeStamp: number
+export interface TrainingEventBase<EventType extends TrainingEventType = TrainingEventType> {
+	type: EventType
+	timestamp: number
 }
+
+export type TrainingEvent<QuestionType, AnswerType, ResponseType> =
+	| TrainingEventBase<'question'> & {
+		question: QuestionType
+		questionIndex: number
+		questionsAskedCount: NonNegativeNumber
+		answer: AnswerType
+	}
+	| TrainingEventBase<'response'> & {
+		response: ResponseType
+	}
+	| TrainingEventBase<'grade'> & {
+		grade: ClosedUnitIntervalMember
+	}
+	| TrainingEventBase<'feedback'> & {
+		feedback: unknown
+	}
+
+export type TrainingEventType =
+	| 'question'
+	| 'response'
+	| 'grade'
+	| 'feedback'
 
 export interface ResponseFetcherProps<
 	QuestionType = unknown,
@@ -272,8 +286,12 @@ export interface ResponseFetcherProps<
 	ResponseType = unknown,
 > extends QuizComponentBaseProps<QuestionType, AnswerType> {
 	setResponse: Setter<ResponseType>
+	trainingSessionHistory: TrainingSessionHistory<QuestionType, AnswerType, ResponseType>
 }
 
+/**
+ * A component which fetches a response from the user.
+ */
 export type ResponseFetcher<QuestionType, AnswerType, ResponseType> =
 	Component<ResponseFetcherProps<QuestionType, AnswerType, ResponseType>>
 

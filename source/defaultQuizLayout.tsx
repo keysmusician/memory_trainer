@@ -1,5 +1,5 @@
-import { Component, For, JSX, createEffect, createSignal } from "solid-js"
-import { QuizLayoutProps, ResponseFetcher, TrainingHistory } from "./quiz"
+import { Component, For, JSX, createEffect, createSignal, on } from "solid-js"
+import { QuizLayoutProps, ResponseFetcher, TrainingSessionHistory } from "./quiz"
 import { style } from "./Style"
 import { Renderer } from "./renderers/Renderer"
 
@@ -69,7 +69,7 @@ export function DefaultQuizLayoutBuilder<
 							answer={props.answer}
 							setResponse={props.setResponse}
 							answerKey={props.answerKey}
-						// trainingHistory={props.trainingHistory}
+							trainingSessionHistory={props.trainingSessionHistory}
 						/>
 					</div>
 				</article>
@@ -96,15 +96,14 @@ export function DefaultFeedbackRenderer<FeedbackType extends JSX.Element>(
 	)
 }
 
-export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }) {
+export function TrainingHistoryPanel(props: { trainingHistory: TrainingSessionHistory }) {
 	const [visible, setVisible] = createSignal(false)
 
 	var previousTimestamp = Date.now()
 
-	createEffect(() => {
-		props.trainingHistory.last
+	createEffect(on(() => props.trainingHistory, () => {
 		previousTimestamp = Date.now()
-	})
+	}))
 
 	const backgroundColor = "rgba(255, 255, 255, .8)"
 
@@ -160,7 +159,7 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 				}}
 			>
 				<For each={Array.from(props.trainingHistory).reverse()} fallback={<div>No history</div>}>
-					{(trainingState, index) => (
+					{(trainingEvent, index) => (
 						<table style={{
 							...trStyle,
 							'border-collapse': 'collapse',
@@ -178,19 +177,19 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 							<tbody>
 								<tr style={trStyle}>
 									<td style={column1}>Question</td>
-									<td>{JSON.stringify(trainingState.question)}</td>
+									<td>{trainingEvent.type === 'question' ? JSON.stringify(trainingEvent.question) : '-'}</td>
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Question Index</td>
-									<td>{trainingState.questionIndex}</td>
+									<td>{trainingEvent.type === 'question' ? trainingEvent.questionIndex : '-'}</td>
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Answer</td>
-									<td>{JSON.stringify(trainingState.answer)}</td>
+									<td>{trainingEvent.type === 'question' ? JSON.stringify(trainingEvent.answer) : '-'}</td>
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Response</td>
-									<td>{JSON.stringify(trainingState.response)}</td>
+									<td>{trainingEvent.type === 'response' ? JSON.stringify(trainingEvent.response) : '-'}</td>
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Time since last history entry</td>
@@ -198,7 +197,7 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingHistory }
 								</tr>
 								<tr style={trStyle}>
 									<td style={column1}>Grade</td>
-									<td>{trainingState.grade ? "pass" : "fail"}</td>
+									<td>{trainingEvent.type === 'grade' ? (trainingEvent.grade ? "pass" : "fail") : '-'}</td>
 								</tr>
 							</tbody>
 						</table>

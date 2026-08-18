@@ -1,7 +1,7 @@
-import { JSX, createReaction, createSignal, getOwner, runWithOwner } from "solid-js"
+import { JSX, createEffect, createReaction, createSignal, getOwner, runWithOwner, on } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 import { AppNavigator, routes, useQuiz as useQuizBuilder } from "../App"
-import { ClosedUnitIntervalMember, TrainingHistory } from "../quiz"
+import { NonNegativeNumber, TrainingSessionHistory } from "../quiz"
 import { style } from "../Style"
 
 
@@ -26,7 +26,10 @@ export function TrainScreen() {
 
   const [feedback, setFeedback] = createSignal<any>()
 
-  // const [trainingHistory, setTrainingHistory] = createSignal<TrainingHistory>(new TrainingHistory())
+  const [trainingSessionHistory, setTrainingSessionHistory] = createSignal(
+    new TrainingSessionHistory()
+  )
+
   // const _trainingHistory = setTrainingHistory((trainingHistory) => {
   //   return new TrainingHistory(...trainingHistory, {
   //     grade: quiz.evaluator(response(), answer()),
@@ -40,19 +43,27 @@ export function TrainScreen() {
   //   })
   // })
 
-  // createEffect(() => {
-  //   setTrainingHistory((trainingHistory) => {
-  //     return new TrainingHistory(...trainingHistory, {
-  //       grade: response() ? quizBuilder.evaluator(response(), answer()) : null,
-  //       question: question(),
-  //       questionIndex: questionIndex()!,
-  //       questionsAskedCount: questionsAskedCount(),
-  //       answer: answer(),
-  //       response: response(),
-  //       timeStamp: Date.now(),
-  //     })
-  //   })
-  // })
+  createEffect(on(answerKeyIndex, (currentAnswerKeyIndex) => {
+    if (currentAnswerKeyIndex === undefined) return
+
+    setTrainingSessionHistory((trainingHistory) => new TrainingSessionHistory(...trainingHistory, {
+        type: 'question',
+        question: question(),
+        questionIndex: currentAnswerKeyIndex,
+        questionsAskedCount: new NonNegativeNumber(trainingHistory.filter((event) => event.type === 'question').length + 1),
+        answer: answer(),
+        timestamp: Date.now(),
+      }))
+  }))
+
+  createEffect(on(response, (currentResponse) => {
+    if (currentResponse === undefined) return
+
+    setTrainingSessionHistory((trainingHistory) => new TrainingSessionHistory(
+      ...trainingHistory,
+      { type: 'response', response: currentResponse, timestamp: Date.now() }
+    ))
+  }))
 
   const owner = getOwner();
 
@@ -74,7 +85,19 @@ export function TrainScreen() {
     trainingAlgorithm: quizBuilder.trainingAlgorithm,
     userInterface: {
       setAnswerKeyIndex: setAnswerKeyIndex,
-      setFeedback: setFeedback,
+      setGrade: (grade) => {
+        setTrainingSessionHistory((trainingHistory) => new TrainingSessionHistory(
+          ...trainingHistory,
+          { type: 'grade', grade, timestamp: Date.now() }
+        ))
+      },
+      setFeedback: (newFeedback) => {
+        setFeedback(newFeedback)
+        setTrainingSessionHistory((trainingHistory) => new TrainingSessionHistory(
+          ...trainingHistory,
+          { type: 'feedback', feedback: newFeedback, timestamp: Date.now() }
+        ))
+      },
       awaitResponse: awaitResponse,
     },
   }).then(() => navigate(routes.score))
@@ -89,7 +112,7 @@ export function TrainScreen() {
         question={question()}
         feedback={feedback()}
         setResponse={setResponse}
-      // trainingHistory={trainingHistory()}
+        trainingSessionHistory={trainingSessionHistory()}
       />
 
       <div style={{

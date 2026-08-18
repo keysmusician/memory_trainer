@@ -2,7 +2,7 @@ import { For, Setter, createEffect, createSignal } from "solid-js"
 import { StartButton } from "./Start"
 import { AppNavigator, routes, useQuiz } from "../App"
 import { style } from "../Style"
-import { IQuizBuilder, QuizBuilder } from "../quiz";
+import { IQuizBuilder } from "../quiz";
 import { useNavigate } from "@solidjs/router";
 
 

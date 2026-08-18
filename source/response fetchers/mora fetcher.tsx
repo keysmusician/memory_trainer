@@ -1,5 +1,5 @@
 import { For, JSX, Setter, createSignal, onCleanup, onMount } from "solid-js"
-import { mora as moras } from "../answer keys/answer keys.barrel"
+import { mora as moras } from "../quizzes/answer keys.barrel"
 import { ResponseFetcherProps } from "../quiz";
 import { Mora } from "../quizzes/japanese/_mora";
 
@@ -21,20 +21,20 @@ function convertToGrid(
   const vowels = ['a', 'i', 'u', 'e', 'o']
 
   const consonants = [
-    // 'k',
-    // 'g',
-    // 's',
-    // 'z',
-    // 't',
-    // 'd',
-    // 'n',
-    // 'h',
-    // 'b',
-    // 'p',
-    // 'm',
-    // 'y',
-    // 'r',
-    // 'w',
+    'k',
+    'g',
+    's',
+    'z',
+    't',
+    'd',
+    'n',
+    'h',
+    'b',
+    'p',
+    'm',
+    'y',
+    'r',
+    'w',
   ]
 
   const blank = null;

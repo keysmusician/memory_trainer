@@ -6,6 +6,7 @@ import { SmartTrainer } from "./training algorithms/SmartTrainer";
 interface IApplicationUI<ResponseType, FeedbackType> {
 	setAnswerKeyIndex(index: number): void
 	awaitResponse(): Promise<ResponseType>
+	setGrade(grade: ClosedUnitIntervalMember): void
 	setFeedback(feedback: FeedbackType): void
 }
 
@@ -131,6 +132,7 @@ export namespace Default {
 					// Determine the next action to take (e.g., grade the response, skip the question, etc.)
 
 					grade = this.evaluator(response, getAnswer())
+					userInterface.setGrade(grade)
 
 					if (grade !== 0) {
 						userInterface.setFeedback(

@@ -1,17 +1,40 @@
+import { createMemo, on } from 'solid-js'
 import { NonNegativeNumber, ResponseFetcherProps } from "../quiz";
 
 
 export interface MultipleChoiceFetcherProps<QuestionType, AnswerType, ResponseType>
 	extends ResponseFetcherProps<QuestionType, AnswerType, ResponseType> {
 	/**
-	 * The number of choices to display.
+	 * The number of incorrect options/choices to display. The correct answer is
+	 * always included in addition to these options.
 	 **/
-	choicesCount: NonNegativeNumber
+	incorrectOptionsCount: NonNegativeNumber
 
 	/**
 	 * A function that returns the string label for a response option.
 	 **/
 	getLabel: (option: AnswerType) => string
+
+	/**
+	 * An optional function that returns an array of incorrect response options
+	 * for a question. Useful if you want a more customized set of options for a
+	 * question than the default implementation provides.
+	 *
+	 * The options will be shuffled and the correct answer will be included in
+	 * the final list of options.
+	 *
+	 * If not provided, the default implementation will be used. The default
+	 * implementation will select random unique incorrect options from the
+	 * answer key, excluding the correct answer.
+	 *
+	 * If less than `incorrectOptionsCount` options are returned, the default
+	 * implementation will be used to fill in the remaining options. If more
+	 * than `incorrectOptionsCount` options are returned, a random subset of
+	 * `incorrectOptionsCount` options will be selected from the returned
+	 * options.
+	 **/
+	getIncorrectOptions?: (question: QuestionType, answer: AnswerType) => AnswerType[]
+
 	// TODO: Add grid layout options
 	// columns: number
 	// rows: number
@@ -28,13 +51,31 @@ export const MultipleChoiceFetcher = function <
 		ResponseType
 	>
 ) {
-	const options = () => createMultipleChoiceOptions(
-		props.answerKey.answers,
-		props.answer,
-		props.choicesCount
-	)
+	const options = createMemo(on(
+		() => props.question,
+		() => {
+			const incorrectOptions = props.getIncorrectOptions?.(
+				props.question,
+				props.answer
+			)
 
-	const columns = Math.ceil(Math.sqrt(props.choicesCount.valueOf()))
+			validateOptions(
+				props.answerKey.answers,
+				props.answer,
+				props.incorrectOptionsCount.valueOf(),
+				incorrectOptions
+			)
+
+			return createMultipleChoiceOptions(
+				props.answerKey.answers,
+				props.answer,
+				props.incorrectOptionsCount,
+				incorrectOptions
+			)
+		}
+	))
+
+	const columns = Math.ceil(Math.sqrt(props.incorrectOptionsCount.valueOf() + 1))
 
 	return (
 		<div
@@ -97,40 +138,69 @@ export const MultipleChoiceFetcher = function <
 	)
 }
 
+function validateOptions<AnswerType>(
+	answers: AnswerType[],
+	correctAnswer: AnswerType,
+	incorrectOptionsCount: number,
+	incorrectOptions?: AnswerType[]
+) {
+	const availableIncorrectOptionsCount = answers
+		.filter((answer) => answer !== correctAnswer)
+		.length
+
+	if (incorrectOptionsCount > availableIncorrectOptionsCount) {
+		console.warn(
+			`incorrectOptionsCount (${incorrectOptionsCount}) is greater than the ${availableIncorrectOptionsCount} incorrect options available in the answer key.`
+		)
+	}
+
+	if (incorrectOptions && incorrectOptions.length < incorrectOptionsCount) {
+		console.warn(
+			`getIncorrectOptions returned ${incorrectOptions.length} options, but ${incorrectOptionsCount} were requested. Falling back to the default implementation for the remaining options.`
+		)
+	}
+}
+
 /**
  * Creates multiple choice options for a question.
  **/
 function createMultipleChoiceOptions<AnswerType>(
 	answers: AnswerType[],
 	correctAnswer: AnswerType,
-	optionCount: NonNegativeNumber
+	incorrectOptionsCount: NonNegativeNumber,
+	providedIncorrectOptions?: AnswerType[]
 ) {
-	var _optionCount = optionCount.valueOf()
-	switch (_optionCount) {
-		case 0:
-			return []
-		case 1:
-			return [correctAnswer]
-		default:
-			// Initialize options with the correct answer
-			const options = [correctAnswer]
+	const _incorrectOptionsCount = incorrectOptionsCount.valueOf()
 
-			const incorrectOptions = answers
-				.filter((answer) => answer !== correctAnswer)
-				// Shuffle array
-				.map(value => ({ value, sort: Math.random() }))
-				.sort((a, b) => a.sort - b.sort)
-				.map(({ value }) => value)
+	const fallbackIncorrectOptions = answers
+		.filter((answer) => answer !== correctAnswer)
+	const requestedIncorrectCount = _incorrectOptionsCount
+	const customIncorrectOptions = providedIncorrectOptions ?? []
+	const uniqueIncorrectOptions = customIncorrectOptions
+		.filter((option, index, options) =>
+			option !== correctAnswer && options.indexOf(option) === index
+		)
+	const remainingIncorrectOptions = fallbackIncorrectOptions.filter(
+		(option) => !uniqueIncorrectOptions.includes(option)
+	)
+	const selectedIncorrectOptions = shuffle(uniqueIncorrectOptions)
+		.slice(0, requestedIncorrectCount)
 
-			// Select random unique incorrect options
-			for (let _ = 1; _ < _optionCount; _++) {
-				options.push(incorrectOptions.pop()!)
-			}
-
-			// Shuffle the options
-			return options
-				.map(value => ({ value, sort: Math.random() }))
-				.sort((a, b) => a.sort - b.sort)
-				.map(({ value }) => value)
+	if (selectedIncorrectOptions.length < requestedIncorrectCount) {
+		selectedIncorrectOptions.push(
+			...shuffle(remainingIncorrectOptions).slice(
+				0,
+				requestedIncorrectCount - selectedIncorrectOptions.length
+			)
+		)
 	}
+
+	return shuffle([correctAnswer, ...selectedIncorrectOptions])
+}
+
+function shuffle<ValueType>(values: ValueType[]) {
+	return values
+		.map((value) => ({ value, sort: Math.random() }))
+		.sort((a, b) => a.sort - b.sort)
+		.map(({ value }) => value)
 }

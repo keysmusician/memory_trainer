@@ -8,6 +8,7 @@ import {
   For,
   on,
   onMount,
+  JSXElement,
 } from 'solid-js'
 import {
   CreateScreen,
@@ -65,36 +66,55 @@ function App() {
   })
 
   return (
-    <Router>
-      <QuizContext.Provider value={[quizValue, setQuizValue]}>
-        <BackgroundImage />
+    <Frame>
+      <Router>
+        <QuizContext.Provider value={[quizValue, setQuizValue]}>
+          <BackgroundImage />
 
-        <Header />
+          <Header />
 
-        <section
-          id='memory_trainer'
-          style={style.group.contentBox}
-        >
-          <Routes>
-            <Route path={[routes.start, '*']} element={<StartScreen />} />
+          <section
+            id='memory_trainer'
+            style={style.group.contentBox}
+          >
+            <Routes>
+              <Route path={[routes.start, '*']} element={<StartScreen />} />
 
-            <Route path={routes.edit} element={<EditScreen />} />
+              <Route path={routes.edit} element={<EditScreen />} />
 
-            {/* <Route path={routes.create} element={<CreateScreen />} /> */}
+              {/* <Route path={routes.create} element={<CreateScreen />} /> */}
 
-            <Route path={routes.train} element={<TrainScreen />} />
+              <Route path={routes.train} element={<TrainScreen />} />
 
-            <Route path={routes.score} element={<ScoreScreen />} />
-          </Routes>
+              <Route path={routes.score} element={<ScoreScreen />} />
+            </Routes>
 
-        </section>
+          </section>
 
-        <ProfileButton
-          student={student}
-          setStudent={setStudent}
-        />
-      </QuizContext.Provider>
-    </Router >
+          <ProfileButton
+            student={student}
+            setStudent={setStudent}
+          />
+        </QuizContext.Provider>
+      </Router >
+    </Frame>
+  )
+}
+
+function Frame(props: { children: JSXElement }) {
+  return (
+    <div
+      style={{
+        'display': 'flex',
+        'flex-direction': 'column',
+        'height': '100vh',
+        'width': '100%',
+        'margin': '0',
+        'padding': '2.5rem',
+      }}
+    >
+      {props.children}
+    </div>
   )
 }
 
@@ -161,7 +181,7 @@ function Header() {
     <Flexbox
       flex={'unset'}
       style={{
-        'padding': '0rem 1rem',
+        // 'padding': '2.5rem 1rem',
       }}
     >
       {/* <Flexbox style={{ 'flex': 1 }} /> */}
@@ -169,7 +189,8 @@ function Header() {
       <Flexbox flex={2}>
         <h1 style={{
           ...style.group.title,
-          'margin': '0.5 rem',
+          'padding': '0',
+          'margin': 'auto',
         }}>Memory Trainer</h1>
       </Flexbox>
 

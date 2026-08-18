@@ -13,7 +13,7 @@ import {
   music_notation,
   US_state_capitals,
   empty
-} from "../answer keys/answer keys.barrel"
+} from "./answer keys.barrel"
 import {
   MusicalKeyboard,
   EnumFetcher,
@@ -26,7 +26,10 @@ import { periodic_table } from "./periodic table/quiz"
 import { country_flags } from "./country flags/quiz"
 import { kanji as kanji_recognition } from "./japanese/kanji/recognition/quiz"
 import { japaneseToEnglishVocabulary, englishToJapaneseVocabulary } from "./japanese/vocabulary/quiz"
+import { daysOfWeekJPtoEN, daysOfWeekENtoJP } from "./japanese/days of week/quiz"
+import { comptiaSecurityPlusAcronyms } from "./CompTIA Security+ SY0-701/acronyms/quiz"
 import { DefaultCoordinator } from "../TrainingCoordinator"
+import { portsToProtocolsQuiz, protocolsToPortsQuiz } from "./ports and protocols/quiz"
 
 
 export const quizzes: IQuizBuilder<any, any, any, any>[] = [
@@ -55,6 +58,11 @@ export const quizzes: IQuizBuilder<any, any, any, any>[] = [
   // // kanji_writing,
   japaneseToEnglishVocabulary,
   englishToJapaneseVocabulary,
+  daysOfWeekJPtoEN,
+  daysOfWeekENtoJP,
+  comptiaSecurityPlusAcronyms,
+  protocolsToPortsQuiz,
+  portsToProtocolsQuiz,
   // hebrew,
   // periodic_table,
   // empty_quiz = new QuizBuilder({
