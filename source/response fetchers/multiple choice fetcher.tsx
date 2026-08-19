@@ -20,18 +20,18 @@ export interface MultipleChoiceFetcherProps<QuestionType, AnswerType, ResponseTy
 	 * for a question. Useful if you want a more customized set of options for a
 	 * question than the default implementation provides.
 	 *
-	 * The options will be shuffled and the correct answer will be included in
-	 * the final list of options.
-	 *
 	 * If not provided, the default implementation will be used. The default
 	 * implementation will select random unique incorrect options from the
-	 * answer key, excluding the correct answer.
+	 * answer key.
 	 *
 	 * If less than `incorrectOptionsCount` options are returned, the default
 	 * implementation will be used to fill in the remaining options. If more
 	 * than `incorrectOptionsCount` options are returned, a random subset of
 	 * `incorrectOptionsCount` options will be selected from the returned
 	 * options.
+	 *
+	 * The options will always be shuffled and the correct answer will be
+	 * included in the final set of options.
 	 **/
 	getIncorrectOptions?: (question: QuestionType, answer: AnswerType) => AnswerType[]
 

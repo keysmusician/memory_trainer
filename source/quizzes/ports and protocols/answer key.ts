@@ -29,8 +29,8 @@ export const portsAndProtocols = new AnswerKey<string, PortAndProtocols>([
 	['SIP', [[5060, 5061], ['TCP', 'UDP']]],
 	['SMB', [[445], ['TCP']]],
 	['SMSD', [[596], ['TCP']]],
-	['SMTP', [[25], ['TCP']]],
-	['Message Submission / SMTP with STARTTLS', [[587], ['TCP']]], // 465 legacy port
+	['SMTP', [[25], ['TCP']]], // aka Message Submission
+	['SMTP with STARTTLS', [[587], ['TCP']]], // aka Message Submission. 465 legacy port
 	['SNMP', [[161, 162], ['UDP']]],
 	['SSH', [[22], ['TCP']]],
 	['Syslog', [[514], ['UDP']]], // (TCP for secure) Standard port for sending system log messages. Syslog over plain UDP 514 is unencrypted.
