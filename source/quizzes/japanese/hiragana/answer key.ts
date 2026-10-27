@@ -17,7 +17,18 @@ export type HiraganaCharacter =
   'や' | 'ゆ' | 'よ' |
   'ら' | 'り' | 'る' | 'れ' | 'ろ' |
   'わ' | 'ゐ' | 'ゑ' | 'を' |
-  'ん'
+  'ん' |
+  'きゃ' | 'きゅ' | 'きょ' |
+  'ぎゃ' | 'ぎゅ' | 'ぎょ' |
+  'しゃ' | 'しゅ' | 'しょ' |
+  'じゃ' | 'じゅ' | 'じょ' |
+  'ちゃ' | 'ちゅ' | 'ちょ' |
+  'にゃ' | 'にゅ' | 'にょ' |
+  'ひゃ' | 'ひゅ' | 'ひょ' |
+  'びゃ' | 'びゅ' | 'びょ' |
+  'ぴゃ' | 'ぴゅ' | 'ぴょ' |
+  'みゃ' | 'みゅ' | 'みょ' |
+  'りゃ' | 'りゅ' | 'りょ'
 
 export const answerKey: AnswerKey<HiraganaCharacter, Mora> = new AnswerKey([
   ['あ', mora.a],
@@ -93,4 +104,37 @@ export const answerKey: AnswerKey<HiraganaCharacter, Mora> = new AnswerKey([
   ['ぷ', mora.pu],
   ['ぺ', mora.pe],
   ['ぽ', mora.po],
+  ['きゃ', mora.kya],
+  ['きゅ', mora.kyu],
+  ['きょ', mora.kyo],
+  ['ぎゃ', mora.gya],
+  ['ぎゅ', mora.gyu],
+  ['ぎょ', mora.gyo],
+  ['しゃ', mora.sha],
+  ['しゅ', mora.shu],
+  ['しょ', mora.sho],
+  ['じゃ', mora.ja],
+  ['じゅ', mora.ju],
+  ['じょ', mora.jo],
+  ['ちゃ', mora.cha],
+  ['ちゅ', mora.chu],
+  ['ちょ', mora.cho],
+  ['にゃ', mora.nya],
+  ['にゅ', mora.nyu],
+  ['にょ', mora.nyo],
+  ['ひゃ', mora.hya],
+  ['ひゅ', mora.hyu],
+  ['ひょ', mora.hyo],
+  ['びゃ', mora.bya],
+  ['びゅ', mora.byu],
+  ['びょ', mora.byo],
+  ['ぴゃ', mora.pya],
+  ['ぴゅ', mora.pyu],
+  ['ぴょ', mora.pyo],
+  ['みゃ', mora.mya],
+  ['みゅ', mora.myu],
+  ['みょ', mora.myo],
+  ['りゃ', mora.rya],
+  ['りゅ', mora.ryu],
+  ['りょ', mora.ryo],
 ])

@@ -1,7 +1,7 @@
 import { katakana as answerKey } from "./katakana";
 import { compare_strictly_equal } from "../../../evaluators/evaluators";
 import { QuizBuilder } from "../../../quiz";
-import { MoraFetcher } from "../../../response fetchers/mora fetcher";
+import { RadialMoraFetcher } from "../../../response fetchers/radial mora fetcher";
 import { JapaneseCharacterRenderer } from "../JapaneseCharacterRenderer";
 import { Mora } from "../_mora";
 import { DefaultCoordinator } from "../../../TrainingCoordinator";
@@ -22,7 +22,7 @@ export const katakana = new QuizBuilder<
       feedback: {
         correct: () => "Correct!",
         tryAgain: () => "Try again.",
-        fail: () => "Incorrect.",
+        fail: (parameters) => `Incorrect. The correct answer was ${parameters.answer.romanization}.`,
       },
     }),
     layout: DefaultQuizLayoutBuilder<
@@ -31,8 +31,8 @@ export const katakana = new QuizBuilder<
       Mora,
       string
     >({
-      responseFetcher: MoraFetcher,
       questionRenderer: JapaneseCharacterRenderer,
-      feedbackRenderer: (props) => <div>{props.}</div>,
+      responseFetcher: RadialMoraFetcher,
+      feedbackRenderer: (props) => <div>{props.feedback}</div>,
     }),
   })

@@ -114,7 +114,7 @@ export namespace style {
 	}
 
 	export namespace iconography {
-		export const debug = (
+		export const debug = () => (
 			<svg
 				width="100%"
 				height="100%"
@@ -137,11 +137,11 @@ export namespace style {
 			</svg>
 		)
 
-		export const user = (
+		export const user = () => (
 			<svg
 				fill="#000000"
-				height="40px"
-				width="40px"
+				height="32px"
+				width="32px"
 				version="1.1"
 				id="Layer_1"
 				xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,26 @@ export namespace style {
 			</svg>
 		)
 
-		export const close = (
+		// A function, so each call creates a new DOM node (a JSX constant can only be mounted once).
+		export const gear = () => (
+			<svg
+				width="20px"
+				height="20px"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#000000"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				xmlns="http://www.w3.org/2000/svg"
+				style={{ 'display': 'block' }}
+			>
+				<circle cx="12" cy="12" r="3" />
+				<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+			</svg>
+		)
+
+		export const close = () => (
 			<svg
 				fill="#000000"
 				height="20px"

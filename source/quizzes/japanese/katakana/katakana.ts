@@ -17,7 +17,18 @@ export type KatakanaCharacter =
   'ヤ' | 'ユ' | 'ヨ' |
   'ラ' | 'リ' | 'ル' | 'レ' | 'ロ' |
   'ワ' | 'ヰ' | 'ヱ' | 'ヲ' |
-  'ン'
+  'ン' |
+  'キャ' | 'キュ' | 'キョ' |
+  'ギャ' | 'ギュ' | 'ギョ' |
+  'シャ' | 'シュ' | 'ショ' |
+  'ジャ' | 'ジュ' | 'ジョ' |
+  'チャ' | 'チュ' | 'チョ' |
+  'ニャ' | 'ニュ' | 'ニョ' |
+  'ヒャ' | 'ヒュ' | 'ヒョ' |
+  'ビャ' | 'ビュ' | 'ビョ' |
+  'ピャ' | 'ピュ' | 'ピョ' |
+  'ミャ' | 'ミュ' | 'ミョ' |
+  'リャ' | 'リュ' | 'リョ'
 
 export const katakana: AnswerKey<KatakanaCharacter, Mora> = new AnswerKey([
   ['ア', mora.a,],
@@ -93,4 +104,37 @@ export const katakana: AnswerKey<KatakanaCharacter, Mora> = new AnswerKey([
   // ['ヱ', Mora.we,],
   ['ヲ', mora.wo,],
   ['ン', mora.n,],
+  ['キャ', mora.kya],
+  ['キュ', mora.kyu],
+  ['キョ', mora.kyo],
+  ['ギャ', mora.gya],
+  ['ギュ', mora.gyu],
+  ['ギョ', mora.gyo],
+  ['シャ', mora.sha],
+  ['シュ', mora.shu],
+  ['ショ', mora.sho],
+  ['ジャ', mora.ja],
+  ['ジュ', mora.ju],
+  ['ジョ', mora.jo],
+  ['チャ', mora.cha],
+  ['チュ', mora.chu],
+  ['チョ', mora.cho],
+  ['ニャ', mora.nya],
+  ['ニュ', mora.nyu],
+  ['ニョ', mora.nyo],
+  ['ヒャ', mora.hya],
+  ['ヒュ', mora.hyu],
+  ['ヒョ', mora.hyo],
+  ['ビャ', mora.bya],
+  ['ビュ', mora.byu],
+  ['ビョ', mora.byo],
+  ['ピャ', mora.pya],
+  ['ピュ', mora.pyu],
+  ['ピョ', mora.pyo],
+  ['ミャ', mora.mya],
+  ['ミュ', mora.myu],
+  ['ミョ', mora.myo],
+  ['リャ', mora.rya],
+  ['リュ', mora.ryu],
+  ['リョ', mora.ryo],
 ])

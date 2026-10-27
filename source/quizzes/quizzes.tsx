@@ -53,7 +53,7 @@ export const quizzes: IQuizBuilder<any, any, any, any>[] = [
   //   trainingAlgorithm: SmartTrainer,
   // }),
   hiragana,
-  // katakana,
+  katakana,
   // kanji_recognition,
   // // kanji_writing,
   japaneseToEnglishVocabulary,

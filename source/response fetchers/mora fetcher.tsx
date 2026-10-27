@@ -18,7 +18,7 @@ function lookupMora(consonant: string, vowel: string): Mora | undefined {
 function convertToGrid(
   moras: Mora[],
 ) {
-  const vowels = ['a', 'i', 'u', 'e', 'o']
+  const vowels = ['a', 'i', 'u', 'e', 'o', 'ya', 'yu', 'yo']
 
   const consonants = [
     'k',
@@ -37,7 +37,7 @@ function convertToGrid(
     'w',
   ]
 
-  const blank = null;
+  const blank = null
 
   const column_headers = [blank, ...vowels]
 
@@ -63,11 +63,17 @@ function convertToGrid(
     if (include_row) grid_data.push(row)
   }
 
-  const n = moras.find(mora => mora.consonant == "n")
+  const rotated_grid_data = Array.from(
+    { length: column_headers.length },
+    (_, column_index) => grid_data.map(row => row[column_index] ?? blank)
+  )
 
-  if (n) grid_data.push([blank, n])
+  const n = moras.find(mora => mora.romanization === "n")
+  if (n) {
+    rotated_grid_data.push([n])
+  }
 
-  return grid_data
+  return rotated_grid_data
 }
 
 /**
@@ -170,13 +176,12 @@ interface MoraGridProps {
   answer: Mora
 }
 function MoraGrid(props: MoraGridProps) {
-  const grid_style = {
-    display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
-    'grid-gap': "0.5em",
-  }
-
   const grid_data = convertToGrid([...new Set(props.answerKey.values())])
+  const grid_style: JSX.CSSProperties = {
+    'display': 'grid',
+    'grid-template-columns': `repeat(${grid_data[0].length}, max-content)`,
+    'gap': '0.5em',
+  }
 
   const [selectedCell, setSelectedCell] = createSignal<SelectedCell>({
     consonant: undefined,
@@ -235,7 +240,7 @@ function MoraGrid(props: MoraGridProps) {
   onCleanup(() => {
     document.removeEventListener('keydown', keyDownHandler)
     document.removeEventListener('keypress', keypressHandler)
-    document.addEventListener('keyup', keyupHandler)
+    document.removeEventListener('keyup', keyupHandler)
   })
 
   return (
@@ -256,55 +261,54 @@ function MoraGrid(props: MoraGridProps) {
         </h2>
       </div>
 
-      <div style={grid_style}>
-        <For each={grid_data}>
-          {(row, row_index) =>
-            <For each={row}>
-              {(cell_data, column_index) => {
-                const common_style: JSX.CSSProperties = {
-                  'grid-row': row_index() + 1,
-                  'grid-column': column_index() + 1,
-                  'text-align': 'center',
-                }
-                if (cell_data) {
-                  if (typeof cell_data == 'string') {
-                    return (
-                      <span
-                        style={{
-                          ...common_style,
-                          'color': selectedCell().consonant == cell_data || selectedCell().vowel == cell_data ? 'red' : 'black'
-                        }}
-                      >{cell_data as string}</span>
-                    )
-                  } else {
-                    return (
-                      <button
-                        style={{
-                          ...common_style,
-                          ...cell_data.romanization == 'n' ?
-                            { 'grid-column': 'span 5' } : {},
-                        }}
-                        onClick={() => {
-                          setSelectedCell({
-                            consonant: undefined,
-                            vowel: undefined,
-                          })
-
-                          props.set_response(cell_data)
-                        }}
-                      >{
-                          typeof cell_data == 'string' ? cell_data :
-                            `${cell_data[props.format()]}`
-                        }</button>
-                    )
+      <div style={{ 'overflow-x': 'auto' }}>
+        <div style={grid_style}>
+          <For each={grid_data}>
+            {(row, row_index) =>
+              <For each={row}>
+                {(cell_data, column_index) => {
+                  const is_standalone_n = typeof cell_data !== 'string' && cell_data?.romanization === 'n'
+                  const common_style: JSX.CSSProperties = {
+                    'grid-row': row_index() + 1,
+                    'grid-column': column_index() + 1,
+                    'text-align': 'center',
                   }
-                } else {
-                  return <span style={common_style}></span>
-                }
-              }}
-            </For>
-          }
-        </For>
+                  if (cell_data) {
+                    if (typeof cell_data == 'string') {
+                      return (
+                        <span
+                          style={{
+                            ...common_style,
+                            'color': selectedCell().consonant == cell_data || selectedCell().vowel == cell_data ? 'red' : 'black'
+                          }}
+                        >{cell_data}</span>
+                      )
+                    } else {
+                      return (
+                        <button
+                          style={{
+                            ...common_style,
+                            ...(is_standalone_n ? { 'grid-column': '1 / -1' } : {}),
+                          }}
+                          onClick={() => {
+                            setSelectedCell({
+                              consonant: undefined,
+                              vowel: undefined,
+                            })
+
+                            props.set_response(cell_data)
+                          }}
+                        >{cell_data[props.format()]}</button>
+                      )
+                    }
+                  } else {
+                    return <span style={common_style}></span>
+                  }
+                }}
+              </For>
+            }
+          </For>
+        </div>
       </div>
     </>
   )

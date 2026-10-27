@@ -8,6 +8,6 @@ digraph {
     "Training algorithm" -> "Quiz"
     "Answer key" -> "Quiz"
     "Renderer" -> "Quiz"
-    "Reciever" -> "Quiz"
+    "Receiver" -> "Quiz"
     "Evaluator" -> "Quiz"
 }

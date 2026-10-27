@@ -119,8 +119,10 @@ function Quizzes() {
                     navigate(routes.edit)
                   }}
                   style={final_nested_button}
+                  title='Configure'
+                  aria-label='Configure'
                 >
-                  Configure
+                  {style.iconography.gear()}
                 </button>
 
                 {/* <button

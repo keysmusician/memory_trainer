@@ -224,7 +224,7 @@ export function TrainingHistoryPanel(props: { trainingHistory: TrainingSessionHi
 				title="Show/hide training history."
 				onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, .4)"}
 				onMouseLeave={(e) => e.currentTarget.style.backgroundColor = backgroundColor}
-			>{style.iconography.debug}</button>
+			>{style.iconography.debug()}</button>
 		</section>
 	)
 }

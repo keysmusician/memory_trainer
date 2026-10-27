@@ -6,6 +6,7 @@ import {
   createEffect,
   createSignal,
   For,
+  Show,
   on,
   onMount,
   JSXElement,
@@ -19,9 +20,8 @@ import {
 } from './screens/Screens.barrel'
 import { IQuizBuilder } from './quiz'
 import { empty_quiz } from './quizzes/quizzes'
-import { Router, Routes, Route } from '@solidjs/router'
+import { Router, Routes, Route, useLocation } from '@solidjs/router'
 import { style } from './Style'
-import { Flexbox } from './Flexbox'
 import { Button } from './Button'
 import { null_student, Student } from './Student'
 import { getRandomPhoto } from './backgrounds'
@@ -71,7 +71,12 @@ function App() {
         <QuizContext.Provider value={[quizValue, setQuizValue]}>
           <BackgroundImage />
 
-          <Header />
+          <Header>
+            <ProfileButton
+              student={student}
+              setStudent={setStudent}
+            />
+          </Header>
 
           <section
             id='memory_trainer'
@@ -90,11 +95,6 @@ function App() {
             </Routes>
 
           </section>
-
-          <ProfileButton
-            student={student}
-            setStudent={setStudent}
-          />
         </QuizContext.Provider>
       </Router >
     </Frame>
@@ -109,8 +109,10 @@ function Frame(props: { children: JSXElement }) {
         'flex-direction': 'column',
         'height': '100vh',
         'width': '100%',
+        'min-width': '0',
         'margin': '0',
         'padding': '2.5rem',
+        'box-sizing': 'border-box',
       }}
     >
       {props.children}
@@ -165,7 +167,10 @@ function BackgroundImage() {
         'flex-direction': 'column',
         'height': '100vh',
         'position': 'fixed',
-        'width': '100%',
+        'top': '0',
+        'left': '0',
+        'width': '100vw',
+        'object-fit': 'cover',
         'z-index': '-1',
       }}
       alt='background'
@@ -176,33 +181,61 @@ function BackgroundImage() {
   )
 }
 
-function Header() {
+function Header(props: { children?: JSXElement }) {
+  const [quiz] = useQuiz()
+  const location = useLocation()
+  const isCompact = () => location.pathname === routes.edit || location.pathname === routes.train
+  const isTraining = () => location.pathname === routes.train
+
   return (
-    <Flexbox
-      flex={'unset'}
-      style={{
-        // 'padding': '2.5rem 1rem',
-      }}
-    >
-      {/* <Flexbox style={{ 'flex': 1 }} /> */}
-
-      <Flexbox flex={2}>
-        <h1 style={{
-          ...style.group.title,
-          'padding': '0',
-          'margin': 'auto',
-        }}>Memory Trainer</h1>
-      </Flexbox>
-
-      {/* <Flexbox
+    <>
+      <header
         style={{
+          'display': 'flex',
+          'flex-direction': 'column',
           'align-items': 'center',
-          'justify-content': 'center'
+          'flex': '0 0 auto',
+          'align-self': 'stretch',
+          'position': 'relative',
+          'width': 'calc(100% + 5rem)',
+          'margin-top': '-2.5rem',
+          'margin-left': '-2.5rem',
+          'box-sizing': 'border-box',
+          'padding': isCompact() ? '.5rem 1rem' : '0',
+          'box-shadow': isCompact() ? '0 4px 5px -4px rgba(0, 0, 0, .24)' : 'none',
+          'transition': 'padding 250ms ease, box-shadow 250ms ease',
         }}
       >
-        <StudentButton />
-      </Flexbox> */}
-    </Flexbox>
+        <h1 style={{
+          ...style.group.title,
+          'font-size': isCompact() ? '2rem' : 'clamp(2rem, 7vw, 5rem)',
+          'line-height': '1.1',
+          'padding': '0',
+          'margin': '0',
+          'transition': 'font-size 250ms ease',
+        }}>Memory Trainer</h1>
+        {props.children}
+      </header>
+      <Show when={isTraining()}>
+        <h2
+          style={{
+            ...style.group.baseText,
+            'font-size': '1.3rem',
+            'align-self': 'center',
+            'width': 'fit-content',
+            'margin': '.5rem auto 0',
+            'padding': '.35rem .75rem',
+            'border-radius': '.5rem',
+            'background-color': 'rgba(255, 255, 255, .55)',
+            'box-shadow': '0 2px 6px rgba(0, 0, 0, .12)',
+            'opacity': '1',
+            'transition': 'opacity 250ms ease',
+          }}
+        >
+          {quiz.title}
+        </h2>
+      </Show>
+    </>
   )
 }
 
@@ -226,14 +259,14 @@ function ProfileButton(props: ProfileButtonProps) {
       alt="Profile Icon"
       style={{
         'border-radius': '50%',
-        'width': '50px',
-        'height': '50px',
+        'width': '32px',
+        'height': '32px',
         'object-fit': 'cover',
       }}
       elementtiming=""
       fetchpriority="auto"
     /> :
-    style.iconography.user;
+    style.iconography.user();
 
   var dialogRef: HTMLDialogElement | undefined;
 
@@ -250,10 +283,12 @@ function ProfileButton(props: ProfileButtonProps) {
       <article
         style={{
           ...style.group.border,
-          'padding': '1rem',
-          'position': 'fixed',
-          'bottom': '2rem',
-          'left': '3rem',
+          'padding': '.25rem',
+          'position': 'absolute',
+          'top': '50%',
+          'right': '1rem',
+          'transform': 'translateY(-50%) scale(.75)',
+          'transform-origin': 'right center',
           'display': 'inline-flex',
           'align-items': 'center',
           'cursor': 'pointer',
@@ -266,11 +301,11 @@ function ProfileButton(props: ProfileButtonProps) {
         <div
           style={{
             ...style.group.border,
-            'padding': '10px',
+            'padding': '5px',
             'display': 'flex',
             'align-items': 'center',
             'justify-content': 'center',
-            'margin-right': '1rem',
+            'margin-right': '.5rem',
             'border-radius': '50%',
             'background-color': style.color.contentBackground,
 
@@ -281,7 +316,8 @@ function ProfileButton(props: ProfileButtonProps) {
 
         <span
           style={{
-            ...style.group.baseText,
+            'font-family': `${style.typography.typeface.primary}, ${style.typography.typeface.secondary}`,
+            'font-size': '1rem',
             'color': style.color.secondary,
           }}
         >
@@ -351,7 +387,7 @@ function CreateProfileDialog(props: CreateProfileDialogProps) {
           props.dialogRef?.close()
         }}
       >
-        {style.iconography.close}
+        {style.iconography.close()}
       </button>
 
       <h2 style={{
@@ -418,7 +454,7 @@ function SelectProfileDialog(props: SelectProfileDialogProps) {
         dialogRef?.close()
       }}
     >
-      {style.iconography.close}
+      {style.iconography.close()}
     </button>
 
     <h2 style={{
